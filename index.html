@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Método Híbrido - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+  <!-- Iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      /* Damos un padding simétrico arriba y abajo */
+      padding: 0rem 0;
+      background-color: #000000;
+      color: #000000;
+      font-family: "Montserrat", sans-serif;
+      background-attachment: fixed;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 480px;
+      /* Padding vertical reducido para móviles */
+      padding: 2px 22px 30px;
+      text-align: center;
+      margin: 0 auto;
+      /* <-- Esto ahora es el único método de centrado horizontal */
+    }
+
+    /* Logo */
+    .logo-img {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto 18px auto;
+      display: block;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) contrast(130%);
+      /* <-- AÑADIDO: contraste */
+      user-select: none;
+    }
+
+    .tagline {
+      margin-top: 4px;
+      font-size: 28px;
+      font-weight: 600;
+      color: #aaaaaa;
+      text-shadow: 0 0 4px rgba(255, 193, 7, 0.8);
+    }
+
+    .mentzer {
+      margin-top: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 200;
+      /* fino elegante */
+      font-size: 23px;
+      /* un pelín más grande */
+      letter-spacing: 1px;
+      color: #d0d0d0;
+      /* gris elegante metalizado */
+      text-transform: uppercase;
+      text-shadow: 0 0 0px rgba(0, 0, 0, 0.0);
+    }
+
+    /* MENÚ */
+    .menu {
+      margin-top: 35px;
+      /* Reducido de 32px */
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      /* Reducido de 16px */
+    }
+
+    .menu-btn {
+      display: flex;
+      flex-direction: row;
+      /* icono a la izquierda, texto a la derecha */
+      justify-content: center;
+      /* centra el conjunto icono+texto */
+      align-items: center;
+      /* los alinea verticalmente */
+      gap: 16px;
+      /* separación icono-texto */
+
+      padding: 12px 20px;
+      /* Padding vertical reducido de 20px a 16px */
+      border-radius: 20px;
+      text-decoration: none;
+
+      background: #111;
+      color: #e5e5e5;
+
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+
+      box-shadow:
+        0 6px 0 #000,
+        0 0 0 1px rgba(255, 255, 255, 0.05);
+
+      transition: 0.12s ease-out;
+    }
+
+    .menu-btn:hover {
+      background: #161616;
+      transform: translateY(2px);
+      box-shadow:
+        0 3px 0 #000,
+        0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-btn-icon {
+      font-size: 24px;
+      /* Reducido de 28px */
+      /* margin-bottom: 8px; -> Eliminado, 'gap' y 'align-items' se encargan */
+      color: #e0dfdc;
+    }
+
+    .label {
+      font-size: 0.9rem;
+      /* Ligeramente más pequeño para móviles */
+    }
+
+    /* Media query para pantallas muy pequeñas */
+    @media (max-height: 700px) {
+      .tagline {
+        font-size: 32px;
+        /* Reducir título */
+      }
+
+      .mentzer {
+        font-size: 22px;
+        /* Reducir subtítulo */
+      }
+
+      .wrapper {
+        padding-top: 15px;
+        padding-bottom: 15px;
+      }
+
+      .menu {
+        margin-top: 20px;
+        gap: 10px;
+      }
+
+      .menu-btn {
+        padding: 14px 18px;
+      }
+
+      .menu-btn-icon {
+        font-size: 22px;
+      }
+    }
+
+    /* --- INICIO: Botón de Chat Fijo --- */
+    .chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #FFC107; /* Color ámbar, similar al de la sombra del título */
+      color: #000; /* Texto/icono negro para contraste */
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease-out, background-color 0.2s ease;
+      z-index: 1000;
+    }
+
+    .chat-button:hover {
+      background-color: #ffd040; /* Un poco más claro al pasar el ratón */
+      transform: scale(1.05);
+    }
+    /* --- FIN: Botón de Chat Fijo --- */
+
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+
+    <!-- LOGO REAL -->
+    <img src="https://yaril.netlify.app/logo.jpg" alt="Método Híbrido Logo" class="logo-img">
+
+    <div class="tagline">
+      Fuerza e hipertrofia <br>
+      <span class="mentzer">Mentzer & Bilbo</span>
+    </div>
+    <!-- MENÚ -->
+    <nav class="menu">
+
+      <a class='menu-btn' href='/test'>
+        <i class="fa-solid fa-star menu-btn-icon"></i>
+        <span class="label">Test Inicial</span>
+      </a>
+
+      <a class='menu-btn' href='/entreno'>
+        <i class="fa-solid fa-dumbbell menu-btn-icon"></i>
+        <span class="label">Entreno</span>
+      </a>
+
+      <a class='menu-btn' href='/progreso'>
+        <i class="fa-solid fa-chart-line menu-btn-icon"></i>
+        <span class="label">Progreso</span>
+      </a>
+
+      <a class='menu-btn' href='/nutricion'>
+        <i class="fa-solid fa-utensils menu-btn-icon"></i>
+        <span class="label">Nutrición</span>
+      </a>
+
+      <a class="menu-btn" href="metodo.html">
+        <i class="fa-solid fa-book-open menu-btn-icon"></i>
+        <span class="label">El método</span>
+      </a>
+
+      <a class='menu-btn' href='/ajustes'>
+        <i class="fa-solid fa-gear menu-btn-icon"></i>
+        <span class="label">Ajustes</span>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- Botón de Chat Fijo -->
+  <a href="chat.html" class="chat-button" aria-label="Abrir chat">
+    <i class="fa-solid fa-comments"></i>
+  </a>
+
+</body>
+</html>
