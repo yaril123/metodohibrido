@@ -18,7 +18,6 @@
 
     body {
       min-height: 100vh;
-      /* Damos un padding simétrico arriba y abajo */
       padding: 0rem 0;
       background-color: #000000;
       color: #000000;
@@ -29,11 +28,9 @@
     .wrapper {
       width: 100%;
       max-width: 480px;
-      /* Padding vertical reducido para móviles */
       padding: 2px 22px 30px;
       text-align: center;
       margin: 0 auto;
-      /* <-- Esto ahora es el único método de centrado horizontal */
     }
 
     /* Logo */
@@ -43,7 +40,6 @@
       margin: 0 auto 18px auto;
       display: block;
       filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) contrast(130%);
-      /* <-- AÑADIDO: contraste */
       user-select: none;
     }
 
@@ -59,114 +55,144 @@
       margin-top: 4px;
       font-family: 'Montserrat', sans-serif;
       font-weight: 200;
-      /* fino elegante */
       font-size: 23px;
-      /* un pelín más grande */
       letter-spacing: 1px;
       color: #d0d0d0;
-      /* gris elegante metalizado */
       text-transform: uppercase;
       text-shadow: 0 0 0px rgba(0, 0, 0, 0.0);
     }
 
+    /* Perfil de Usuario / Login */
+    .user-section {
+      margin-top: 20px;
+      padding: 10px;
+      background: #111;
+      border-radius: 12px;
+      border: 1px solid #333;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-info {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #333;
+    }
+
+    .auth-btn {
+      background-color: #FFC107;
+      color: #000;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: transform 0.1s;
+      text-transform: uppercase;
+    }
+    
+    .auth-btn.logout {
+      background-color: #333;
+      color: #fff;
+      font-size: 0.8rem;
+    }
+
+    .auth-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .sync-status {
+      font-size: 0.75rem;
+      color: #888;
+      margin-top: 5px;
+      height: 20px; /* Espacio reservado */
+    }
+
     /* MENÚ */
     .menu {
-      margin-top: 35px;
-      /* Reducido de 32px */
+      margin-top: 25px;
       display: flex;
       flex-direction: column;
       gap: 12px;
-      /* Reducido de 16px */
     }
 
     .menu-btn {
       display: flex;
       flex-direction: row;
-      /* icono a la izquierda, texto a la derecha */
       justify-content: center;
-      /* centra el conjunto icono+texto */
       align-items: center;
-      /* los alinea verticalmente */
       gap: 16px;
-      /* separación icono-texto */
-
       padding: 12px 20px;
-      /* Padding vertical reducido de 20px a 16px */
       border-radius: 20px;
       text-decoration: none;
-
       background: #111;
       color: #e5e5e5;
-
       font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-
-      box-shadow:
-        0 6px 0 #000,
-        0 0 0 1px rgba(255, 255, 255, 0.05);
-
+      box-shadow: 0 6px 0 #000, 0 0 0 1px rgba(255, 255, 255, 0.05);
       transition: 0.12s ease-out;
+      cursor: pointer;
+      border: none; /* Para botones que no son enlaces */
+      width: 100%;
+      font-family: "Montserrat", sans-serif;
+      font-size: 1rem;
     }
 
     .menu-btn:hover {
       background: #161616;
       transform: translateY(2px);
-      box-shadow:
-        0 3px 0 #000,
-        0 0 0 1px rgba(255, 255, 255, 0.08);
+      box-shadow: 0 3px 0 #000, 0 0 0 1px rgba(255, 255, 255, 0.08);
     }
 
     .menu-btn-icon {
       font-size: 24px;
-      /* Reducido de 28px */
-      /* margin-bottom: 8px; -> Eliminado, 'gap' y 'align-items' se encargan */
       color: #e0dfdc;
+    }
+
+    /* Estilo especial para botón de sincronizar */
+    .menu-btn.sync-btn {
+      background: #1a1a1a;
+      border: 1px solid #FFC107;
+      color: #FFC107;
+    }
+    .menu-btn.sync-btn .menu-btn-icon {
+      color: #FFC107;
     }
 
     .label {
       font-size: 0.9rem;
-      /* Ligeramente más pequeño para móviles */
     }
 
-    /* Media query para pantallas muy pequeñas */
+    /* Media query */
     @media (max-height: 700px) {
-      .tagline {
-        font-size: 32px;
-        /* Reducir título */
-      }
-
-      .mentzer {
-        font-size: 22px;
-        /* Reducir subtítulo */
-      }
-
-      .wrapper {
-        padding-top: 15px;
-        padding-bottom: 15px;
-      }
-
-      .menu {
-        margin-top: 20px;
-        gap: 10px;
-      }
-
-      .menu-btn {
-        padding: 14px 18px;
-      }
-
-      .menu-btn-icon {
-        font-size: 22px;
-      }
+      .tagline { font-size: 32px; }
+      .mentzer { font-size: 22px; }
+      .wrapper { padding-top: 15px; padding-bottom: 15px; }
+      .menu { margin-top: 20px; gap: 10px; }
+      .menu-btn { padding: 14px 18px; }
+      .menu-btn-icon { font-size: 22px; }
     }
 
-    /* --- INICIO: Botón de Chat Fijo --- */
+    /* Chat Flotante */
     .chat-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background-color: #FFC107; /* Color ámbar, similar al de la sombra del título */
-      color: #000; /* Texto/icono negro para contraste */
+      background-color: #FFC107;
+      color: #000;
       width: 60px;
       height: 60px;
       border-radius: 50%;
@@ -181,15 +207,36 @@
     }
 
     .chat-button:hover {
-      background-color: #ffd040; /* Un poco más claro al pasar el ratón */
+      background-color: #ffd040;
       transform: scale(1.05);
     }
-    /* --- FIN: Botón de Chat Fijo --- */
-
+    
+    /* Modal simple para mensajes */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      border: 1px solid #FFC107;
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+    }
   </style>
 </head>
 
 <body>
+  <div id="toast" class="toast">Notificación</div>
+
   <div class="wrapper">
 
     <!-- LOGO REAL -->
@@ -199,6 +246,24 @@
       Fuerza e hipertrofia <br>
       <span class="mentzer">Mentzer & Bilbo</span>
     </div>
+
+    <!-- SECCIÓN DE USUARIO -->
+    <div class="user-section" id="userSection" style="display: none;">
+      <div class="user-info">
+        <img id="userPhoto" src="" alt="Avatar" class="user-avatar">
+        <span id="userName">Usuario</span>
+      </div>
+      <div class="sync-status" id="syncStatus"></div>
+      <button id="logoutBtn" class="auth-btn logout">Cerrar Sesión</button>
+    </div>
+
+    <div class="user-section" id="loginSection">
+      <span style="font-size: 0.8rem; margin-bottom: 5px;">Guarda tu progreso en la nube</span>
+      <button id="loginBtn" class="auth-btn">
+        <i class="fa-brands fa-google"></i> Entrar con Google
+      </button>
+    </div>
+
     <!-- MENÚ -->
     <nav class="menu">
 
@@ -231,6 +296,12 @@
         <i class="fa-solid fa-gear menu-btn-icon"></i>
         <span class="label">Ajustes</span>
       </a>
+      
+      <!-- BOTÓN DE SINCRONIZACIÓN MANUAL (Solo visible si logueado) -->
+      <button id="syncBtn" class="menu-btn sync-btn" style="display: none;">
+        <i class="fa-solid fa-cloud-arrow-up menu-btn-icon"></i>
+        <span class="label">Guardar Progreso</span>
+      </button>
 
     </nav>
 
@@ -241,5 +312,183 @@
     <i class="fa-solid fa-comments"></i>
   </a>
 
+  <!-- Scripts Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Configuración proporcionada
+    const firebaseConfig = {
+      apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
+      authDomain: "metodo-hibrido.firebaseapp.com",
+      projectId: "metodo-hibrido",
+      storageBucket: "metodo-hibrido.firebasestorage.app",
+      messagingSenderId: "982967728212",
+      appId: "1:982967728212:web:b27ea198c80601fc8315c1",
+      measurementId: "G-PETF3C4DM9"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // Elementos del DOM
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const syncBtn = document.getElementById('syncBtn');
+    const userSection = document.getElementById('userSection');
+    const loginSection = document.getElementById('loginSection');
+    const userNameSpan = document.getElementById('userName');
+    const userPhoto = document.getElementById('userPhoto');
+    const syncStatus = document.getElementById('syncStatus');
+    const toast = document.getElementById('toast');
+
+    // Helpers
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function updateStatus(msg) {
+      syncStatus.textContent = msg;
+    }
+
+    // --- LÓGICA DE SINCRONIZACIÓN ---
+
+    // 1. Subir LocalStorage a Firestore
+    async function uploadData(user) {
+      if (!user) return;
+      updateStatus("Guardando en la nube...");
+      
+      try {
+        // Convertir todo el localStorage a un objeto JSON
+        const allData = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          // Evitar guardar cosas internas de firebase
+          if (!key.startsWith('firebase:')) {
+            allData[key] = localStorage.getItem(key);
+          }
+        }
+        
+        allData.lastUpdated = new Date().toISOString(); // Marca de tiempo
+
+        // Guardar en Firestore: artifacts -> appID -> users -> uid -> document 'backup'
+        // Nota: Usamos la ruta requerida por las reglas de seguridad del sistema
+        const userDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'users', user.uid, 'backup');
+        
+        await setDoc(userDocRef, allData);
+        
+        updateStatus("Datos guardados correctamente.");
+        showToast("Progreso guardado en la nube");
+        setTimeout(() => updateStatus(""), 3000);
+      } catch (error) {
+        console.error("Error subiendo datos:", error);
+        updateStatus("Error al guardar.");
+        showToast("Error al guardar datos");
+      }
+    }
+
+    // 2. Descargar Firestore a LocalStorage
+    async function downloadData(user) {
+      if (!user) return;
+      updateStatus("Buscando datos guardados...");
+
+      try {
+        const userDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'users', user.uid, 'backup');
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+          updateStatus("Sincronizando datos...");
+          const data = docSnap.data();
+          
+          // Escribir en LocalStorage
+          Object.keys(data).forEach(key => {
+            if (key !== 'lastUpdated') {
+              localStorage.setItem(key, data[key]);
+            }
+          });
+          
+          updateStatus("Datos cargados.");
+          showToast("Datos recuperados de tu cuenta");
+        } else {
+          updateStatus("Cuenta nueva o sin datos.");
+          // Si no hay datos en la nube pero sí en local, quizás queramos subir lo local
+          if (localStorage.length > 0) {
+             // Opcional: Auto-upload inicial
+             // await uploadData(user);
+          }
+        }
+        setTimeout(() => updateStatus(""), 3000);
+      } catch (error) {
+        console.error("Error descargando datos:", error);
+        updateStatus("Error de sincronización.");
+      }
+    }
+
+    // --- EVENTOS DE AUTENTICACIÓN ---
+
+    loginBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          showToast("Sesión iniciada");
+          // La lógica de carga se maneja en onAuthStateChanged
+        }).catch((error) => {
+          console.error(error);
+          showToast("Error al iniciar sesión");
+        });
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      // Antes de salir, opcionalmente podríamos guardar
+      const user = auth.currentUser;
+      if(user) {
+          uploadData(user).then(() => {
+              signOut(auth).then(() => showToast("Sesión cerrada"));
+          });
+      } else {
+          signOut(auth);
+      }
+    });
+
+    syncBtn.addEventListener('click', () => {
+      const user = auth.currentUser;
+      if (user) {
+        uploadData(user);
+      } else {
+        showToast("Debes iniciar sesión primero");
+      }
+    });
+
+    // --- MONITOR DE ESTADO ---
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Usuario logueado
+        loginSection.style.display = 'none';
+        userSection.style.display = 'flex';
+        syncBtn.style.display = 'flex'; // Mostrar botón de guardar
+        
+        // Actualizar UI
+        userNameSpan.textContent = user.displayName || user.email;
+        userPhoto.src = user.photoURL || 'https://via.placeholder.com/30';
+
+        // *** AQUÍ OCURRE LA MAGIA: Al entrar, cargamos los datos ***
+        downloadData(user);
+
+      } else {
+        // Usuario fuera
+        loginSection.style.display = 'flex';
+        userSection.style.display = 'none';
+        syncBtn.style.display = 'none';
+        syncStatus.textContent = "";
+      }
+    });
+
+  </script>
 </body>
 </html>
