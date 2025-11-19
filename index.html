@@ -118,6 +118,10 @@
       color: #888;
       margin-top: 5px;
       height: 20px; /* Espacio reservado */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
     }
 
     /* MENÚ */
@@ -335,6 +339,9 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
+    // Usamos una ID segura para la ruta de la base de datos
+    const APP_STORAGE_ID = typeof __app_id !== 'undefined' ? __app_id : 'metodo-hibrido-data';
+
     // Elementos del DOM
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
@@ -350,11 +357,12 @@
     function showToast(msg) {
       toast.textContent = msg;
       toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      setTimeout(() => toast.classList.remove('show'), 4000);
     }
 
-    function updateStatus(msg) {
+    function updateStatus(msg, isError = false) {
       syncStatus.textContent = msg;
+      syncStatus.style.color = isError ? '#ff6b6b' : '#888';
     }
 
     // --- LÓGICA DE SINCRONIZACIÓN ---
@@ -377,33 +385,37 @@
         
         allData.lastUpdated = new Date().toISOString(); // Marca de tiempo
 
-        // Guardar en Firestore: artifacts -> appID -> users -> uid -> document 'backup'
-        // Nota: Usamos la ruta requerida por las reglas de seguridad del sistema
-        const userDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'users', user.uid, 'backup');
+        // RUTA CORREGIDA: artifacts -> APP_STORAGE_ID -> users -> uid -> backup
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'backup');
         
         await setDoc(userDocRef, allData);
         
-        updateStatus("Datos guardados correctamente.");
+        updateStatus("Guardado correctamente");
         showToast("Progreso guardado en la nube");
         setTimeout(() => updateStatus(""), 3000);
       } catch (error) {
         console.error("Error subiendo datos:", error);
-        updateStatus("Error al guardar.");
-        showToast("Error al guardar datos");
+        if (error.code === 'permission-denied') {
+          updateStatus("Error de permisos (Reglas)", true);
+          showToast("Faltan permisos en Firebase. Revisa las Reglas.");
+        } else {
+          updateStatus("Error al guardar", true);
+          showToast("Error: " + error.message);
+        }
       }
     }
 
     // 2. Descargar Firestore a LocalStorage
     async function downloadData(user) {
       if (!user) return;
-      updateStatus("Buscando datos guardados...");
+      updateStatus("Buscando datos...");
 
       try {
-        const userDocRef = doc(db, 'artifacts', firebaseConfig.appId, 'users', user.uid, 'backup');
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'backup');
         const docSnap = await getDoc(userDocRef);
 
         if (docSnap.exists()) {
-          updateStatus("Sincronizando datos...");
+          updateStatus("Sincronizando...");
           const data = docSnap.data();
           
           // Escribir en LocalStorage
@@ -413,20 +425,21 @@
             }
           });
           
-          updateStatus("Datos cargados.");
+          updateStatus("Datos cargados");
           showToast("Datos recuperados de tu cuenta");
         } else {
-          updateStatus("Cuenta nueva o sin datos.");
-          // Si no hay datos en la nube pero sí en local, quizás queramos subir lo local
-          if (localStorage.length > 0) {
-             // Opcional: Auto-upload inicial
-             // await uploadData(user);
-          }
+          updateStatus("Cuenta nueva / Sin backup");
+          // Opcional: Si es cuenta nueva, podríamos subir lo actual
         }
         setTimeout(() => updateStatus(""), 3000);
       } catch (error) {
         console.error("Error descargando datos:", error);
-        updateStatus("Error de sincronización.");
+        if (error.code === 'permission-denied') {
+            updateStatus("Error de permisos", true);
+            showToast("Error: Permiso denegado en base de datos.");
+        } else {
+            updateStatus("Error de conexión", true);
+        }
       }
     }
 
@@ -436,19 +449,21 @@
       signInWithPopup(auth, provider)
         .then((result) => {
           showToast("Sesión iniciada");
-          // La lógica de carga se maneja en onAuthStateChanged
         }).catch((error) => {
           console.error(error);
-          showToast("Error al iniciar sesión");
+          showToast("Error Login: " + error.message);
         });
     });
 
     logoutBtn.addEventListener('click', () => {
-      // Antes de salir, opcionalmente podríamos guardar
       const user = auth.currentUser;
       if(user) {
-          uploadData(user).then(() => {
-              signOut(auth).then(() => showToast("Sesión cerrada"));
+          // Intentamos guardar antes de salir
+          uploadData(user).finally(() => {
+              signOut(auth).then(() => {
+                showToast("Sesión cerrada");
+                updateStatus("");
+              });
           });
       } else {
           signOut(auth);
@@ -471,13 +486,13 @@
         // Usuario logueado
         loginSection.style.display = 'none';
         userSection.style.display = 'flex';
-        syncBtn.style.display = 'flex'; // Mostrar botón de guardar
+        syncBtn.style.display = 'flex'; 
         
         // Actualizar UI
-        userNameSpan.textContent = user.displayName || user.email;
+        userNameSpan.textContent = user.displayName || user.email.split('@')[0];
         userPhoto.src = user.photoURL || 'https://via.placeholder.com/30';
 
-        // *** AQUÍ OCURRE LA MAGIA: Al entrar, cargamos los datos ***
+        // Cargar datos
         downloadData(user);
 
       } else {
