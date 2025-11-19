@@ -422,6 +422,10 @@
 
     // Estado Interno para Auto-Save
     let lastSyncedData = ""; // Para comparar cambios
+    
+    // --- NUEVO: Variable de Seguridad ---
+    // Bloquea cualquier subida hasta que sepamos qué hay en la nube.
+    let isInitialSyncComplete = false; 
 
     // --- UI HELPERS ---
     function toggleDropdown() {
@@ -476,12 +480,20 @@
     // 1. Subir (Solo si hay cambios o forzado)
     async function uploadData(user, force = false) {
       if (!user) return;
+
+      // --- NUEVO: BLOQUEO DE SEGURIDAD ---
+      // Si aún no hemos terminado de revisar la nube al entrar, PROHIBIDO SUBIR.
+      // Esto evita que un localStorage vacío sobrescriba una cuenta llena.
+      if (!isInitialSyncComplete) {
+        console.warn("Subida bloqueada: esperando sincronización inicial.");
+        return;
+      }
       
       const currentDataString = getLocalStorageString();
       
       // Si no es forzado y los datos son idénticos a lo último sincronizado, no hacemos nada
       if (!force && currentDataString === lastSyncedData) {
-        console.log("Sin cambios detectados, omitiendo subida.");
+        // console.log("Sin cambios detectados, omitiendo subida.");
         setStatus('synced');
         return;
       }
@@ -509,6 +521,7 @@
     async function downloadData(user) {
       if (!user) return;
       setStatus('syncing');
+      console.log("Iniciando descarga de seguridad...");
 
       try {
         const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'data', 'backup');
@@ -517,21 +530,34 @@
         if (docSnap.exists()) {
           const data = docSnap.data();
           
-          // Aplicar al localStorage
+          // Aplicar al localStorage (Sobrescribimos lo local con lo de la nube)
           Object.keys(data).forEach(key => {
             if (key !== 'lastUpdated') {
               localStorage.setItem(key, data[key]);
             }
           });
-          
-          console.log("Datos descargados.");
+          console.log("Datos de la nube aplicados al dispositivo.");
+        } else {
+          console.log("Cuenta nueva o sin datos en la nube. Manteniendo datos locales.");
+          // Si no hay nada en la nube, es seguro subir lo que tenemos ahora
         }
-        // Actualizamos nuestra referencia "limpia" para que no se detecte como cambio pendiente
+
+        // --- IMPORTANTE: MARCAMOS COMO SEGURO ---
+        // Solo ahora permitimos que el autoguardado funcione
         lastSyncedData = getLocalStorageString();
+        isInitialSyncComplete = true; 
         setStatus('synced');
+
+        // Si era cuenta nueva y teníamos datos locales, los subimos ahora
+        if (!docSnap.exists() && localStorage.length > 0) {
+             uploadData(user, true);
+        }
+
       } catch (error) {
         console.error("Error descargando:", error);
         setStatus('error');
+        // Si falla la descarga (por internet), NO activamos isInitialSyncComplete
+        // para proteger los datos de la nube de ser sobrescritos por error.
       }
     }
 
@@ -549,6 +575,7 @@
       uploadData(user, true).finally(() => {
         signOut(auth);
         profileDropdown.classList.remove('active');
+        window.location.reload(); // Recargar para limpiar estado visual
       });
     });
 
@@ -577,6 +604,9 @@
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
+        // Reiniciamos el cerrojo al entrar
+        isInitialSyncComplete = false;
+
         // UI Logueado
         loggedInMenu.style.display = 'block';
         loggedOutMenu.style.display = 'none';
@@ -597,6 +627,7 @@
         statusDot.className = 'status-dot'; // Gris
         
         lastSyncedData = ""; // Reset
+        isInitialSyncComplete = false;
       }
     });
 
