@@ -385,8 +385,8 @@
         
         allData.lastUpdated = new Date().toISOString(); // Marca de tiempo
 
-        // RUTA CORREGIDA: artifacts -> APP_STORAGE_ID -> users -> uid -> backup
-        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'backup');
+        // RUTA CORREGIDA: artifacts -> ID -> users -> UID -> data -> backup (6 segmentos, PAR)
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'data', 'backup');
         
         await setDoc(userDocRef, allData);
         
@@ -411,7 +411,8 @@
       updateStatus("Buscando datos...");
 
       try {
-        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'backup');
+        // RUTA CORREGIDA: artifacts -> ID -> users -> UID -> data -> backup (6 segmentos, PAR)
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'data', 'backup');
         const docSnap = await getDoc(userDocRef);
 
         if (docSnap.exists()) {
@@ -439,6 +440,7 @@
             showToast("Error: Permiso denegado en base de datos.");
         } else {
             updateStatus("Error de conexión", true);
+            showToast("Error: " + error.message);
         }
       }
     }
