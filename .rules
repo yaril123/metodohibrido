@@ -1,9 +1,0 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
-  authDomain: "metodo-hibrido.firebaseapp.com",
-  projectId: "metodo-hibrido",
-  storageBucket: "metodo-hibrido.firebasestorage.app",
-  messagingSenderId: "982967728212",
-  appId: "1:982967728212:web:b27ea198c80601fc8315c1",
-  measurementId: "G-PETF3C4DM9"
-};
