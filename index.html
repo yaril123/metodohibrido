@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Método Híbrido - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fuente -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+  <!-- Iconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      padding: 0;
+      background-color: #000000;
+      color: #000000;
+      font-family: "Montserrat", sans-serif;
+      background-attachment: fixed;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 480px;
+      padding: 2px 22px 30px;
+      text-align: center;
+      margin: 0 auto;
+      padding-top: 40px; /* Espacio para el header flotante */
+    }
+
+    /* Logo */
+    .logo-img {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto 18px auto;
+      display: block;
+      filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7)) contrast(130%);
+      user-select: none;
+    }
+
+    .tagline {
+      margin-top: 4px;
+      font-size: 28px;
+      font-weight: 600;
+      color: #aaaaaa;
+      text-shadow: 0 0 4px rgba(255, 193, 7, 0.8);
+    }
+
+    .mentzer {
+      margin-top: 4px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 200;
+      font-size: 23px;
+      letter-spacing: 1px;
+      color: #d0d0d0;
+      text-transform: uppercase;
+      text-shadow: 0 0 0px rgba(0, 0, 0, 0.0);
+    }
+
+    /* --- PERFIL FLOTANTE (Top Right) --- */
+    .profile-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+    }
+
+    .profile-trigger {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #222;
+      border: 2px solid #333;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s, border-color 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #aaa;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .profile-trigger:hover {
+      transform: scale(1.05);
+      border-color: #FFC107;
+      color: #FFC107;
+    }
+
+    .profile-trigger img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Punto de estado (Sincronización) */
+    .status-dot {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: #666; /* Gris por defecto */
+      border: 2px solid #000;
+      transition: background-color 0.3s;
+    }
+    .status-dot.syncing { background-color: #FFC107; animation: pulse 1s infinite; } /* Amarillo */
+    .status-dot.synced { background-color: #4CAF50; } /* Verde */
+    .status-dot.error { background-color: #F44336; } /* Rojo */
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Menú Desplegable del Perfil */
+    .profile-dropdown {
+      position: absolute;
+      top: 65px;
+      right: 0;
+      width: 220px;
+      background-color: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      padding: 10px;
+      display: none; /* Oculto por defecto */
+      flex-direction: column;
+      gap: 8px;
+      transform-origin: top right;
+      animation: scaleIn 0.2s ease forwards;
+    }
+
+    .profile-dropdown.active {
+      display: flex;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .dropdown-header {
+      padding: 5px 10px;
+      border-bottom: 1px solid #333;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    .dropdown-user-name {
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: block;
+    }
+
+    .dropdown-status-text {
+      color: #888;
+      font-size: 0.75rem;
+      margin-top: 2px;
+      display: block;
+    }
+
+    .dropdown-item {
+      background: transparent;
+      border: none;
+      color: #ddd;
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .dropdown-item:hover {
+      background-color: #2a2a2a;
+      color: #FFC107;
+    }
+
+    .dropdown-item.logout {
+      color: #ff6b6b;
+    }
+    .dropdown-item.logout:hover {
+      background-color: #2a1111;
+    }
+
+    /* --- FIN PERFIL FLOTANTE --- */
+
+    /* MENÚ PRINCIPAL */
+    .menu {
+      margin-top: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .menu-btn {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      background: #111;
+      color: #e5e5e5;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 6px 0 #000, 0 0 0 1px rgba(255, 255, 255, 0.05);
+      transition: 0.12s ease-out;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      font-family: "Montserrat", sans-serif;
+      font-size: 1rem;
+    }
+
+    .menu-btn:hover {
+      background: #161616;
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #000, 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .menu-btn-icon {
+      font-size: 24px;
+      color: #e0dfdc;
+    }
+
+    .label {
+      font-size: 0.9rem;
+    }
+
+    /* Media query */
+    @media (max-height: 700px) {
+      .tagline { font-size: 32px; }
+      .mentzer { font-size: 22px; }
+      .wrapper { padding-top: 30px; padding-bottom: 15px; }
+      .menu { margin-top: 20px; gap: 10px; }
+      .menu-btn { padding: 14px 18px; }
+      .menu-btn-icon { font-size: 22px; }
+    }
+
+    /* Chat Flotante */
+    .chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #FFC107;
+      color: #000;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease-out, background-color 0.2s ease;
+      z-index: 1000;
+    }
+
+    .chat-button:hover {
+      background-color: #ffd040;
+      transform: scale(1.05);
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- PERFIL FLOTANTE -->
+  <div class="profile-container">
+    <!-- Botón Redondo del Perfil -->
+    <div id="profileTrigger" class="profile-trigger">
+      <i id="defaultUserIcon" class="fa-solid fa-user"></i>
+      <img id="userPhoto" src="" alt="Perfil" style="display: none;">
+      <!-- Indicador de estado (Verde/Amarillo/Rojo) -->
+      <div id="statusDot" class="status-dot"></div>
+    </div>
+
+    <!-- Dropdown de Ajustes -->
+    <div id="profileDropdown" class="profile-dropdown">
+      
+      <!-- Estado LOGIN: Mostrar info y logout -->
+      <div id="loggedInMenu" style="display: none;">
+        <div class="dropdown-header">
+          <span id="dropdownUserName" class="dropdown-user-name">Usuario</span>
+          <span id="dropdownStatusText" class="dropdown-status-text">Conectado</span>
+        </div>
+        <button id="manualSyncBtn" class="dropdown-item">
+          <i class="fa-solid fa-rotate"></i> Sincronizar ahora
+        </button>
+        <button id="logoutBtn" class="dropdown-item logout">
+          <i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- Estado LOGOUT: Mostrar botón login -->
+      <div id="loggedOutMenu">
+        <div class="dropdown-header">
+          <span class="dropdown-user-name">Invitado</span>
+          <span class="dropdown-status-text">Sin sincronización</span>
+        </div>
+        <button id="loginBtn" class="dropdown-item" style="color: #FFC107;">
+          <i class="fa-brands fa-google"></i> Entrar con Google
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="wrapper">
+
+    <!-- LOGO REAL -->
+    <img src="Logo.jpg" onerror="this.src='https://yaril123.github.io/metodohibrido/Logo.jpg'" alt="Método Híbrido Logo" class="logo-img">
+
+    <div class="tagline">
+      Fuerza e hipertrofia <br>
+      <span class="mentzer">Mentzer & Bilbo</span>
+    </div>
+
+    <!-- MENÚ -->
+    <nav class="menu">
+
+      <a class='menu-btn' href='/metodohibrido/test'>
+        <i class="fa-solid fa-star menu-btn-icon"></i>
+        <span class="label">Test Inicial</span>
+      </a>
+
+      <a class='menu-btn' href='/metodohibrido/entreno'>
+        <i class="fa-solid fa-dumbbell menu-btn-icon"></i>
+        <span class="label">Entreno</span>
+      </a>
+
+      <a class='menu-btn' href='/metodohibrido/progreso'>
+        <i class="fa-solid fa-chart-line menu-btn-icon"></i>
+        <span class="label">Progreso</span>
+      </a>
+
+      <a class='menu-btn' href='/metodohibrido/nutricion'>
+        <i class="fa-solid fa-utensils menu-btn-icon"></i>
+        <span class="label">Nutrición</span>
+      </a>
+
+      <a class="menu-btn" href="/metodohibrido/metodo.html">
+        <i class="fa-solid fa-book-open menu-btn-icon"></i>
+        <span class="label">El método</span>
+      </a>
+
+      <a class='menu-btn' href='/metodohibrido/ajustes'>
+        <i class="fa-solid fa-gear menu-btn-icon"></i>
+        <span class="label">Ajustes</span>
+      </a>
+
+    </nav>
+
+  </div>
+
+  <!-- Botón de Chat Fijo -->
+  <a href="chat.html" class="chat-button" aria-label="Abrir chat">
+    <i class="fa-solid fa-comments"></i>
+  </a>
+
+  <!-- Scripts Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
+      authDomain: "metodo-hibrido.firebaseapp.com",
+      projectId: "metodo-hibrido",
+      storageBucket: "metodo-hibrido.firebasestorage.app",
+      messagingSenderId: "982967728212",
+      appId: "1:982967728212:web:b27ea198c80601fc8315c1",
+      measurementId: "G-PETF3C4DM9"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+    const APP_STORAGE_ID = typeof __app_id !== 'undefined' ? __app_id : 'metodo-hibrido-data';
+
+    // Elementos UI
+    const profileTrigger = document.getElementById('profileTrigger');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const defaultUserIcon = document.getElementById('defaultUserIcon');
+    const userPhoto = document.getElementById('userPhoto');
+    const statusDot = document.getElementById('statusDot');
+    
+    const loggedInMenu = document.getElementById('loggedInMenu');
+    const loggedOutMenu = document.getElementById('loggedOutMenu');
+    
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const manualSyncBtn = document.getElementById('manualSyncBtn');
+    
+    const dropdownUserName = document.getElementById('dropdownUserName');
+    const dropdownStatusText = document.getElementById('dropdownStatusText');
+
+    // Estado Interno
+    let lastSyncedData = "";
+    let isInitialSyncComplete = false; 
+
+    // --- UI HELPERS ---
+    function toggleDropdown() {
+      const isVisible = profileDropdown.classList.contains('active');
+      if (isVisible) profileDropdown.classList.remove('active');
+      else profileDropdown.classList.add('active');
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!profileTrigger.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileDropdown.classList.remove('active');
+      }
+    });
+
+    profileTrigger.addEventListener('click', toggleDropdown);
+
+    function setStatus(state) {
+      statusDot.className = 'status-dot'; // Reset
+      if (state === 'syncing') {
+        statusDot.classList.add('syncing');
+        dropdownStatusText.textContent = "Guardando...";
+      } else if (state === 'synced') {
+        statusDot.classList.add('synced');
+        dropdownStatusText.textContent = "Todo sincronizado";
+      } else if (state === 'error') {
+        statusDot.classList.add('error');
+        dropdownStatusText.textContent = "Error de sincronización";
+      } else {
+        dropdownStatusText.textContent = "Sin conexión";
+      }
+    }
+
+    // --- CORE LOGIC ---
+
+    function getLocalStorageString() {
+      const allData = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key.startsWith('firebase:')) {
+          allData[key] = localStorage.getItem(key);
+        }
+      }
+      return JSON.stringify(Object.keys(allData).sort().reduce((obj, key) => { 
+        obj[key] = allData[key]; 
+        return obj;
+      }, {}));
+    }
+
+    // 1. Subir (Upload)
+    async function uploadData(user, force = false) {
+      if (!user) return;
+
+      // PROTECCIÓN: No subir si no hemos verificado la nube primero
+      if (!isInitialSyncComplete && !force) {
+        console.warn("Subida bloqueada: esperando sincronización inicial.");
+        return;
+      }
+      
+      const currentDataString = getLocalStorageString();
+      
+      if (!force && currentDataString === lastSyncedData) {
+        setStatus('synced');
+        return;
+      }
+
+      setStatus('syncing');
+      
+      try {
+        const allData = JSON.parse(currentDataString);
+        // Marcamos la hora exacta de la subida
+        allData.lastUpdated = new Date().toISOString();
+
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'data', 'backup');
+        await setDoc(userDocRef, allData);
+        
+        // IMPORTANTE: Guardar también en localStorage que estamos actualizados
+        localStorage.setItem('lastUpdated', allData.lastUpdated);
+
+        lastSyncedData = getLocalStorageString(); // Actualizamos referencia
+        setStatus('synced');
+        console.log("Datos subidos correctamente.");
+      } catch (error) {
+        console.error("Error subiendo:", error);
+        setStatus('error');
+      }
+    }
+
+    // 2. Descargar (Download) con RESOLUCIÓN DE CONFLICTOS
+    async function downloadData(user) {
+      if (!user) return;
+      setStatus('syncing');
+      console.log("Iniciando verificación de nube...");
+
+      try {
+        const userDocRef = doc(db, 'artifacts', APP_STORAGE_ID, 'users', user.uid, 'data', 'backup');
+        const docSnap = await getDoc(userDocRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data();
+          const localTimestampStr = localStorage.getItem('lastUpdated');
+          
+          let cloudTime = 0;
+          let localTime = 0;
+
+          if (cloudData.lastUpdated) cloudTime = new Date(cloudData.lastUpdated).getTime();
+          if (localTimestampStr) localTime = new Date(localTimestampStr).getTime();
+
+          console.log(`Cloud Date: ${cloudTime}, Local Date: ${localTime}`);
+
+          // --- LOGICA DE DECISIÓN ---
+          
+          if (localTime > cloudTime) {
+            // CASO 1: LOCAL ES MÁS NUEVO (Trabajo offline)
+            // No sobrescribimos. Al revés, forzamos subida de lo local a la nube.
+            console.log("Conflicto: El dispositivo tiene datos más recientes. Subiendo a la nube...");
+            isInitialSyncComplete = true; // Permitir subida
+            await uploadData(user, true); // Forzar subida
+            
+          } else if (cloudTime > localTime || !localTime) {
+            // CASO 2: NUBE ES MÁS NUEVA (O dispositivo nuevo)
+            // Sobrescribimos local con la nube.
+            console.log("Nube más reciente. Actualizando dispositivo...");
+            
+            // Limpieza: Borrar claves locales que no estén en la nube (para reflejar borrados)
+            // Nota: No borramos claves de firebase
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (!key.startsWith('firebase:') && !cloudData.hasOwnProperty(key) && key !== 'lastUpdated') {
+                keysToRemove.push(key);
+              }
+            }
+            keysToRemove.forEach(k => localStorage.removeItem(k));
+
+            // Aplicar datos nube
+            Object.keys(cloudData).forEach(key => {
+              // lastUpdated lo guardamos explícitamente, el resto normal
+              localStorage.setItem(key, cloudData[key]);
+            });
+            
+            console.log("Datos de la nube aplicados.");
+          } else {
+             console.log("Datos sincronizados. No se requieren cambios.");
+          }
+
+        } else {
+          console.log("Cuenta nueva o sin datos en la nube. Subiendo datos locales iniciales.");
+          // Si no hay nada en la nube, subimos lo que tenemos (si tenemos algo)
+          if (localStorage.length > 0) {
+             isInitialSyncComplete = true;
+             await uploadData(user, true);
+          }
+        }
+
+        lastSyncedData = getLocalStorageString();
+        isInitialSyncComplete = true; 
+        setStatus('synced');
+
+      } catch (error) {
+        console.error("Error descargando:", error);
+        setStatus('error');
+      }
+    }
+
+    // --- EVENTOS ---
+
+    loginBtn.addEventListener('click', () => {
+      signInWithPopup(auth, provider).then(() => {
+        profileDropdown.classList.remove('active');
+      }).catch(e => console.error(e));
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      const user = auth.currentUser;
+      uploadData(user, true).finally(() => {
+        signOut(auth);
+        profileDropdown.classList.remove('active');
+        window.location.reload(); 
+      });
+    });
+
+    manualSyncBtn.addEventListener('click', () => {
+      const user = auth.currentUser;
+      if(user) downloadData(user); // Manual sync should check cloud first!
+    });
+
+    // AUTO-SAVE
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === 'hidden') {
+        const user = auth.currentUser;
+        if (user) uploadData(user);
+      }
+    });
+    
+    setInterval(() => {
+       const user = auth.currentUser;
+       if (user) uploadData(user); 
+    }, 30000);
+
+
+    // --- AUTH MONITOR ---
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        isInitialSyncComplete = false;
+
+        // UI Logueado
+        loggedInMenu.style.display = 'block';
+        loggedOutMenu.style.display = 'none';
+        defaultUserIcon.style.display = 'none';
+        userPhoto.style.display = 'block';
+        userPhoto.src = user.photoURL || 'https://via.placeholder.com/50';
+        dropdownUserName.textContent = user.displayName || "Usuario";
+        
+        downloadData(user);
+
+      } else {
+        // UI No Logueado
+        loggedInMenu.style.display = 'none';
+        loggedOutMenu.style.display = 'block';
+        defaultUserIcon.style.display = 'block';
+        userPhoto.style.display = 'none';
+        statusDot.className = 'status-dot';
+        
+        lastSyncedData = "";
+        isInitialSyncComplete = false;
+      }
+    });
+
+  </script>
+</body>
+</html>

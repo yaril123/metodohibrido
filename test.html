@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Inicial - Método Híbrido</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos base (los mismos de nutricion.html) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0D;
+            color: #E0E0E0;
+        }
+        .card {
+            background-color: #18181b;
+            border: 1px solid #3f3f46;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+        .form-input {
+            background-color: #0D0D0D;
+            border: 1px solid #3f3f46;
+            color: #E0E0E0;
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3);
+        }
+        .save-button {
+            background: linear-gradient(90deg, #facc15, #ca8a04);
+            color: #18181b;
+            font-weight: 700;
+            border: 1px solid #a16207;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .save-button:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(250, 204, 21, 0.1);
+        }
+        .nav-button {
+            display: inline-block;
+            width: 100%;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #3f3f46;
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-button:hover {
+            background-color: #52525b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        /* Animación */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+        
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Test Inicial</h1>
+            <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Método Bilbo (Lombardi)</p>
+        </header>
+
+        <!-- NUEVO: Instrucciones del Test -->
+        <div class="card mb-6 space-y-4 text-gray-300">
+            <h3 class="text-xl font-bold text-white">Antes de comenzar...</h3>
+            <p>Antes de comenzar a entrenar vamos a hacer un test para saber por donde tenemos que comenzar.</p>
+            <p>Estos son los ejercicios que vamos a realizar en el test:</p>
+            <ul style="list-style-type: disc; padding-left: 40px;">
+                <li>Press de banca plano (barra)</li>
+                <li>Jalón en polea agarre neutro</li>
+                <li>Jalón al pecho agarre estrecho</li>
+                <li>Curl en barra Z</li>
+            </ul>
+
+            <ol class="list-decimal list-inside space-y-2 pl-2">
+                <li>Calienta las articulaciones y músculos durante unos minutos.</li>
+                <li>Busca un peso que puedas cargar <strong class="text-yellow-400">entre 15 y 50 repeticiones</strong>, preferiblemente <strong class="text-yellow-400">30</strong> para el test. Pero aún, no hagas nada con el.</li>
+                <li>Antes de realizar la serie que contará para nuestro test, haz cada ejercicio con la mitad de peso del que vas a cargar en la serie objetivo y realiza de 8 a 10 repeticiones, lentas y técnicas. La idea es calentar los músculos, no cansarte. Recuerda, solo debes cargar con el <strong class="text-white">50%</strong> del peso con el que vas a hacer la serie.</li>
+                <li>Prepara el peso con el que puedes cargar entre 15 y 50 repeticiones y haz cuantas repeticiones puedas, hasta el <strong class="text-white">fallo técnico</strong> (cuando empieces a retorcerte o tirar de manera no adecuada). No buscamos el fallo absoluto.</li>
+                <li>Apunta las repeticiones y el peso cargado en las tablas de abajo. Descansa al menos 2 o 3 minutos antes de pasar al siguiente ejercicio y vuelve al punto numero 2 para el siguiente ejercicio.</li>
+            </ol>
+            <p class="font-medium">Cuando acabes, descansa. No entrenes más ese día. Tómatelo con calma.</p>
+            
+            <p class="mt-4 p-3 bg-zinc-900 border border-yellow-500 rounded-lg text-yellow-400 font-medium">
+                <strong class="font-bold block">¡Importante!</strong>
+                Si dejas de entrenar más de 2 semanas, debes realizar de nuevo el test inicial. Habrás perdido parte de tu forma y la mejor manera de retomar es volver a hacer el test.
+            </p>
+        </div>
+
+        <!-- Explicación del Método -->
+        <div class="card mb-6 space-y-4 text-gray-300">
+            <p>Para el test inicial vamos a utilizar el <strong class="text-yellow-400">método Bilbo</strong>, ya que con esta metodología podemos calcular nuestra Repetición Máxima (RM) sin riesgo a lesionarnos ni poner en peligro ligamentos ni tendones.</p>
+            <p>Este test tiene como fin calcular nuestra <strong class="text-white">Repetición Máxima Estimada (e1RM)</strong> para tener el punto de partida inicial y saber de manera bastante exacta nuestro nivel de entreno para poder progresar de la manera más eficiente.</p>
+            <p>Para hallar esta e1RM, vamos a usar la fórmula de Lombardi: <strong class="text-white">Peso (kg) x (Repeticiones ^ 0.10)</strong>.</p>
+        </div>
+
+        <!-- Formulario del Test -->
+        <div class="card mb-6">
+            <form id="test-form">
+                <div class="space-y-6">
+                    
+                    <!-- Ejercicio 1: Press de banca plano (con barra) -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Press de banca plano (barra)</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="press-banca-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="press-banca-peso" class="form-input" placeholder="Ej: 50">
+                            </div>
+                            <div>
+                                <label for="press-banca-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="press-banca-reps" class="form-input" placeholder="Ej: 25">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 2: Jalón en polea agarre neutro -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Jalón en polea agarre neutro</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="jalon-neutro-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="jalon-neutro-peso" class="form-input" placeholder="Ej: 40">
+                            </div>
+                            <div>
+                                <label for="jalon-neutro-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="jalon-neutro-reps" class="form-input" placeholder="Ej: 30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 3: Jalón al pecho agarre estrecho -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Jalón al pecho agarre estrecho</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="jalon-pecho-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="jalon-pecho-peso" class="form-input" placeholder="Ej: 35">
+                            </div>
+                            <div>
+                                <label for="jalon-pecho-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="jalon-pecho-reps" class="form-input" placeholder="Ej: 28">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 4: Curl en barra Z -->
+                    <!-- Nota: Uso "Curl en barra Z" para que coincida con progreso.html -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Curl en barra Z</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="curl-barra-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="curl-barra-peso" class="form-input" placeholder="Ej: 20">
+                            </div>
+                            <div>
+                                <label for="curl-barra-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="curl-barra-reps" class="form-input" placeholder="Ej: 22">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div id="error-message" class="text-red-400 text-center text-sm mt-6 hidden">Introduce al menos un valor de peso y repeticiones.</div>
+                
+                <div class="mt-8">
+                    <button type="submit" id="calculate-btn" class="save-button">Guardar Test y Calcular RM</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección de Resultados (Oculta por defecto) -->
+        <div id="results-card" class="card hidden border-2 border-yellow-400">
+            <h2 class="text-2xl font-bold text-yellow-400 mb-4">Resultados (RM Estimada)</h2>
+            <div id="results-content" class="space-y-3">
+                <!-- Los resultados se inyectarán aquí -->
+            </div>
+            <p id="save-notification" class="text-green-400 text-center font-semibold mt-6 hidden">
+                ¡Test guardado con éxito! Tus RM estimadas se han actualizado en "Progreso" y se usarán en "Entreno".
+            </p>
+        </div>
+
+        <!-- NUEVO: Registro de Tests Anteriores -->
+        <div id="test-history-section" class="mt-6">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-4 text-center">Registro de Test Inicial</h2>
+            <div id="test-history-content" class="space-y-4">
+                <!-- El historial se inyectará aquí -->
+            </div>
+        </div>
+
+
+        <!-- Botón de Navegación a Inicio -->
+        <div class="mt-12 text-center">
+            <a class="nav-button" href="https://yaril123.github.io/metodohibrido/">
+                Volver a Inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('test-form');
+            const errorMessage = document.getElementById('error-message');
+            const resultsCard = document.getElementById('results-card');
+            const resultsContent = document.getElementById('results-content');
+            const saveNotification = document.getElementById('save-notification');
+
+            // Lista de ejercicios para el test.
+            // IMPORTANTE: Los 'name' DEBEN coincidir con los de progreso.html
+            const exercises = [
+                { id: 'press-banca', name: 'Press de banca plano (barra)' },
+                { id: 'jalon-neutro', name: 'Jalón en polea agarre neutro' },
+                { id: 'jalon-pecho', name: 'Jalón al pecho agarre estrecho' },
+                { id: 'curl-barra', name: 'Curl en barra Z' } 
+            ];
+
+            // --- Helper Function ---
+            function calculateLombardi(weight, reps) {
+                const w = parseFloat(weight);
+                const r = parseInt(reps, 10);
+                if (isNaN(w) || isNaN(r) || w <= 0 || r <= 0) return 0;
+                // Fórmula Lombardi: Peso x (Reps ^ 0.10)
+                return w * Math.pow(r, 0.10);
+            }
+
+            // --- Cargar Historial de Tests ---
+            function loadTestHistory() {
+                const history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
+                const historyContent = document.getElementById('test-history-content');
+                if (!historyContent) return;
+
+                const testLogs = Object.entries(history)
+                    .filter(([key, log]) => 
+                        log.workoutTitle === 'Test RM Inicial' || key.endsWith('_TEST_INICIAL')
+                    )
+                    .sort((a, b) => new Date(b[1].date) - new Date(a[1].date)); // [key, log]
+
+                if (testLogs.length === 0) {
+                    historyContent.innerHTML = '<p class="text-center text-gray-500">No hay tests anteriores registrados.</p>';
+                    return;
+                }
+
+                let html = '';
+                testLogs.forEach(([key, log]) => {
+                    // Formatear fecha
+                    const date = new Date(log.date);
+                    const formattedDate = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+                    html += `<div class="card fade-in">
+                                <h3 class="text-lg font-bold text-yellow-400 mb-3">Test del ${formattedDate}</h3>
+                                <div class="space-y-2">`;
+                    
+                    log.exercises.forEach(ex => {
+                        if (ex.series && ex.series.length > 0) {
+                            const s = ex.series[0]; // El test solo tiene una serie por ejercicio
+                            const e1rm = calculateLombardi(s.weight, s.reps);
+                            html += `
+                                <div class="flex justify-between items-center bg-zinc-800 p-3 rounded-lg">
+                                    <span class="text-gray-300 font-medium">${ex.name}</span>
+                                    <div class="text-right">
+                                        <span class="text-white font-bold">${e1rm.toFixed(1)} kg</span>
+                                        <span class="block text-xs text-gray-400">${s.weight} kg x ${s.reps} reps</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+
+                    html += `</div></div>`;
+                });
+
+                historyContent.innerHTML = html;
+            }
+
+            // --- Event Listener del Formulario ---
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                let resultsHTML = '';
+                let exercisesToLog = [];
+                let hasData = false;
+
+                exercises.forEach(exercise => {
+                    const pesoInput = document.getElementById(`${exercise.id}-peso`);
+                    const repsInput = document.getElementById(`${exercise.id}-reps`);
+
+                    const peso = parseFloat(pesoInput.value);
+                    const reps = parseInt(repsInput.value, 10);
+
+                    let e1rm = 0;
+                    let resultText = '<span class="text-gray-500">(Sin datos)</span>';
+
+                    if (!isNaN(peso) && peso > 0 && !isNaN(reps) && reps > 0) {
+                        hasData = true;
+                        e1rm = calculateLombardi(peso, reps); // Usamos la helper function
+                        resultText = `<span class="text-white font-bold">${e1rm.toFixed(1)} kg</span>`;
+                        
+                        // Preparamos los datos para guardar en localStorage
+                        exercisesToLog.push({
+                            name: exercise.name,
+                            series: [
+                                // Guardamos esto como la única serie del ejercicio
+                                { weight: peso.toString(), reps: reps.toString() } 
+                            ]
+                        });
+                    }
+
+                    resultsHTML += `
+                        <div class="flex justify-between items-center bg-zinc-800 p-3 rounded-lg">
+                            <span class="text-gray-300 font-medium">${exercise.name}</span>
+                            ${resultText}
+                        </div>
+                    `;
+                });
+
+                // Validar si se introdujo algo
+                if (!hasData) {
+                    errorMessage.classList.remove('hidden');
+                    resultsCard.classList.add('hidden');
+                    return;
+                }
+                
+                errorMessage.classList.add('hidden');
+
+                // Guardar en localStorage si hay datos
+                if (exercisesToLog.length > 0) {
+                    try {
+                        const today = new Date();
+                        // Creamos una clave única para el test
+                        const testKey = `${today.toISOString()}_TEST_INICIAL`;
+                        let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
+
+                        const logEntry = {
+                            date: today.toISOString().split('T')[0],
+                            time: "00:00:00", // Test no cronometrado
+                            workoutType: 'bilbo', // Lo marcamos como tipo Bilbo
+                            workoutTitle: 'Test RM Inicial',
+                            exercises: exercisesToLog
+                        };
+                        
+                        history[testKey] = logEntry;
+                        localStorage.setItem('workoutHistory', JSON.stringify(history));
+
+                        // Actualizar el historial visible en la página
+                        loadTestHistory();
+                        saveNotification.classList.remove('hidden');
+
+                    } catch (error) {
+                        console.error("Error al guardar en localStorage:", error);
+                        saveNotification.textContent = "Error al guardar el test.";
+                        saveNotification.classList.remove('hidden');
+                        saveNotification.classList.remove('text-green-400');
+                        saveNotification.classList.add('text-red-400');
+                    }
+                }
+
+                // Mostrar resultados
+                resultsContent.innerHTML = resultsHTML;
+                resultsCard.classList.remove('hidden');
+                resultsCard.classList.add('fade-in');
+                resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+
+            // --- Carga Inicial ---
+            loadTestHistory();
+        });
+    </script>
+
+</body>
+
+</html>
