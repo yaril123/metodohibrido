@@ -21,6 +21,29 @@
             color: #E0E0E0;
             padding-bottom: 2rem; /* Espacio para el botón de Inicio */
         }
+        /* Pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #0D0D0D;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #facc15;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* New Button Styles */
         .day-nav-button {
             border: 1px solid #3f3f46; /* zinc-700 */
@@ -384,6 +407,12 @@
 </head>
 <body class="p-4 sm:p-6 md:p-8">
 
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p class="text-white font-bold">Cargando...</p>
+    </div>
+
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 header-background">
             <img src="https://logise1.netlify.app/src/gym/automatizado.png" alt="Fondo" class="header-image">
@@ -484,18 +513,34 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const appId = 'metodo-hibrido-data';
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyDPCHIEH-oG60kLBnOf98Qwtj56DFLcPaE",
+          authDomain: "towerdefense-dfbfb.firebaseapp.com",
+          projectId: "towerdefense-dfbfb",
+          storageBucket: "towerdefense-dfbfb.firebasestorage.app",
+          messagingSenderId: "780250375670",
+          appId: "1:780250375670:web:ccded917e7b2316e5013d7",
+          measurementId: "G-4GW89G9D55"
+        };
+        
+        const authToken = null;
 
         let db, auth;
         let userId = null;
         let isLoggedIn = false;
+        
+        // Variables de control de estado de carga
         let isAuthReady = false;
+        let isDataReady = false;
+        let isDomReady = false;
+        let isAppLaunched = false;
+
         let appData = {}; // Estado centralizado de la aplicación (sustituye a la mayoría de localStorage)
         const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
 
@@ -657,8 +702,28 @@
 
         // --- CORE UI/LOGIC FUNCTIONS ---
 
+        // Intentar lanzar la app. Solo corre si Data y DOM están listos.
+        function tryLaunchApp() {
+            if (isDataReady && isDomReady && !isAppLaunched) {
+                isAppLaunched = true;
+                console.log("Both DOM and Data are ready. Launching Core App...");
+                // Ocultar pantalla de carga
+                const loadingScreen = document.getElementById('loading-screen');
+                if(loadingScreen) loadingScreen.style.opacity = '0';
+                setTimeout(() => { if(loadingScreen) loadingScreen.style.display = 'none'; }, 500);
+
+                coreAppInit();
+            } else {
+                console.log(`Waiting... DataReady: ${isDataReady}, DomReady: ${isDomReady}`);
+            }
+        }
+
         // Función de inicialización principal que se llama cuando los datos están listos
         function coreAppInit() {
+             // Limpieza previa (por si se llama dos veces)
+             DOM.tabsContainer.innerHTML = '';
+             DOM.contentContainer.innerHTML = '';
+
              // 1. Generar los botones de las pestañas
             days.forEach((day) => {
                 const button = document.createElement('button');
@@ -673,8 +738,9 @@
                 DOM.tabsContainer.appendChild(button);
             });
             
-            // 2. Configurar listeners
-            setupEventListeners();
+            // 2. Configurar listeners (Solo si no están ya configurados, aunque la estructura es idempotente)
+            // Ya que llamamos a generateWorkoutHTML, recreamos el contenido
+            generateWorkoutHTML();
             
             // 3. Cargar el estado del modo compacto
             const isCompact = getAppData('compactMode');
@@ -722,7 +788,7 @@
             loadProgress();
         }
 
-        // --- Funciones auxiliares movidas fuera de DOMContentLoaded ---
+        // --- Funciones auxiliares ---
 
         function generateWorkoutHTML() {
             days.forEach(day => {
@@ -1404,8 +1470,36 @@
         }
 
         // --- Event Listeners & Initialization ---
-        function setupEventListeners() {
-            
+        function setupDOM() {
+             // 1. Inicializar referencias al DOM
+            DOM.tabsContainer = document.getElementById('tabs');
+            DOM.contentContainer = document.getElementById('workout-content');
+            DOM.mainTitle = document.getElementById('main-title');
+            DOM.workoutTitle = document.getElementById('workout-title');
+            DOM.stopwatchDisplay = document.getElementById('stopwatch-display');
+            DOM.stopwatchControlBtn = document.getElementById('stopwatch-control');
+            DOM.pauseModal = document.getElementById('pause-modal');
+            DOM.resumeBtn = document.getElementById('resume-btn');
+            DOM.finishBtn = document.getElementById('finish-btn');
+            DOM.finishConfirmModal = document.getElementById('finish-confirm-modal');
+            DOM.confirmFinishYesBtn = document.getElementById('confirm-finish-yes-btn');
+            DOM.confirmFinishNoBtn = document.getElementById('confirm-finish-no-btn');
+            DOM.notification = document.getElementById('notification');
+            DOM.progressionModal = document.getElementById('progression-modal');
+            DOM.progressionModalText = document.getElementById('progression-modal-text');
+            DOM.progressYesBtn = document.getElementById('progress-yes-btn');
+            DOM.progressNoBtn = document.getElementById('progress-no-btn');
+            DOM.bilboCycleModal = document.getElementById('bilbo-cycle-modal');
+            DOM.bilboCycleText = document.getElementById('bilbo-cycle-text');
+            DOM.bilboCycleOkBtn = document.getElementById('bilbo-cycle-ok-btn');
+            DOM.settingsBtn = document.getElementById('settings-btn');
+            DOM.settingsModal = document.getElementById('settings-modal');
+            DOM.closeSettingsModalBtn = document.getElementById('close-settings-modal');
+            DOM.resetCycleBtn = document.getElementById('reset-cycle-btn');
+            DOM.clearHistoryBtn = document.getElementById('clear-history-btn');
+            DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
+
+            // 2. Listeners
             if (DOM.tabsContainer) {
                 DOM.tabsContainer.addEventListener('click', (e) => {
                     const button = e.target.closest('.day-nav-button');
@@ -1529,30 +1623,25 @@
                         console.log("Datos de Firebase recibidos:", appData);
                     } else {
                         console.log("Documento de Firebase no existe. Usando valores por defecto o locales.");
-                        // Si no existe en la nube, comprobamos si hay algo que subir de local (por si es el primer login)
                         appData = loadAllLocalData();
-                        // Subimos a Firebase para crear el documento inicial (index.html también lo hace, pero aquí aseguramos)
                         writeAllDataToFirestore(appData);
                     }
-                    // Una vez que tenemos los datos (de Firebase o local), inicializamos la UI
-                    if (isAuthReady) {
-                        coreAppInit(); 
-                        // loadProgress(); // Ya se llama dentro de coreAppInit
-                    }
+                    // DATA IS READY
+                    isDataReady = true;
+                    tryLaunchApp();
+
                 }, (error) => {
                     console.error("Error en onSnapshot (Firebase):", error);
                     // Fallback a la data local si hay error de conexión/permisos
                     appData = loadAllLocalData();
-                    if (isAuthReady) {
-                        coreAppInit(); 
-                    }
+                    isDataReady = true;
+                    tryLaunchApp();
                 });
             } else {
                 // LOCAL: Carga inicial de todos los datos locales para modo invitado
                 appData = loadAllLocalData();
-                 if (isAuthReady) {
-                    coreAppInit(); 
-                }
+                isDataReady = true;
+                tryLaunchApp();
             }
         }
 
@@ -1571,59 +1660,52 @@
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-            // setLogLevel('Debug'); // Descomentar para logs de Firestore
 
-            // Listener de estado de autenticación
-            onAuthStateChanged(auth, async (user) => {
-                if (!user) {
-                    if (authToken) {
-                        await signInWithCustomToken(auth, authToken).catch(e => console.error("Error signing in with custom token:", e));
-                    } else {
-                        await signInAnonymously(auth).catch(e => console.error("Error signing in anonymously:", e));
-                    }
-                }
-                authReady(auth.currentUser);
-            });
+            // 1. FORZAR PERSISTENCIA LOCAL (Crucial para que index.html pase la sesión)
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                     // Listener de estado de autenticación
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            // Usuario logueado (desde Index o caché)
+                            authReady(user);
+                        } else {
+                            // No hay usuario. Esperamos un poco antes de crear anónimo
+                            // para no sobreescribir una sesión que esté cargando.
+                            // Pero para ser robustos, si llega aquí es que realmente no hay.
+                            if (authToken) {
+                                await signInWithCustomToken(auth, authToken).catch(e => console.error(e));
+                            } else {
+                                await signInAnonymously(auth).catch(e => console.error(e));
+                            }
+                            // authReady se llamará en el siguiente disparo de onAuthStateChanged
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error setting persistence:", error);
+                });
+
         } else {
             // Fallback si la configuración de Firebase no está disponible
             authReady(null);
         }
         // --- FIN CONFIGURACIÓN FIREBASE ---
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // 1. Inicializar referencias al DOM
-            DOM.tabsContainer = document.getElementById('tabs');
-            DOM.contentContainer = document.getElementById('workout-content');
-            DOM.mainTitle = document.getElementById('main-title');
-            DOM.workoutTitle = document.getElementById('workout-title');
-            DOM.stopwatchDisplay = document.getElementById('stopwatch-display');
-            DOM.stopwatchControlBtn = document.getElementById('stopwatch-control');
-            DOM.pauseModal = document.getElementById('pause-modal');
-            DOM.resumeBtn = document.getElementById('resume-btn');
-            DOM.finishBtn = document.getElementById('finish-btn');
-            DOM.finishConfirmModal = document.getElementById('finish-confirm-modal');
-            DOM.confirmFinishYesBtn = document.getElementById('confirm-finish-yes-btn');
-            DOM.confirmFinishNoBtn = document.getElementById('confirm-finish-no-btn');
-            DOM.notification = document.getElementById('notification');
-            DOM.progressionModal = document.getElementById('progression-modal');
-            DOM.progressionModalText = document.getElementById('progression-modal-text');
-            DOM.progressYesBtn = document.getElementById('progress-yes-btn');
-            DOM.progressNoBtn = document.getElementById('progress-no-btn');
-            DOM.bilboCycleModal = document.getElementById('bilbo-cycle-modal');
-            DOM.bilboCycleText = document.getElementById('bilbo-cycle-text');
-            DOM.bilboCycleOkBtn = document.getElementById('bilbo-cycle-ok-btn');
-            DOM.settingsBtn = document.getElementById('settings-btn');
-            DOM.settingsModal = document.getElementById('settings-modal');
-            DOM.closeSettingsModalBtn = document.getElementById('close-settings-modal');
-            DOM.resetCycleBtn = document.getElementById('reset-cycle-btn');
-            DOM.clearHistoryBtn = document.getElementById('clear-history-btn');
-            DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
+        // MANEJO ROBUSTO DE DOMCONTENTLOADED
+        function onDomReady() {
+            if (isDomReady) return; // Ya se ejecutó
+            setupDOM();
+            isDomReady = true;
+            tryLaunchApp();
+        }
 
-            // 2. Generar la estructura HTML de los ejercicios
-            generateWorkoutHTML();
-            
-            // Nota: La llamada a coreAppInit se realiza ahora desde onAuthStateChanged
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onDomReady);
+        } else {
+            onDomReady();
+        }
+
     </script>
 </body>
 </html>

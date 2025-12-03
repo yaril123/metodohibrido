@@ -20,6 +20,29 @@
             color: #E0E0E0;
             padding-bottom: 2rem;
         }
+        /* Pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #0D0D0D;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #facc15;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* Estilos de botones (copiados de entreno.html para consistencia) */
         .day-nav-button {
             border: 1px solid #3f3f46; /* zinc-700 */
@@ -192,6 +215,12 @@
 </head>
 <body class="p-4 sm:p-6 md:p-8">
 
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p class="text-white font-bold">Cargando...</p>
+    </div>
+
     <div class="max-w-7xl mx-auto">
         <!-- RM Records Section -->
         <section id="rm-section" class="mt-12">
@@ -287,18 +316,32 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const appId = 'metodo-hibrido-data';
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyDPCHIEH-oG60kLBnOf98Qwtj56DFLcPaE",
+          authDomain: "towerdefense-dfbfb.firebaseapp.com",
+          projectId: "towerdefense-dfbfb",
+          storageBucket: "towerdefense-dfbfb.firebasestorage.app",
+          messagingSenderId: "780250375670",
+          appId: "1:780250375670:web:ccded917e7b2316e5013d7",
+          measurementId: "G-4GW89G9D55"
+        };
+        
+        const authToken = null;
 
         let db, auth;
         let userId = null;
         let isLoggedIn = false;
         let isAuthReady = false;
+        let isDataReady = false;
+        let isDomReady = false;
+        let isAppLaunched = false;
+
         let appData = {}; // Estado centralizado de la aplicación
         const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
 
@@ -889,6 +932,22 @@
         }
         // --- End Core UI/Rendering Functions ---
 
+        // Intentar lanzar la app. Solo corre si Data y DOM están listos.
+        function tryLaunchApp() {
+            if (isDataReady && isDomReady && !isAppLaunched) {
+                isAppLaunched = true;
+                console.log("Both DOM and Data are ready. Launching Core App...");
+                
+                // Ocultar pantalla de carga
+                const loadingScreen = document.getElementById('loading-screen');
+                if(loadingScreen) loadingScreen.style.opacity = '0';
+                setTimeout(() => { if(loadingScreen) loadingScreen.style.display = 'none'; }, 500);
+
+                runCoreInit();
+            } else {
+                console.log(`Waiting... DataReady: ${isDataReady}, DomReady: ${isDomReady}`);
+            }
+        }
 
         // Establece la escucha de datos para Firebase o la carga inicial local
         function setupDataListener() {
@@ -906,25 +965,23 @@
                     } else {
                         console.log("Documento de Firebase no existe. Usando datos locales o por defecto.");
                         appData = loadAllLocalData();
+                        writeAllDataToFirestore(appData);
                     }
-                    // Una vez que tenemos los datos (de Firebase o local), inicializamos la UI
-                    if (isAuthReady) {
-                        runCoreInit(); 
-                    }
+                    // DATA IS READY
+                    isDataReady = true;
+                    tryLaunchApp();
                 }, (error) => {
                     console.error("Error en onSnapshot (Firebase):", error);
                     // Fallback a la data local si hay error de conexión/permisos
                     appData = loadAllLocalData();
-                    if (isAuthReady) {
-                        runCoreInit(); 
-                    }
+                    isDataReady = true;
+                    tryLaunchApp();
                 });
             } else {
                 // LOCAL: Carga inicial de todos los datos locales para modo invitado
                 appData = loadAllLocalData();
-                 if (isAuthReady) {
-                    runCoreInit(); 
-                }
+                isDataReady = true;
+                tryLaunchApp();
             }
         }
 
@@ -943,26 +1000,35 @@
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
-            // setLogLevel('Debug'); // Descomentar para logs de Firestore
-
-            // Listener de estado de autenticación
-            onAuthStateChanged(auth, async (user) => {
-                if (!user) {
-                    if (authToken) {
-                        await signInWithCustomToken(auth, authToken).catch(e => console.error("Error signing in with custom token:", e));
-                    } else {
-                        await signInAnonymously(auth).catch(e => console.error("Error signing in anonymously:", e));
-                    }
-                }
-                authReady(auth.currentUser);
-            });
+            
+            // 1. FORZAR PERSISTENCIA LOCAL (Crucial para que index.html pase la sesión)
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                    // Listener de estado de autenticación
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            // Usuario logueado (desde Index o caché)
+                            authReady(user);
+                        } else {
+                            // No hay usuario. Esperamos un poco antes de crear anónimo.
+                            if (authToken) {
+                                await signInWithCustomToken(auth, authToken).catch(e => console.error(e));
+                            } else {
+                                await signInAnonymously(auth).catch(e => console.error(e));
+                            }
+                        }
+                    });
+                })
+                .catch(e => console.error("Error setting persistence", e));
         } else {
             // Fallback si la configuración de Firebase no está disponible
             authReady(null);
         }
         // --- FIN CONFIGURACIÓN FIREBASE ---
 
-        document.addEventListener('DOMContentLoaded', function() {
+        // MANEJO ROBUSTO DE DOMCONTENTLOADED
+        function onDomReady() {
+            if (isDomReady) return;
             // Inicializar las referencias al DOM
             DOM.calendarGrid = document.getElementById('calendar-grid');
             DOM.monthYearEl = document.getElementById('month-year');
@@ -977,8 +1043,9 @@
             DOM.historyModalContent = document.getElementById('history-modal-content');
             DOM.closeHistoryModalBtn = document.getElementById('close-history-modal');
             
-            // Nota: La llamada a runCoreInit se realiza desde setupDataListener/onSnapshot
-        });
-    </script>
-</body>
-</html>
+            isDomReady = true;
+            tryLaunchApp();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onDomReady);
