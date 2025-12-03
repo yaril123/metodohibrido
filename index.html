@@ -128,15 +128,15 @@
       position: absolute;
       top: 65px;
       right: 0;
-      width: 240px; /* Un poco más ancho para el formulario */
+      width: 220px;
       background-color: #1a1a1a;
       border: 1px solid #333;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      padding: 12px;
+      padding: 10px;
       display: none; /* Oculto por defecto */
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       transform-origin: top right;
       animation: scaleIn 0.2s ease forwards;
     }
@@ -151,7 +151,7 @@
     }
 
     .dropdown-header {
-      padding: 0 5px 8px 5px;
+      padding: 5px 10px;
       border-bottom: 1px solid #333;
       margin-bottom: 5px;
       text-align: left;
@@ -162,9 +162,6 @@
       font-weight: 600;
       font-size: 0.95rem;
       display: block;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .dropdown-status-text {
@@ -203,67 +200,6 @@
     .dropdown-item.logout:hover {
       background-color: #2a1111;
     }
-
-    /* ESTILOS DE FORMULARIO EMAIL/PASS */
-    .auth-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 0 2px;
-      margin-bottom: 5px;
-    }
-    .auth-input {
-      background: #333;
-      border: 1px solid #444;
-      color: #fff;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      outline: none;
-      font-family: "Montserrat", sans-serif;
-      transition: border-color 0.2s;
-    }
-    .auth-input:focus {
-      border-color: #FFC107;
-    }
-    .auth-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .btn-auth {
-      flex: 1;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-      font-family: "Montserrat", sans-serif;
-      transition: all 0.2s;
-    }
-    .btn-auth:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-login-email { background-color: #FFC107; color: black; }
-    .btn-register-email { background-color: #333; color: white; border: 1px solid #555; }
-    .btn-register-email:hover { border-color: #FFC107; color: #FFC107; }
-
-    .auth-divider {
-      text-align: center;
-      color: #555;
-      font-size: 0.75rem;
-      margin: 5px 0;
-      position: relative;
-    }
-    .auth-divider::before, .auth-divider::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      width: 40%;
-      height: 1px;
-      background: #333;
-    }
-    .auth-divider::before { left: 0; }
-    .auth-divider::after { right: 0; }
 
     /* --- FIN PERFIL FLOTANTE --- */
 
@@ -380,27 +316,14 @@
         </button>
       </div>
 
-      <!-- Estado LOGOUT: Mostrar Login Forms -->
+      <!-- Estado LOGOUT: Mostrar botón login Google -->
       <div id="loggedOutMenu">
         <div class="dropdown-header">
           <span class="dropdown-user-name">Invitado</span>
           <span class="dropdown-status-text">Sin sincronización</span>
         </div>
-        
-        <!-- Formulario Email/Pass -->
-        <div class="auth-form">
-            <input type="email" id="emailInput" class="auth-input" placeholder="Email">
-            <input type="password" id="passInput" class="auth-input" placeholder="Contraseña">
-            <div class="auth-actions">
-                <button id="emailLoginBtn" class="btn-auth btn-login-email">Entrar</button>
-                <button id="emailRegisterBtn" class="btn-auth btn-register-email">Crear</button>
-            </div>
-        </div>
-
-        <div class="auth-divider">o usa</div>
-
         <button id="loginBtn" class="dropdown-item" style="color: #FFC107; justify-content: center;">
-          <i class="fa-brands fa-google"></i> Google
+          <i class="fa-brands fa-google"></i> Entrar con Google
         </button>
       </div>
 
@@ -467,9 +390,7 @@
       signInWithPopup, 
       GoogleAuthProvider, 
       signOut, 
-      onAuthStateChanged,
-      signInWithEmailAndPassword,
-      createUserWithEmailAndPassword
+      onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
@@ -503,12 +424,6 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const manualSyncBtn = document.getElementById('manualSyncBtn');
     
-    // Auth Email Elements
-    const emailInput = document.getElementById('emailInput');
-    const passInput = document.getElementById('passInput');
-    const emailLoginBtn = document.getElementById('emailLoginBtn');
-    const emailRegisterBtn = document.getElementById('emailRegisterBtn');
-
     const dropdownUserName = document.getElementById('dropdownUserName');
     const dropdownStatusText = document.getElementById('dropdownStatusText');
 
@@ -524,7 +439,7 @@
     }
 
     document.addEventListener('click', (e) => {
-      // Evitar cerrar si clicamos dentro del formulario
+      // Evitar cerrar si clicamos dentro del menú
       if (profileDropdown.contains(e.target)) return;
 
       if (!profileTrigger.contains(e.target)) {
@@ -694,58 +609,6 @@
       });
     });
 
-    // 2. Email Login
-    emailLoginBtn.addEventListener('click', () => {
-        const email = emailInput.value;
-        const password = passInput.value;
-        if(!email || !password) {
-            alert("Por favor ingresa email y contraseña.");
-            return;
-        }
-        signInWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                profileDropdown.classList.remove('active');
-                // Limpiar campos
-                emailInput.value = '';
-                passInput.value = '';
-            })
-            .catch((error) => {
-                console.error(error);
-                let msg = "Error al iniciar sesión.";
-                if(error.code === 'auth/invalid-credential') msg = "Email o contraseña incorrectos.";
-                if(error.code === 'auth/invalid-email') msg = "El email no es válido.";
-                alert(msg);
-            });
-    });
-
-    // 3. Email Register
-    emailRegisterBtn.addEventListener('click', () => {
-        const email = emailInput.value;
-        const password = passInput.value;
-        if(!email || !password) {
-            alert("Por favor ingresa email y contraseña.");
-            return;
-        }
-        if(password.length < 6) {
-            alert("La contraseña debe tener al menos 6 caracteres.");
-            return;
-        }
-        createUserWithEmailAndPassword(auth, email, password)
-            .then(() => {
-                profileDropdown.classList.remove('active');
-                alert("Cuenta creada con éxito. ¡Bienvenido!");
-                emailInput.value = '';
-                passInput.value = '';
-            })
-            .catch((error) => {
-                console.error(error);
-                let msg = "Error al crear cuenta.";
-                if(error.code === 'auth/email-already-in-use') msg = "Este email ya está registrado.";
-                if(error.code === 'auth/weak-password') msg = "La contraseña es muy débil.";
-                alert(msg);
-            });
-    });
-
     logoutBtn.addEventListener('click', () => {
       const user = auth.currentUser;
       uploadData(user, true).finally(() => {
@@ -790,8 +653,6 @@
         if(user.photoURL) {
              userPhoto.src = user.photoURL;
         } else {
-             // Si no hay foto, usamos un avatar genérico más bonito o mantenemos el icono
-             // Para simplificar, usamos un servicio de avatares por nombre/email
              userPhoto.src = `https://ui-avatars.com/api/?name=${user.email}&background=FFC107&color=000`;
         }
         
