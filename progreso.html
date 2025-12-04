@@ -274,12 +274,22 @@
 
          <!-- Calendar Section -->
          <section id="calendar-section" class="mt-12">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-6">Calendario de Entrenos</h2>
             <div id="calendar-container" class="p-6 rounded-lg">
                 <div id="calendar-header" class="flex justify-between items-center mb-4">
                     <button id="prev-month" class="p-2 rounded-full hover:bg-zinc-600">&lt;</button>
                     <h2 id="month-year" class="text-xl font-bold"></h2>
                     <button id="next-month" class="p-2 rounded-full hover:bg-zinc-600">&gt;</button>
                 </div>
+                
+                <!-- Botón Añadir Manual -->
+                <button id="open-add-modal-btn" class="w-full mb-4 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    AÑADIR REGISTRO MANUAL
+                </button>
+
                 <!-- Leyenda del Calendario -->
                 <div class="flex justify-center space-x-4 mb-4 text-xs sm:text-sm">
                     <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-1"></span> Bilbo</div>
@@ -302,7 +312,7 @@
         </div>
     </div>
 
-    <!-- Modals & Notifications -->
+    <!-- Modal Historial -->
     <div id="history-modal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden p-4">
         <div class="modal-content max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-lg relative">
             <button id="close-history-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
@@ -313,25 +323,60 @@
         </div>
     </div>
 
+    <!-- Modal Añadir Día Manual -->
+    <div id="add-day-modal" class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden p-4">
+        <div class="modal-content max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-lg relative border border-zinc-700">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400 uppercase">Añadir Entrenamiento</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-zinc-400 text-sm font-bold mb-2">Fecha</label>
+                    <input type="date" id="manual-date" class="w-full bg-zinc-800 border border-zinc-600 text-white rounded p-3 focus:outline-none focus:border-yellow-400">
+                </div>
+
+                <div>
+                    <label class="block text-zinc-400 text-sm font-bold mb-2">Tipo de Entrenamiento</label>
+                    <select id="manual-type" class="w-full bg-zinc-800 border border-zinc-600 text-white rounded p-3 focus:outline-none focus:border-yellow-400">
+                        <option value="">Selecciona una rutina...</option>
+                        <option value="hd_push">HD PUSH</option>
+                        <option value="hd_pull">HD PULL</option>
+                        <option value="bilbo_push">BILBO PUSH</option>
+                        <option value="bilbo_pull">BILBO PULL</option>
+                        <option value="rest1">CARDIO / DESCANSO</option>
+                    </select>
+                </div>
+
+                <!-- Contenedor dinámico de ejercicios -->
+                <div id="manual-exercises-container" class="space-y-4 mt-4 border-t border-zinc-700 pt-4">
+                    <p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-zinc-700">
+                <button id="cancel-manual-btn" class="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 text-white font-bold transition-colors">Cancelar</button>
+                <button id="save-manual-btn" class="px-4 py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors">Guardar</button>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
         const appId = 'metodo-hibrido-data';
         
-const firebaseConfig = {
-  apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
-  authDomain: "metodo-hibrido.firebaseapp.com",
-  projectId: "metodo-hibrido",
-  storageBucket: "metodo-hibrido.firebasestorage.app",
-  messagingSenderId: "982967728212",
-  appId: "1:982967728212:web:b27ea198c80601fc8315c1",
-  measurementId: "G-PETF3C4DM9"
-};
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
+            authDomain: "metodo-hibrido.firebaseapp.com",
+            projectId: "metodo-hibrido",
+            storageBucket: "metodo-hibrido.firebasestorage.app",
+            messagingSenderId: "982967728212",
+            appId: "1:982967728212:web:b27ea198c80601fc8315c1",
+            measurementId: "G-PETF3C4DM9"
+        };
         
         const authToken = null;
 
@@ -397,7 +442,7 @@ const firebaseConfig = {
         
         let DOM = {}; // Se inicializa en DOMContentLoaded
 
-        // --- FUNCIONES DE PERSISTENCIA (Solo lectura, ya que guarda entreno.html) ---
+        // --- FUNCIONES DE PERSISTENCIA ---
 
         function loadLocalData(key) {
             const value = localStorage.getItem(key);
@@ -408,15 +453,12 @@ const firebaseConfig = {
             }
         }
         
-        // Carga todos los datos relevantes de localStorage
         function loadAllLocalData() {
-            // Progreso solo necesita el historial para visualización
             return {
                 workoutHistory: loadLocalData('workoutHistory') || {},
             };
         }
         
-        // Función para obtener datos: Abstracta el origen (Firebase o local)
         function getAppData(key) {
              const defaultValue = {
                 workoutHistory: {},
@@ -425,13 +467,24 @@ const firebaseConfig = {
             return data !== undefined && data !== null ? data : defaultValue[key];
         }
 
-        // Función para obtener la fecha de hoy (movida al ámbito global)
+        async function writeAllDataToFirestore(data) {
+            if (!db || !userId) return;
+            try {
+                await setDoc(doc(db, DATA_DOC_PATH(userId), 'data'), data);
+                console.log("Datos guardados en Firestore correctamente.");
+            } catch (e) {
+                console.error("Error guardando en Firestore:", e);
+                // Fallback local si falla la red
+                localStorage.setItem('workoutHistory', JSON.stringify(data.workoutHistory));
+            }
+        }
+
         function getTodayDateString() {
             const today = new Date();
             return today.toISOString().split('T')[0];
         }
 
-        // --- RM / E1RM Calculation Functions (moved to module scope) ---
+        // --- RM / E1RM Calculation Functions ---
         function calculateLombardi(weight, reps) {
             if (reps <= 0 || weight <= 0) return 0;
             return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
@@ -474,7 +527,6 @@ const firebaseConfig = {
             const history = getAppData('workoutHistory'); 
             const maxRepMap = new Map();
             
-            // Rellenar allExerciseNames primero
             days.forEach((day) => {
                 const workout = workouts[day];
                 if (workout.type !== 'rest') {
@@ -502,10 +554,8 @@ const firebaseConfig = {
             }
             return maxRepMap;
         }
-        // --- END RM / E1RM Calculation Functions ---
-        
 
-        // --- Core UI/Rendering Functions (moved to module scope) ---
+        // --- Core UI/Rendering Functions ---
         function renderCalendar() {
             if (!DOM.calendarGrid) return;
             DOM.calendarGrid.innerHTML = '';
@@ -566,9 +616,9 @@ const firebaseConfig = {
                 const seriesRows = ex.series.map((s, i) => {
                     let seriesName = `Serie ${i + 1}`;
                     if (workout.workoutTitle.includes("BILBO") && i === 0) seriesName = "Serie Bilbo";
-                    if (workout.workoutTitle.includes("HEAVY DUTY") && i < ex.series.length -1) seriesName = `Calentamiento ${i+1}`;
+                    // Simplificación: si es manual, asumimos que se ingresó como Serie Efectiva
                     if (workout.workoutTitle.includes("HEAVY DUTY") && i === ex.series.length -1) seriesName = "Serie Efectiva";
-
+                    
                     return `
                     <tr class="border-b border-zinc-700 last:border-b-0">
                         <td class="py-2 px-3 text-zinc-300 font-semibold">${seriesName}</td>
@@ -742,7 +792,7 @@ const firebaseConfig = {
             sortedEntries.forEach(log => {
                 if (!log.exercises) return;
 
-                if (log.workoutTitle === "BILBO — PUSH") {
+                if (log.workoutTitle.includes("BILBO — PUSH")) {
                     const exercise = log.exercises.find(ex => ex.name === bilboPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                             const series = exercise.series[0];
@@ -754,7 +804,7 @@ const firebaseConfig = {
                             });
                             }
                     }
-                } else if (log.workoutTitle === "BILBO — PULL") {
+                } else if (log.workoutTitle.includes("BILBO — PULL")) {
                     const exercise = log.exercises.find(ex => ex.name === bilboPullExercise);
                         if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
@@ -766,7 +816,7 @@ const firebaseConfig = {
                             });
                             }
                     }
-                } else if (log.workoutTitle === "HEAVY DUTY — PUSH") {
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
                     const exercise = log.exercises.find(ex => ex.name === hdPushExercise);
                         if (exercise && exercise.series && exercise.series.length > 0) {
                             const lastSeries = exercise.series[exercise.series.length - 1];
@@ -778,7 +828,7 @@ const firebaseConfig = {
                             });
                             }
                     }
-                } else if (log.workoutTitle === "HEAVY DUTY — PULL") {
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
                     const exercise = log.exercises.find(ex => ex.name === hdPullExercise);
                         if (exercise && exercise.series && exercise.series.length > 0) {
                             const lastSeries = exercise.series[exercise.series.length - 1];
@@ -896,8 +946,145 @@ const firebaseConfig = {
             e1rmChartCurlZ = createE1RMChart(`e1rmChart-${exercisesToTrack.curlZ.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartCurlZ, data.curlZ, '#e5e7eb');
         }
 
+        // --- MANEJO DE MODAL AÑADIR DÍA ---
+
+        function setupManualEntryListeners() {
+            const modal = document.getElementById('add-day-modal');
+            const openBtn = document.getElementById('open-add-modal-btn');
+            const cancelBtn = document.getElementById('cancel-manual-btn');
+            const saveBtn = document.getElementById('save-manual-btn');
+            const typeSelect = document.getElementById('manual-type');
+            const container = document.getElementById('manual-exercises-container');
+            const dateInput = document.getElementById('manual-date');
+
+            if(openBtn) {
+                openBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                    dateInput.value = getTodayDateString();
+                });
+            }
+
+            if(cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    typeSelect.value = "";
+                    container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                });
+            }
+
+            if(typeSelect) {
+                typeSelect.addEventListener('change', (e) => {
+                    const type = e.target.value;
+                    container.innerHTML = ''; // Limpiar
+
+                    if (!type) {
+                        container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                        return;
+                    }
+
+                    if (type.includes('rest')) {
+                        // Formulario de Cardio
+                        container.innerHTML = `
+                             <div class="bg-zinc-800 p-3 rounded border border-zinc-600">
+                                <h4 class="font-bold text-blue-400 mb-3">Datos Cardio/Descanso</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-zinc-400 mb-1">Tiempo (min)</label>
+                                        <input type="number" id="manual-cardio-time" class="w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-blue-500 outline-none" placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-zinc-400 mb-1">Pulso Medio</label>
+                                        <input type="number" id="manual-cardio-pulse" class="w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-blue-500 outline-none" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Formulario de Pesas
+                        const workoutConfig = workouts[type];
+                        if (workoutConfig && workoutConfig.exercises) {
+                            workoutConfig.exercises.forEach((ex, index) => {
+                                const html = `
+                                    <div class="bg-zinc-800 p-3 rounded border border-zinc-600 exercise-input-group" data-name="${ex.name}">
+                                        <h4 class="font-bold text-yellow-500 mb-2 text-sm">${ex.name}</h4>
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-xs text-zinc-400 mb-1">Peso (kg)</label>
+                                                <input type="number" step="0.5" class="manual-weight w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-yellow-500 outline-none" placeholder="kg">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs text-zinc-400 mb-1">Reps</label>
+                                                <input type="number" class="manual-reps w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-yellow-500 outline-none" placeholder="reps">
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                container.insertAdjacentHTML('beforeend', html);
+                            });
+                        }
+                    }
+                });
+            }
+
+            if(saveBtn) {
+                saveBtn.addEventListener('click', async () => {
+                    const date = dateInput.value;
+                    const type = typeSelect.value;
+                    
+                    if(!date || !type) {
+                        alert("Por favor selecciona fecha y tipo de entreno.");
+                        return;
+                    }
+
+                    let newEntry = {
+                        date: date,
+                        workoutType: type.includes('rest') ? 'rest' : (type.includes('hd') ? 'hd' : 'bilbo'),
+                        workoutTitle: type.includes('rest') ? 'CARDIO' : workouts[type].title,
+                        time: "Manual",
+                        exercises: []
+                    };
+
+                    if(type.includes('rest')) {
+                        const timeVal = document.getElementById('manual-cardio-time')?.value || 0;
+                        const pulseVal = document.getElementById('manual-cardio-pulse')?.value || 0;
+                        newEntry.exercises.push({
+                            name: "Cardio Z2",
+                            series: [{ weight: timeVal, reps: pulseVal }] // Usamos estos campos para guardar time/pulse
+                        });
+                    } else {
+                        const inputs = document.querySelectorAll('.exercise-input-group');
+                        inputs.forEach(group => {
+                            const name = group.dataset.name;
+                            const weight = group.querySelector('.manual-weight').value;
+                            const reps = group.querySelector('.manual-reps').value;
+                            
+                            if(weight && reps) {
+                                newEntry.exercises.push({
+                                    name: name,
+                                    series: [{ weight: weight, reps: reps }]
+                                });
+                            }
+                        });
+                    }
+
+                    // Guardar en estado global
+                    appData.workoutHistory[date] = newEntry;
+
+                    // Persistir
+                    await writeAllDataToFirestore(appData);
+
+                    // Actualizar UI
+                    runCoreInit();
+
+                    // Cerrar Modal
+                    modal.classList.add('hidden');
+                    typeSelect.value = "";
+                    container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                });
+            }
+        }
+
         function setupEventListeners() {
-            
             if (DOM.prevMonthBtn) DOM.prevMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() - 1); renderCalendar(); });
             if (DOM.nextMonthBtn) DOM.nextMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() + 1); renderCalendar(); });
             if (DOM.closeHistoryModalBtn) DOM.closeHistoryModalBtn.addEventListener('click', () => DOM.historyModal.classList.add('hidden'));
@@ -911,10 +1098,11 @@ const firebaseConfig = {
                     }
                 });
             }
+            
+            setupManualEntryListeners();
         }
 
         function runCoreInit() {
-            // Rellenar la lista de todos los ejercicios para "Peso Máximo Cargado"
             days.forEach((day) => {
                 const workout = workouts[day];
                 if (workout.type !== 'rest') {
@@ -922,7 +1110,13 @@ const firebaseConfig = {
                 }
             });
             
-            setupEventListeners();
+            // Re-setup listeners is safe or check if added? 
+            // Better keep simple, listeners usually added once on DomReady, but here we call init multiple times?
+            // Actually setupEventListeners is called in runCoreInit, which is called on launch.
+            // But runCoreInit is also called after manual save.
+            // To prevent double listeners, we should move setupEventListeners OUT of runCoreInit or use flags.
+            // However, the modal elements exist always. 
+            // Fix: Move setupEventListeners call to tryLaunchApp (only once) and move chart rendering to a separate updateUI function.
             
             e1rmMap = calculateAllEstimated1RMs();
             renderCalendar(); 
@@ -931,7 +1125,12 @@ const firebaseConfig = {
             renderEstimated1RMs(e1rmMap);
             renderE1RMCharts(); 
         }
-        // --- End Core UI/Rendering Functions ---
+
+        // Separamos la inicialización de eventos de la actualización de UI
+        function initAppLogic() {
+            setupEventListeners();
+            runCoreInit();
+        }
 
         // Intentar lanzar la app. Solo corre si Data y DOM están listos.
         function tryLaunchApp() {
@@ -944,13 +1143,10 @@ const firebaseConfig = {
                 if(loadingScreen) loadingScreen.style.opacity = '0';
                 setTimeout(() => { if(loadingScreen) loadingScreen.style.display = 'none'; }, 500);
 
-                runCoreInit();
-            } else {
-                console.log(`Waiting... DataReady: ${isDataReady}, DomReady: ${isDomReady}`);
+                initAppLogic();
             }
         }
 
-        // Establece la escucha de datos para Firebase o la carga inicial local
         function setupDataListener() {
             if (!db || !userId) return;
 
@@ -959,7 +1155,6 @@ const firebaseConfig = {
                 const docRef = doc(db, DATA_DOC_PATH(userId), 'data');
                 
                 onSnapshot(docRef, (docSnap) => {
-                    // Si el documento existe, actualiza el estado interno
                     if (docSnap.exists()) {
                         appData = docSnap.data();
                         console.log("Datos de Firebase recibidos:", appData);
@@ -968,32 +1163,30 @@ const firebaseConfig = {
                         appData = loadAllLocalData();
                         writeAllDataToFirestore(appData);
                     }
-                    // DATA IS READY
                     isDataReady = true;
                     tryLaunchApp();
+                    // Si ya se lanzó la app, refrescar la UI con los nuevos datos
+                    if (isAppLaunched) runCoreInit();
                 }, (error) => {
                     console.error("Error en onSnapshot (Firebase):", error);
-                    // Fallback a la data local si hay error de conexión/permisos
                     appData = loadAllLocalData();
                     isDataReady = true;
                     tryLaunchApp();
                 });
             } else {
-                // LOCAL: Carga inicial de todos los datos locales para modo invitado
                 appData = loadAllLocalData();
                 isDataReady = true;
                 tryLaunchApp();
             }
         }
 
-        // Inicialización de Autenticación
         function authReady(user) {
             if (!isAuthReady) {
                 isAuthReady = true;
                 userId = user ? user.uid : crypto.randomUUID();
                 isLoggedIn = !!user;
                 
-                setupDataListener(); // Inicia la carga/escucha de datos
+                setupDataListener(); 
             }
         }
         
@@ -1002,16 +1195,12 @@ const firebaseConfig = {
             db = getFirestore(app);
             auth = getAuth(app);
             
-            // 1. FORZAR PERSISTENCIA LOCAL (Crucial para que index.html pase la sesión)
             setPersistence(auth, browserLocalPersistence)
                 .then(() => {
-                    // Listener de estado de autenticación
                     onAuthStateChanged(auth, async (user) => {
                         if (user) {
-                            // Usuario logueado (desde Index o caché)
                             authReady(user);
                         } else {
-                            // No hay usuario. Esperamos un poco antes de crear anónimo.
                             if (authToken) {
                                 await signInWithCustomToken(auth, authToken).catch(e => console.error(e));
                             } else {
@@ -1022,15 +1211,11 @@ const firebaseConfig = {
                 })
                 .catch(e => console.error("Error setting persistence", e));
         } else {
-            // Fallback si la configuración de Firebase no está disponible
             authReady(null);
         }
-        // --- FIN CONFIGURACIÓN FIREBASE ---
 
-        // MANEJO ROBUSTO DE DOMCONTENTLOADED
         function onDomReady() {
             if (isDomReady) return;
-            // Inicializar las referencias al DOM
             DOM.calendarGrid = document.getElementById('calendar-grid');
             DOM.monthYearEl = document.getElementById('month-year');
             DOM.prevMonthBtn = document.getElementById('prev-month');
