@@ -616,8 +616,9 @@
                 const seriesRows = ex.series.map((s, i) => {
                     let seriesName = `Serie ${i + 1}`;
                     if (workout.workoutTitle.includes("BILBO") && i === 0) seriesName = "Serie Bilbo";
-                    // Simplificación: si es manual, asumimos que se ingresó como Serie Efectiva
+                    // Si se añadió manualmente, intentamos deducir nombres lógicos
                     if (workout.workoutTitle.includes("HEAVY DUTY") && i === ex.series.length -1) seriesName = "Serie Efectiva";
+                    else if (workout.workoutTitle.includes("HEAVY DUTY") && i < ex.series.length -1) seriesName = `Calentamiento ${i+1}`;
                     
                     return `
                     <tr class="border-b border-zinc-700 last:border-b-0">
@@ -1000,23 +1001,34 @@
                             </div>
                         `;
                     } else {
-                        // Formulario de Pesas
+                        // Formulario de Pesas (3 Series)
                         const workoutConfig = workouts[type];
                         if (workoutConfig && workoutConfig.exercises) {
                             workoutConfig.exercises.forEach((ex, index) => {
+                                let seriesRows = '';
+                                for(let i=1; i<=3; i++) {
+                                    seriesRows += `
+                                        <div class="grid grid-cols-6 gap-2 items-center mb-2 series-row">
+                                            <div class="col-span-1 text-zinc-500 text-xs font-bold text-center">S${i}</div>
+                                            <div class="col-span-2">
+                                                <input type="number" step="0.5" class="manual-weight w-full bg-black text-white p-1 rounded border border-zinc-700 focus:border-yellow-500 outline-none text-center text-sm" placeholder="kg">
+                                            </div>
+                                            <div class="col-span-1 text-center text-zinc-600 text-xs">x</div>
+                                            <div class="col-span-2">
+                                                <input type="number" class="manual-reps w-full bg-black text-white p-1 rounded border border-zinc-700 focus:border-yellow-500 outline-none text-center text-sm" placeholder="reps">
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+
                                 const html = `
                                     <div class="bg-zinc-800 p-3 rounded border border-zinc-600 exercise-input-group" data-name="${ex.name}">
                                         <h4 class="font-bold text-yellow-500 mb-2 text-sm">${ex.name}</h4>
-                                        <div class="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label class="block text-xs text-zinc-400 mb-1">Peso (kg)</label>
-                                                <input type="number" step="0.5" class="manual-weight w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-yellow-500 outline-none" placeholder="kg">
-                                            </div>
-                                            <div>
-                                                <label class="block text-xs text-zinc-400 mb-1">Reps</label>
-                                                <input type="number" class="manual-reps w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-yellow-500 outline-none" placeholder="reps">
-                                            </div>
+                                        <div class="flex justify-between text-xs text-zinc-400 px-1 mb-1">
+                                            <span class="ml-8">Peso</span>
+                                            <span class="mr-2">Reps</span>
                                         </div>
+                                        ${seriesRows}
                                     </div>
                                 `;
                                 container.insertAdjacentHTML('beforeend', html);
@@ -1049,19 +1061,27 @@
                         const pulseVal = document.getElementById('manual-cardio-pulse')?.value || 0;
                         newEntry.exercises.push({
                             name: "Cardio Z2",
-                            series: [{ weight: timeVal, reps: pulseVal }] // Usamos estos campos para guardar time/pulse
+                            series: [{ weight: timeVal, reps: pulseVal }]
                         });
                     } else {
                         const inputs = document.querySelectorAll('.exercise-input-group');
                         inputs.forEach(group => {
                             const name = group.dataset.name;
-                            const weight = group.querySelector('.manual-weight').value;
-                            const reps = group.querySelector('.manual-reps').value;
+                            const rows = group.querySelectorAll('.series-row');
+                            const seriesData = [];
+
+                            rows.forEach(row => {
+                                const weight = row.querySelector('.manual-weight').value;
+                                const reps = row.querySelector('.manual-reps').value;
+                                if(weight && reps) {
+                                    seriesData.push({ weight: weight, reps: reps });
+                                }
+                            });
                             
-                            if(weight && reps) {
+                            if(seriesData.length > 0) {
                                 newEntry.exercises.push({
                                     name: name,
-                                    series: [{ weight: weight, reps: reps }]
+                                    series: seriesData
                                 });
                             }
                         });
@@ -1109,14 +1129,6 @@
                     workout.exercises.forEach(ex => allExerciseNames.add(ex.name));
                 }
             });
-            
-            // Re-setup listeners is safe or check if added? 
-            // Better keep simple, listeners usually added once on DomReady, but here we call init multiple times?
-            // Actually setupEventListeners is called in runCoreInit, which is called on launch.
-            // But runCoreInit is also called after manual save.
-            // To prevent double listeners, we should move setupEventListeners OUT of runCoreInit or use flags.
-            // However, the modal elements exist always. 
-            // Fix: Move setupEventListeners call to tryLaunchApp (only once) and move chart rendering to a separate updateUI function.
             
             e1rmMap = calculateAllEstimated1RMs();
             renderCalendar(); 
