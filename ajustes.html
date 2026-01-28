@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes - Método Híbrido</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos base (los mismos de las otras páginas) */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0D;
+            color: #E0E0E0;
+        }
+
+        .card {
+            background-color: #18181b;
+            border: 1px solid #3f3f46;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+        }
+
+        /* Botón de navegación */
+        .nav-button {
+            display: inline-block;
+            width: 100%;
+            max-width: 28rem;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #3f3f46;
+            color: white;
+            font-size: 1.125rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-button:hover {
+            background-color: #52525b;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Estilos de botones de acción */
+        .settings-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            color: #e5e7eb;
+            border-radius: 0.5rem;
+            text-align: left;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            border: 1px solid #52525b;
+        }
+
+        .settings-button:hover {
+            background-color: #52525b;
+            /* zinc-600 */
+        }
+
+        .settings-button.danger {
+            background-color: #991b1b;
+            /* red-800 */
+            border-color: #b91c1c;
+        }
+
+        .settings-button.danger:hover {
+            background-color: #b91c1c;
+            /* red-700 */
+        }
+
+        /* Estilo para el Toggle Switch */
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            border-radius: 0.5rem;
+            border: 1px solid #52525b;
+        }
+
+        .toggle-switch .toggle-label {
+            /* <-- CAMBIO: 'label' ahora es '.toggle-label' */
+            font-weight: 600;
+            color: #e5e7eb;
+            margin-right: 1rem;
+        }
+
+        .toggle-switch input {
+            height: 0;
+            width: 0;
+            visibility: hidden;
+        }
+
+        .toggle-slider {
+            cursor: pointer;
+            width: 50px;
+            height: 28px;
+            background-color: #52525b;
+            /* zinc-600 */
+            border-radius: 14px;
+            position: relative;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+            /* <-- AÑADIDO: para asegurar que no se encoja */
+            display: inline-block;
+            /* <-- CORRECCIÓN: para que respete width/height/position */
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: #facc15;
+            /* Gold */
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Notificación */
+        #notification {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 50%;
+            transform: translate(-50%, 10rem);
+            background-color: #22c55e;
+            /* green-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            opacity: 0;
+            z-index: 50;
+        }
+
+        #notification.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Ajustes</h1>
+            <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Gestión de Datos</p>
+        </header>
+
+        <!-- Card: Gestión de Datos -->
+        <div class="card mb-6">
+            <h2 class="text-xl font-bold text-white mb-4">Gestión de Datos</h2>
+            <div class="space-y-4">
+
+                <!-- Reiniciar Ciclo Bilbo -->
+                <div>
+                    <button id="reset-cycle-btn" class="settings-button">Reiniciar Ciclo Bilbo</button>
+                    <p class="text-xs text-gray-400 mt-1 pl-1">Vuelve a empezar el "Ciclo Bilbo" desde el número 1. Útil
+                        al terminar una macro-rutina.</p>
+                </div>
+
+                <!-- Borrar Historial de Entrenos -->
+                <div>
+                    <button id="clear-history-btn" class="settings-button danger">Borrar TODO el Historial de
+                        Entrenos</button>
+                    <p class="text-xs text-gray-400 mt-1 pl-1">Elimina permanentemente todos tus entrenos guardados,
+                        tests y progresión. Esta acción no se puede deshacer.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Card: Preferencias -->
+        <div class="card">
+            <h2 class="text-xl font-bold text-white mb-4">Preferencias</h2>
+            <div class="space-y-4">
+
+                <!-- Modo Compacto -->
+                <div class="toggle-switch">
+                    <!-- CAMBIO: 'label' original ahora es 'span.toggle-label' -->
+                    <span class="toggle-label" for="compact-mode-toggle">Modo Compacto (Ocultar consejos)</span>
+                    <!-- CAMBIO: 'input' y 'span' envueltos en un 'label' para hacer clicable el deslizador -->
+                    <label>
+                        <input type="checkbox" id="compact-mode-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-400 mt-1 pl-1">Activa esta opción para ocultar los consejos técnicos en la
+                    página de "Entreno" y tener una vista más limpia.</p>
+
+                <!-- NUEVO: Sonidos del Temporizador -->
+                <div class="toggle-switch">
+                    <span class="toggle-label" for="timer-sounds-toggle">Sonidos del Temporizador</span>
+                    <label>
+                        <input type="checkbox" id="timer-sounds-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-400 mt-1 pl-1">Activa o desactiva el sonido "beep" al finalizar el
+                    temporizador de descanso.</p>
+
+            </div>
+        </div>
+
+
+        <!-- Botón de Navegación a Inicio -->
+        <div class="mt-12 text-center">
+            <a class="nav-button" href="index.html">
+                Volver a Inicio
+            </a>
+        </div>
+    </div>
+
+    <!-- Notificación Toast -->
+    <div id="notification">Acción completada</div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Elementos
+            const resetCycleBtn = document.getElementById('reset-cycle-btn');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const compactModeToggle = document.getElementById('compact-mode-toggle');
+            const timerSoundsToggle = document.getElementById('timer-sounds-toggle'); // <-- NUEVO
+            const notification = document.getElementById('notification');
+
+            // --- Notificación ---
+            function showNotification(message, isError = false) {
+                notification.textContent = message;
+                notification.style.backgroundColor = isError ? '#ef4444' : '#22c55e'; // red-500 or green-500
+                notification.classList.add('show');
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+
+            // --- Cargar Estado Inicial de Preferencias ---
+            const isCompact = localStorage.getItem('compactMode') === 'true';
+            compactModeToggle.checked = isCompact;
+
+            const areTimerSoundsOn = localStorage.getItem('timerSounds') !== 'false'; // <-- NUEVO (default a 'true')
+            timerSoundsToggle.checked = areTimerSoundsOn; // <-- NUEVO
+
+            // --- Listeners ---
+
+            // Modo Compacto
+            compactModeToggle.addEventListener('change', (e) => {
+                localStorage.setItem('compactMode', e.target.checked);
+                showNotification(`Modo Compacto ${e.target.checked ? 'activado' : 'desactivado'}`);
+            });
+
+            // NUEVO: Sonidos del Temporizador
+            timerSoundsToggle.addEventListener('change', (e) => {
+                localStorage.setItem('timerSounds', e.target.checked);
+                showNotification(`Sonidos del temporizador ${e.target.checked ? 'activados' : 'desactivados'}`);
+            });
+
+            // Reiniciar Ciclo Bilbo
+            resetCycleBtn.addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que quieres reiniciar el conteo de ciclos de Bilbo a 1?')) {
+                    localStorage.setItem('bilboCycleCount', '1');
+                    localStorage.setItem('bilboPushCycleEnded', 'false');
+                    localStorage.setItem('bilboPullCycleEnded', 'false');
+                    localStorage.setItem('bilboResetFlags', JSON.stringify({})); // Limpiar flags de reseteo
+                    showNotification('Ciclo Bilbo reiniciado a 1');
+                }
+            });
+
+            // Borrar TODO el historial
+            clearHistoryBtn.addEventListener('click', () => {
+                const confirmation = prompt('Esta acción es irreversible. Borrará todo tu historial de entrenos, tests y progresión. Escribe "BORRAR" para confirmar:');
+
+                if (confirmation === 'BORRAR') {
+                    try {
+                        // Borrar todo lo relacionado con el historial y la progresión
+                        localStorage.removeItem('workoutHistory');
+                        localStorage.removeItem('progressionFlags');
+                        localStorage.removeItem('workoutProgress');
+                        localStorage.removeItem('bilboResetFlags');
+
+                        // Resetear el ciclo Bilbo también
+                        localStorage.setItem('bilboCycleCount', '1');
+                        localStorage.setItem('bilboPushCycleEnded', 'false');
+                        localStorage.setItem('bilboPullCycleEnded', 'false');
+
+                        showNotification('¡Historial borrado con éxito!');
+                    } catch (error) {
+                        console.error('Error al borrar el historial:', error);
+                        showNotification('Error al borrar el historial', true);
+                    }
+                } else {
+                    showNotification('Acción cancelada', true);
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

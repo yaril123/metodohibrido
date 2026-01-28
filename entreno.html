@@ -1,0 +1,1839 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Entrenamiento - Entreno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <!-- Chart.js y adaptador de fecha (necesarios para los cálculos de RM) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0D;
+            color: #E0E0E0;
+            padding-bottom: 2rem;
+            /* Espacio para el botón de Inicio */
+        }
+
+        /* Pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #0D0D0D;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #facc15;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* New Button Styles */
+        .day-nav-button {
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+            background: #18181b;
+            /* zinc-900 */
+            color: #e5e7eb;
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .day-nav-button span {
+            font-size: 12px;
+            font-weight: 900;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+        }
+
+        @keyframes active-pulse {
+            0% {
+                transform: scale(1);
+                filter: brightness(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+
+            50% {
+                transform: scale(1.08);
+                filter: brightness(1.3);
+                box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            }
+
+            100% {
+                transform: scale(1);
+                filter: brightness(1);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+        }
+
+        .day-nav-button.active {
+            /* No background or color change, just animation */
+            animation: active-pulse 1.3s infinite ease-in-out;
+            border-color: #facc15;
+            /* Gold border for active */
+        }
+
+        .day-nav-button-hd {
+            background: linear-gradient(90deg, #d4d4d8, #a1a1aa);
+            /* zinc-300 to zinc-400 */
+            color: black;
+            border-color: #71717a;
+            /* zinc-500 */
+        }
+
+        .day-nav-button-bilbo {
+            background: linear-gradient(90deg, #facc15, #ca8a04);
+            /* yellow-400 to yellow-600 */
+            color: black;
+            border-color: #a16207;
+            /* yellow-700 */
+        }
+
+        .day-nav-button-rest {
+            background-color: #3f3f46;
+            /* zinc-700 */
+            color: white;
+            border-color: #52525b;
+            /* zinc-600 */
+        }
+
+        .day-nav-button-rest span {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+
+        .header-background {
+            position: relative;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .header-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Degradado de abajo (negro) a arriba (transparente) */
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.1) 100%);
+            z-index: 2;
+            border-radius: 1.5rem;
+        }
+
+        .header-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 1.5rem;
+            z-index: 1;
+            /* Imagen en el fondo */
+        }
+
+        .header-content {
+            position: absolute;
+            z-index: 3;
+            /* Contenido por encima de todo */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 1.5rem 2rem;
+        }
+
+        .exercise-card {
+            background-color: #18181b;
+            /* zinc-900 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .exercise-title {
+            color: #facc15;
+            /* Gold */
+        }
+
+        .timer-clock {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .timer-yellow {
+            background-color: rgba(250, 204, 21, 0.1);
+            border: 2px solid #facc15;
+            color: #facc15;
+        }
+
+        .timer-yellow:hover {
+            background-color: rgba(250, 204, 21, 0.2);
+        }
+
+        .timer-running {
+            background-color: #facc15;
+            color: #1A1A1A;
+        }
+
+        .series-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-collapse: collapse;
+        }
+
+        .series-table th,
+        .series-table td {
+            padding: 0.75rem 0.25rem;
+            text-align: left;
+            border-bottom: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .series-table th {
+            color: #a1a1aa;
+            /* zinc-400 */
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .series-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .weight-input,
+        .reps-input {
+            background-color: #0D0D0D;
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+            border-radius: 0.375rem;
+            color: #E0E0E0;
+            padding: 0.5rem;
+            width: 100%;
+            max-width: 70px;
+            text-align: center;
+        }
+
+        .weight-input:focus,
+        .reps-input:focus {
+            outline: none;
+            border-color: #facc15;
+            /* Gold */
+        }
+
+        .effective-set .weight-input,
+        .effective-set .reps-input {
+            border-color: #facc15;
+            /* Gold */
+        }
+
+        /* Hide number input arrows */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .completed-card {
+            border-color: #22c55e;
+            opacity: 0.7;
+        }
+
+        .completed-card .exercise-title {
+            text-decoration: line-through;
+            color: #a1a1aa;
+            /* zinc-400 */
+        }
+
+        /* Custom Checkbox */
+        .custom-checkbox {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 0.15em solid #52525b;
+            /* zinc-600 */
+            border-radius: 0.35em;
+            transform: translateY(-0.075em);
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+        }
+
+        .custom-checkbox::before {
+            content: "";
+            width: 0.8em;
+            height: 0.8em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em #22c55e;
+            transform-origin: bottom left;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+
+        .custom-checkbox:checked::before {
+            transform: scale(1);
+        }
+
+        .modal {
+            z-index: 50;
+            /* Ensure it's on top */
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #18181b;
+            /* zinc-900 */
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        #notification {
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        /* Settings Button */
+        #settings-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 60px;
+            height: 60px;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            color: white;
+            border: 1px solid #a1a1aa;
+            /* zinc-400 */
+            border-radius: 50%;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 40;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+        }
+
+        #settings-btn:hover {
+            transform: scale(1.1);
+            background-color: #52525b;
+            /* zinc-600 */
+            border-color: #facc15;
+            color: #facc15;
+        }
+
+        /* Settings Modal */
+        .settings-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            color: #e5e7eb;
+            border-radius: 0.5rem;
+            text-align: left;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .settings-button:hover {
+            background-color: #52525b;
+            /* zinc-600 */
+        }
+
+        .settings-button.danger {
+            background-color: #991b1b;
+        }
+
+        .settings-button.danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background-color: #3f3f46;
+            /* zinc-700 */
+            border-radius: 0.5rem;
+        }
+
+        .toggle-switch label {
+            font-weight: 600;
+            color: #e5e7eb;
+        }
+
+        .toggle-switch input {
+            height: 0;
+            width: 0;
+            visibility: hidden;
+        }
+
+        .toggle-slider {
+            cursor: pointer;
+            width: 50px;
+            height: 28px;
+            background-color: #52525b;
+            /* zinc-600 */
+            border-radius: 14px;
+            position: relative;
+            transition: background-color 0.2s;
+        }
+
+        .toggle-slider:before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        input:checked+.toggle-slider {
+            background-color: #facc15;
+            /* Gold */
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Compact Mode */
+        .compact-mode .exercise-tips {
+            display: none;
+        }
+
+        /* Info Modal Table */
+        .info-table {
+            width: 100%;
+            text-align: left;
+            font-size: 0.875rem;
+            color: #d4d4d8;
+            /* zinc-300 */
+        }
+
+        .info-table thead {
+            background-color: #3f3f46;
+            /* zinc-700 */
+        }
+
+        .info-table th,
+        .info-table td {
+            padding: 0.75rem 1rem;
+        }
+
+        .info-table tbody {
+            border-top: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .info-table tr {
+            border-bottom: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .info-subtitle {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #facc15;
+            /* Gold */
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="p-4 sm:p-6 md:p-8">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p class="text-white font-bold">Cargando...</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 header-background">
+            <img src="https://logise1.netlify.app/src/gym/automatizado.png" alt="Fondo" class="header-image">
+
+            <div class="header-content">
+                <div>
+                    <h1 id="main-title" class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">
+                        HEAVY DUTY</h1>
+                    <p id="workout-title" class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1"></p>
+                </div>
+                <div id="stopwatch-container" class="text-right flex-shrink-0">
+                    <div id="stopwatch-display" class="text-2xl sm:text-3xl font-bold text-white">00:00:00</div>
+                    <button id="stopwatch-control"
+                        class="mt-2 w-full px-4 py-2 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg">Start</button>
+                </div>
+            </div>
+        </header>
+
+        <div id="tabs" class="grid grid-cols-7 gap-2 mb-8"></div>
+        <main id="workout-content"></main>
+
+        <!-- Botón de Navegación a Inicio -->
+        <div class="mt-12 text-center">
+            <a href="index.html"
+                class="inline-block w-full max-w-md mx-auto p-4 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-lg font-bold uppercase tracking-wider transition-all duration-200 hover:shadow-lg"
+                style="text-decoration: none;">
+                Inicio
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Floating Settings Button -->
+    <button id="settings-btn">⚙️</button>
+
+    <!-- Modals & Notifications -->
+    <div id="notification"
+        class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-green-600 text-white py-2 px-5 rounded-lg shadow-lg opacity-0 transform translate-y-10 z-50">
+        Entrenamiento guardado con exito!!!
+    </div>
+    <div id="pause-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-sm w-full">
+            <h2 class="text-2xl font-bold mb-6 text-white">Entrenamiento Pausado</h2>
+            <div class="flex gap-4">
+                <button id="resume-btn"
+                    class="flex-1 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Reanudar</button>
+                <button id="finish-btn"
+                    class="flex-1 bg-red-600 hover:bg-red-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Terminar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Confirmación de Finalización -->
+    <div id="finish-confirm-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-sm w-full">
+            <h2 class="text-xl font-bold mb-6 text-white">¿Estas seguro de que quieres finalizar el entreno?</h2>
+            <div class="flex gap-4">
+                <button id="confirm-finish-no-btn"
+                    class="flex-1 bg-gray-600 hover:bg-gray-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">No</button>
+                <button id="confirm-finish-yes-btn"
+                    class="flex-1 bg-red-600 hover:bg-red-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Sí</button>
+            </div>
+        </div>
+    </div>
+    <!-- Nuevo Modal de Progresión HD -->
+    <div id="progression-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-sm w-full">
+            <h2 id="progression-modal-title" class="text-xl font-bold mb-4 text-white">¡Buen trabajo!</h2>
+            <p id="progression-modal-text" class="text-gray-300 mb-6"></p>
+            <div class="flex gap-4">
+                <button id="progress-no-btn"
+                    class="flex-1 bg-gray-600 hover:bg-gray-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">No,
+                    mantener</button>
+                <button id="progress-yes-btn"
+                    class="flex-1 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Sí,
+                    subir peso</button>
+            </div>
+        </div>
+    </div>
+    <!-- Nuevo Modal de Ciclo Bilbo -->
+    <div id="bilbo-cycle-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-sm w-full">
+            <h2 id="bilbo-cycle-title" class="text-xl font-bold mb-4 text-yellow-400">¡Ciclo Bilbo Completado!</h2>
+            <p id="bilbo-cycle-text" class="text-gray-300 mb-6"></p>
+            <button id="bilbo-cycle-ok-btn"
+                class="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Entendido</button>
+        </div>
+    </div>
+    <!-- MODAL DE AJUSTES -->
+    <div id="settings-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div
+            class="modal-content max-w-md w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 rounded-lg shadow-lg relative">
+            <button id="close-settings-modal"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold text-yellow-400 mb-6">Ajustes y Personalización</h2>
+            <div class="space-y-4">
+                <a href="metodo.html" class="settings-button">Ver Información del Plan</a>
+
+                <div class="toggle-switch">
+                    <label for="compact-mode-toggle">Modo Compacto (Ocultar consejos)</label>
+                    <input type="checkbox" id="compact-mode-toggle">
+                    <span class="toggle-slider"></span>
+                </div>
+
+                <button id="reset-cycle-btn" class="settings-button">Reiniciar Ciclo Bilbo</button>
+                <button id="clear-history-btn" class="settings-button danger">Borrar Historial de Entrenos</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTA: El modal de Info ya no se usa aquí, se enlaza a metodo.html -->
+    <div id="info-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
+        const appId = 'metodo-hibrido-data';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
+            authDomain: "metodo-hibrido.firebaseapp.com",
+            projectId: "metodo-hibrido",
+            storageBucket: "metodo-hibrido.firebasestorage.app",
+            messagingSenderId: "982967728212",
+            appId: "1:982967728212:web:b27ea198c80601fc8315c1",
+            measurementId: "G-PETF3C4DM9"
+        };
+
+        const authToken = null;
+
+        let db, auth;
+        let userId = null;
+        let isLoggedIn = false;
+
+        // Variables de control de estado de carga
+        let isAuthReady = false;
+        let isDataReady = false;
+        let isDomReady = false;
+        let isAppLaunched = false;
+
+        let appData = {}; // Estado centralizado de la aplicación (sustituye a la mayoría de localStorage)
+        const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
+
+        // --- Configuration ---
+        const workouts = {
+            hd_push: {
+                title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
+                    { name: "Press inclinado con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 135 },
+                    { name: "Press en suelo con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 165 },
+                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 135 },
+                    { name: "Elevaciones laterales sentado", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 105 },
+                ]
+            },
+            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            hd_pull: {
+                title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
+                    { name: "Jalón en polea agarre neutro", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 165 },
+                    { name: "Remo con barra T", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 165 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 105 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 105 },
+                ]
+            },
+            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            bilbo_push: {
+                title: "BILBO — PUSH", type: 'bilbo', exercises: [
+                    { name: "Press de banca plano (barra)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Sin bloqueo de codos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 105 },
+                    { name: "Elevaciones laterales con gomas", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 75 },
+                    { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 105 },
+                    { name: "Cruces con goma (pecho)", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 75 },
+                ]
+            },
+            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            bilbo_pull: {
+                title: "BILBO — PULL", type: 'bilbo', exercises: [
+                    { name: "Jalón al pecho agarre estrecho", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tira al pecho, mirada neutra. Evita sacar la cabeza al final del movimiento; hombros bajos y omóplatos juntos.", rest: 120 },
+                    { name: "Remo bajo con polea (agarre neutro)", rmPercentage: "55 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Movimiento fluido, sin arqueo lumbar. Sin arqueo lumbar. Control respiratorio, sin apnea.", rest: 120 },
+                    { name: "Remo Inclinado 30º, Mancuernas, Neutro", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tronco 30°, codos pegados, cuello neutro. Mantén columna larga, abdomen activo y cuello alineado al suelo.", rest: 120 },
+                    { name: "Curl en barra Z", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos fijos, hombros relajados. Apoya bien los pies, suelta el cuello; mueve solo antebrazos y respira lento.", rest: 75 },
+                ]
+            }
+        };
+        const days = ['hd_push', 'rest1', 'hd_pull', 'rest2', 'bilbo_push', 'rest3', 'bilbo_pull'];
+        const dayNames = { hd_push: 'HD PUSH', rest1: 'CARDIO', hd_pull: 'HD PULL', rest2: 'CARDIO', bilbo_push: 'BILBO PUSH', rest3: 'CARDIO', bilbo_pull: 'BILBO PULL' };
+
+        let allExerciseNames = new Set();
+        let currentExerciseNameForModal = null;
+        let e1rmMap = new Map(); // Mapa de 1RM estimado
+        let DOM = {}; // Se llenará en DOMContentLoaded
+
+        const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false };
+
+
+        // --- FUNCIONES DE PERSISTENCIA (Prioridad: Firebase si logueado, sino localStorage) ---
+
+        function loadLocalData(key) {
+            const value = localStorage.getItem(key);
+            try {
+                // Intenta parsear JSON. Si falla, devuelve el valor como string.
+                return value ? JSON.parse(value) : null;
+            } catch (e) {
+                return value;
+            }
+        }
+
+        function saveLocalData(key, value) {
+            // Guarda como string si no es objeto, sino serializa.
+            localStorage.setItem(key, typeof value === 'object' ? JSON.stringify(value) : value);
+        }
+
+        // Carga todos los datos relevantes de localStorage
+        function loadAllLocalData() {
+            return {
+                workoutHistory: loadLocalData('workoutHistory') || {},
+                progressionFlags: loadLocalData('progressionFlags') || {},
+                bilboCycleCount: localStorage.getItem('bilboCycleCount') || '1',
+                bilboPushCycleEnded: localStorage.getItem('bilboPushCycleEnded') || 'false',
+                bilboPullCycleEnded: localStorage.getItem('bilboPullCycleEnded') || 'false',
+                bilboResetFlags: loadLocalData('bilboResetFlags') || {},
+                workoutProgress: loadLocalData('workoutProgress') || null,
+                compactMode: localStorage.getItem('compactMode') === 'true'
+            };
+        }
+
+        // Guarda todos los datos relevantes a localStorage (para modo invitado)
+        function saveAllLocalData(updatedAppData) {
+            saveLocalData('workoutHistory', updatedAppData.workoutHistory);
+            saveLocalData('progressionFlags', updatedAppData.progressionFlags);
+            localStorage.setItem('bilboCycleCount', updatedAppData.bilboCycleCount);
+            localStorage.setItem('bilboPushCycleEnded', updatedAppData.bilboPushCycleEnded);
+            localStorage.setItem('bilboPullCycleEnded', updatedAppData.bilboPullCycleEnded);
+            saveLocalData('bilboResetFlags', updatedAppData.bilboResetFlags);
+            saveLocalData('workoutProgress', updatedAppData.workoutProgress);
+            localStorage.setItem('compactMode', updatedAppData.compactMode);
+        }
+
+        // Escribe todos los datos al documento de Firebase (documento 'data' en colección 'entreno')
+        async function writeAllDataToFirestore(updatedAppData) {
+            if (!isLoggedIn || !db || !userId) return;
+            try {
+                // Usamos merge:true para no sobrescribir otros campos que puedan existir
+                await setDoc(doc(db, DATA_DOC_PATH(userId), 'data'), updatedAppData, { merge: true });
+                console.log("Datos guardados en Firebase.");
+            } catch (e) {
+                console.error("Error guardando datos en Firebase:", e);
+                // Si falla Firebase, guardar en local por si acaso
+                saveAllLocalData(updatedAppData);
+            }
+        }
+
+        // Función para obtener datos: Abstracta el origen (Firebase o local)
+        function getAppData(key) {
+            // Caso especial para el progreso diario (es dependiente de la fecha)
+            if (key === 'workoutProgress') {
+                const todayStr = getTodayDateString();
+                const progress = appData.workoutProgress || null;
+                // Devolvemos el progreso solo si la fecha coincide con hoy
+                if (progress && progress.date === todayStr) {
+                    return progress;
+                }
+                return null;
+            }
+
+            // Tratamiento de valores por defecto (evita undefined)
+            const defaultValue = {
+                workoutHistory: {},
+                progressionFlags: {},
+                bilboResetFlags: {},
+                bilboCycleCount: '1',
+                bilboPushCycleEnded: 'false',
+                bilboPullCycleEnded: 'false',
+                compactMode: false,
+                workoutProgress: null,
+            };
+
+            const data = appData[key];
+
+            if (data !== undefined && data !== null) {
+                return data;
+            } else {
+                return defaultValue[key];
+            }
+        }
+
+        // Función para establecer datos: Abstracta el destino (Firebase o local)
+        function setAppData(key, value) {
+            // 1. Actualiza el estado interno
+            appData[key] = value;
+
+            // 2. Persiste
+            if (!isLoggedIn) {
+                // Guarda solo en local para usuarios invitados
+                saveAllLocalData(appData);
+            } else {
+                // Guarda en Firebase para usuarios logueados (la escucha onSnapshot actualizará appData en otros clientes)
+                writeAllDataToFirestore(appData);
+            }
+        }
+
+        // Función para obtener la fecha de hoy
+        function getTodayDateString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        // --- CORE UI/LOGIC FUNCTIONS ---
+
+        // Intentar lanzar la app. Solo corre si Data y DOM están listos.
+        function tryLaunchApp() {
+            if (isDataReady && isDomReady && !isAppLaunched) {
+                isAppLaunched = true;
+                console.log("Both DOM and Data are ready. Launching Core App...");
+                // Ocultar pantalla de carga
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) loadingScreen.style.opacity = '0';
+                setTimeout(() => { if (loadingScreen) loadingScreen.style.display = 'none'; }, 500);
+
+                coreAppInit();
+            } else {
+                console.log(`Waiting... DataReady: ${isDataReady}, DomReady: ${isDomReady}`);
+            }
+        }
+
+        // Función de inicialización principal que se llama cuando los datos están listos
+        function coreAppInit() {
+            // Limpieza previa (por si se llama dos veces)
+            DOM.tabsContainer.innerHTML = '';
+            DOM.contentContainer.innerHTML = '';
+
+            // 1. Generar los botones de las pestañas
+            days.forEach((day) => {
+                const button = document.createElement('button');
+                button.dataset.day = day;
+                let classes = 'day-nav-button ';
+                const buttonText = dayNames[day];
+                if (buttonText.includes('HD')) classes += 'day-nav-button-hd';
+                else if (buttonText.includes('BILBO')) classes += 'day-nav-button-bilbo';
+                else classes += 'day-nav-button-rest';
+                button.className = classes;
+                button.innerHTML = `<span>${dayNames[day]}</span>`;
+                DOM.tabsContainer.appendChild(button);
+            });
+
+            // 2. Configurar listeners (Solo si no están ya configurados, aunque la estructura es idempotente)
+            // Ya que llamamos a generateWorkoutHTML, recreamos el contenido
+            generateWorkoutHTML();
+
+            // 3. Cargar el estado del modo compacto
+            const isCompact = getAppData('compactMode');
+            document.body.classList.toggle('compact-mode', isCompact);
+            if (DOM.compactModeToggle) {
+                DOM.compactModeToggle.checked = isCompact;
+            }
+
+            // 4. Determinar el día a cargar
+            let dayToLoad = days[0];
+            const history = getAppData('workoutHistory');
+            const sortedDates = Object.keys(history).sort().reverse();
+
+            if (sortedDates.length > 0) {
+                const lastWorkoutDateStr = sortedDates[0];
+                const lastWorkoutLog = history[lastWorkoutDateStr];
+
+                let lastDayKey = null;
+                if (lastWorkoutLog && lastWorkoutLog.workoutTitle) {
+                    for (const day of days) {
+                        if (workouts[day].title === lastWorkoutLog.workoutTitle) {
+                            lastDayKey = day;
+                            break;
+                        }
+                    }
+                }
+
+                if (lastDayKey) {
+                    const lastDayIndex = days.indexOf(lastDayKey);
+                    let nextDayIndex = (lastDayIndex + 1) % days.length;
+                    let nextDayKey = days[nextDayIndex];
+
+                    while (workouts[nextDayKey].type === 'rest') {
+                        nextDayIndex = (nextDayIndex + 1) % days.length;
+                        nextDayKey = days[nextDayIndex];
+                    }
+                    dayToLoad = nextDayKey;
+                }
+            }
+
+            // 5. Cargar datos y mostrar UI
+            e1rmMap = calculateAllEstimated1RMs();
+            showDay(dayToLoad);
+            loadLastPerformance(e1rmMap);
+            loadProgress();
+        }
+
+        // --- Funciones auxiliares ---
+
+        function generateWorkoutHTML() {
+            days.forEach(day => {
+                const dayContainer = document.createElement('div');
+                dayContainer.id = day;
+                dayContainer.className = 'workout-day hidden';
+                const gridContainer = document.createElement('div');
+                gridContainer.className = 'grid grid-cols-1 gap-6';
+                const workout = workouts[day];
+                workout.exercises.forEach((exercise, exIndex) => {
+                    const isStrengthDay = workout.type !== 'rest';
+                    if (isStrengthDay) {
+                        allExerciseNames.add(exercise.name);
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'exercise-card';
+                    card.dataset.day = day;
+                    card.dataset.exIndex = exIndex;
+                    let seriesRows = '';
+                    let tableHeader = '';
+
+                    if (isStrengthDay) {
+                        tableHeader = `
+                            <thead>
+                                <tr>
+                                    <th>Serie</th>
+                                    <th class="text-center">Peso (KG)</th>
+                                    <th class="text-center">Reps</th>
+                                    <th class="text-center">Últ. Peso</th>
+                                    <th class="text-center">Últ. Reps</th>
+                                    <th class="text-center">Reps Acons.</th>
+                                    <th>% 1RM</th>
+                                </tr>
+                            </thead>`;
+                        let seriesBody = '';
+                        const rmValues = exercise.rmPercentage ? exercise.rmPercentage.replace(/%/g, '').split('/').map(v => v.trim()) : [];
+                        exercise.sets.forEach((set, setIndex) => {
+                            const isBilboDay = day.includes('bilbo');
+                            const isEffectiveSet = (isBilboDay && setIndex === 0) || (!isBilboDay && setIndex === exercise.sets.length - 1);
+                            const currentRm = rmValues[setIndex] || (rmValues.length === 1 ? rmValues[0] : '');
+                            const rmDisplay = currentRm ? (isNaN(currentRm) ? currentRm : `${currentRm}%`) : '';
+                            const rowClass = isEffectiveSet ? 'effective-set' : '';
+                            const seriesTdClass = isEffectiveSet ? 'text-white font-semibold text-lg' : 'text-[#c6c6c6] font-semibold';
+                            const rmTdClass = isEffectiveSet ? 'text-white font-medium text-lg' : 'text-[#c6c6c6] font-medium';
+                            const repsTdClass = isEffectiveSet ? 'text-white font-bold text-lg text-center' : 'text-[#c6c6c6] font-bold text-center';
+
+                            let seriesName;
+                            if (isBilboDay) {
+                                if (setIndex === 0) { seriesName = 'Serie Bilbo'; } else { seriesName = `Serie ${setIndex + 1}`; }
+                            } else {
+                                if (isEffectiveSet) { seriesName = 'Serie'; } else { seriesName = `Calentamiento ${setIndex + 1}`; }
+                            }
+
+                            seriesBody += `
+                                <tr class="set-row ${rowClass}">
+                                    <td class="${seriesTdClass}">${seriesName}</td>
+                                    <td class="text-center"><input type="number" step="0.5" class="weight-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
+                                    <td class="text-center"><input type="number" class="reps-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
+                                    <td class="text-center text-gray-400 last-weight-cell">-</td>
+                                    <td class="text-center text-gray-400 last-reps-cell">-</td>
+                                    <td class="${repsTdClass}">${set.reps}</td>
+                                    <td class="${rmTdClass}">${rmDisplay}</td>
+                                </tr>
+                            `;
+                        });
+                        seriesRows = `<tbody>${seriesBody}</tbody>`;
+                    } else { // Is Rest/Cardio Day
+                        tableHeader = `
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Tiempo (min)</th>
+                                    <th class="text-center">Pulso (BPM)</th>
+                                </tr>
+                            </thead>`;
+                        seriesRows = `
+                            <tbody>
+                                <tr class="set-row">
+                                    <td class="text-center"><input type="number" step="1" class="weight-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="0"></td>
+                                    <td class="text-center"><input type="number" class="reps-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="0"></td>
+                                </tr>
+                            </tbody>`;
+                    }
+
+                    const minutes = Math.floor(exercise.rest / 60);
+                    const seconds = exercise.rest % 60;
+                    const restTimeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    const dropSetHTML = (exercise.dropSet === true && isStrengthDay) ? `<span><strong class="text-gray-400 font-medium">Drop Set:</strong> ✅ Sí</span>` : '';
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start gap-4">
+                            <div class="flex-grow">
+                                <h3 class="exercise-title text-xl font-bold mb-4">${exercise.name}</h3>
+                                <div class="exercise-tips space-y-2">
+                                ${isStrengthDay ? `
+                                    <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-300">
+                                        <span><strong class="text-gray-400 font-medium">% 1RM:</strong> ${exercise.rmPercentage}</span>
+                                        <span><strong class="text-gray-400 font-medium">Series:</strong> ${exercise.seriesCount}</span>
+                                        ${dropSetHTML}
+                                    </div>
+                                    <p class="text-sm text-gray-300"><strong class="text-gray-400 font-medium">Consejo técnico:</strong> ${exercise.tip}</p>
+                                ` : `
+                                     <p class="text-sm text-gray-300"><strong class="text-gray-400 font-medium">Consejo técnico:</strong> ${exercise.tip}</p>
+                                    ${exercise.antiMigraineTip ? `<p class="text-sm text-gray-300">${exercise.antiMigraineTip}</p>` : ''}
+                                `}
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-4 flex-shrink-0">
+                                ${isStrengthDay ? `<div class="timer-clock timer-yellow" data-duration="${exercise.rest}" data-day="${day}" data-ex-index="${exIndex}">${restTimeFormatted}</div>` : ''}
+                            </div>
+                        </div>
+                        <table class="series-table">
+                            ${tableHeader}
+                            ${seriesRows}
+                        </table>
+                        <div class="mt-4 flex items-center gap-2">
+                            <input type="checkbox" class="custom-checkbox" data-day="${day}" data-ex-index="${exIndex}">
+                            <label class="text-sm text-gray-400">Marcar como completado</label>
+                        </div>
+                    `;
+                    gridContainer.appendChild(card);
+                });
+                dayContainer.appendChild(gridContainer);
+                DOM.contentContainer.appendChild(dayContainer);
+            });
+        }
+
+
+        function showDay(dayToShow) {
+            // Mostrar la sección de entrenamiento
+            DOM.contentContainer.classList.remove('hidden');
+            DOM.tabsContainer.classList.remove('hidden');
+
+            document.querySelectorAll('.workout-day').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.day-nav-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.day-nav-button[data-day="${dayToShow}"]`)?.classList.add('active');
+            document.getElementById(dayToShow)?.classList.remove('hidden');
+
+            const workoutInfo = workouts[dayToShow];
+            const bilboCycleCount = getAppData('bilboCycleCount'); // Usa getAppData
+            let subtitleHTML = '';
+
+            if (dayToShow.includes('hd')) {
+                DOM.mainTitle.textContent = "HEAVY DUTY";
+                if (dayToShow.includes('push')) {
+                    subtitleHTML = "PUSH";
+                } else if (dayToShow.includes('pull')) {
+                    subtitleHTML = "PULL";
+                }
+            } else if (dayToShow.includes('bilbo')) {
+                DOM.mainTitle.textContent = "MÉTODO BILBO";
+                if (dayToShow.includes('push')) {
+                    subtitleHTML = `PUSH<br><span style="color: white; font-size: 0.7em; font-weight: normal;">Ciclo ${bilboCycleCount}</span>`;
+                } else if (dayToShow.includes('pull')) {
+                    subtitleHTML = `PULL<br><span style="color: white; font-size: 0.7em; font-weight: normal;">Ciclo ${bilboCycleCount}</span>`;
+                }
+            } else if (dayToShow.includes('rest')) {
+                DOM.mainTitle.textContent = "CARDIO";
+                subtitleHTML = "Descanso Activo (Z2)";
+            }
+            DOM.workoutTitle.innerHTML = subtitleHTML;
+        }
+
+        function startTimer(duration, timerElement) {
+            const timerId = `${timerElement.dataset.day}-${timerElement.dataset.exIndex}`;
+            if (state.activeTimers[timerId]) {
+                clearInterval(state.activeTimers[timerId].interval);
+            }
+            timerElement.classList.add('timer-running');
+            let timer = duration;
+            const interval = setInterval(() => {
+                const minutes = parseInt(timer / 60, 10);
+                const seconds = parseInt(timer % 60, 10);
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    timerElement.classList.remove('timer-running');
+                    const originalMinutes = Math.floor(duration / 60);
+                    const originalSeconds = duration % 60;
+                    timerElement.textContent = `${originalMinutes}:${originalSeconds.toString().padStart(2, '0')}`;
+                    delete state.activeTimers[timerId];
+                    const synth = new Tone.Synth().toDestination();
+                    synth.triggerAttackRelease("C5", "8n", Tone.now());
+                    synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
+                }
+            }, 1000);
+            state.activeTimers[timerId] = { interval, element: timerElement };
+        }
+
+        function showNotification(message) {
+            DOM.notification.textContent = message;
+            DOM.notification.classList.remove('opacity-0', 'translate-y-10');
+            DOM.notification.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                DOM.notification.classList.add('opacity-0', 'translate-y-10');
+                DOM.notification.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+
+        // --- Stopwatch Functions ---
+        function updateStopwatchDisplay() {
+            const hours = Math.floor(state.totalSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((state.totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (state.totalSeconds % 60).toString().padStart(2, '0');
+            DOM.stopwatchDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        function startStopwatch() {
+            if (state.isStopwatchRunning) return;
+            state.isStopwatchRunning = true;
+            DOM.stopwatchControlBtn.textContent = 'Pausar';
+            state.stopwatchInterval = setInterval(() => {
+                state.totalSeconds++;
+                updateStopwatchDisplay();
+            }, 1000);
+        }
+
+        function pauseStopwatch() {
+            if (!state.isStopwatchRunning) return;
+            state.isStopwatchRunning = false;
+            clearInterval(state.stopwatchInterval);
+            DOM.pauseModal.classList.remove('hidden');
+        }
+
+
+        // --- Data Persistence ---
+        function saveProgress() {
+            const todayStr = getTodayDateString();
+            let progress = { date: todayStr, workouts: {} };
+            days.forEach(day => {
+                progress.workouts[day] = {};
+                const dayExercises = document.querySelectorAll(`.exercise-card[data-day="${day}"]`);
+                dayExercises.forEach((card, exIndex) => {
+                    const isCompleted = card.querySelector('input[type="checkbox"]').checked;
+                    const weights = [];
+                    card.querySelectorAll('.weight-input').forEach(input => { weights.push(input.value); });
+                    const reps = [];
+                    card.querySelectorAll('.reps-input').forEach(input => { reps.push(input.value); });
+                    progress.workouts[day][exIndex] = { completed: isCompleted, weights: weights, reps: reps };
+                });
+            });
+            setAppData('workoutProgress', progress); // Usa setAppData
+        }
+
+        function loadProgress() {
+            const progress = getAppData('workoutProgress'); // Usa getAppData
+            if (!progress || progress.date !== getTodayDateString()) {
+                return;
+            }
+            days.forEach(day => {
+                if (progress.workouts[day]) {
+                    Object.keys(progress.workouts[day]).forEach(exIndex => {
+                        const data = progress.workouts[day][exIndex];
+                        const card = document.querySelector(`.exercise-card[data-day="${day}"][data-ex-index="${exIndex}"]`);
+                        if (!card) return;
+                        const checkbox = card.querySelector('input[type="checkbox"]');
+                        checkbox.checked = data.completed;
+                        if (data.completed) card.classList.add('completed-card');
+                        card.querySelectorAll('.weight-input').forEach((input, setIndex) => {
+                            if (data.weights && data.weights[setIndex] && data.weights[setIndex] !== '') {
+                                input.value = data.weights[setIndex];
+                            }
+                        });
+                        card.querySelectorAll('.reps-input').forEach((input, setIndex) => {
+                            input.value = (data.reps && data.reps[setIndex]) ? data.reps[setIndex] : '';
+                        });
+                    });
+                }
+            });
+        }
+
+
+        // --- Progression Modal ---
+        function showProgressionModal(exerciseName) {
+            currentExerciseNameForModal = exerciseName;
+            DOM.progressionModalText.textContent = `Para ${exerciseName}, ¿la última repetición fué perfecta? ¿Quieres subir el peso para la próxima vez?`;
+            DOM.progressionModal.classList.remove('hidden');
+        }
+
+        function showBilboCycleModal(exerciseName, newCycle, newWeight) {
+            currentExerciseNameForModal = exerciseName;
+            DOM.bilboCycleText.textContent = `¡Ciclo completado para ${exerciseName}! Nuevo ciclo: ${newCycle}. Se sugiere reiniciar a ${newWeight.toFixed(1)} kg.`;
+            DOM.bilboCycleModal.classList.remove('hidden');
+        }
+
+        function approveWeightIncrease() {
+            let flags = getAppData('progressionFlags'); // Usa getAppData
+            flags[currentExerciseNameForModal] = true;
+            setAppData('progressionFlags', flags); // Usa setAppData
+            DOM.progressionModal.classList.add('hidden');
+            currentExerciseNameForModal = null;
+        }
+
+        function denyWeightIncrease() {
+            let flags = getAppData('progressionFlags'); // Usa getAppData
+            flags[currentExerciseNameForModal] = false;
+            setAppData('progressionFlags', flags); // Usa setAppData
+            DOM.progressionModal.classList.add('hidden');
+            currentExerciseNameForModal = null;
+        }
+
+        function closeBilboCycleModal() {
+            let flags = getAppData('bilboResetFlags'); // Usa getAppData
+            flags[currentExerciseNameForModal] = true; // Set reset flag
+            setAppData('bilboResetFlags', flags); // Usa setAppData
+            DOM.bilboCycleModal.classList.add('hidden');
+            currentExerciseNameForModal = null;
+        }
+
+        // --- Funciones de confirmación de finalización ---
+        function showFinishConfirmation() {
+            if (state.isStopwatchRunning) {
+                pauseStopwatch(); // Pausar si está corriendo
+            }
+            DOM.finishConfirmModal.classList.remove('hidden');
+        }
+
+        function cancelFinish() {
+            DOM.finishConfirmModal.classList.add('hidden');
+            if (state.isStopwatchRunning) {
+                startStopwatch();
+            }
+        }
+
+        function handleConfirmFinish() {
+            DOM.finishConfirmModal.classList.add('hidden');
+            finishWorkout();
+        }
+
+
+        // --- Calendar & History Functions ---
+        function finishWorkout() {
+            clearInterval(state.stopwatchInterval);
+            state.isStopwatchRunning = false;
+
+            const todayStr = getTodayDateString();
+            const finalTime = DOM.stopwatchDisplay.textContent;
+
+            let dayTrained = null;
+            let completedExercises = [];
+            let isBilboDay = false;
+            const progressionChecks = [];
+            const bilboResets = [];
+            e1rmMap = calculateAllEstimated1RMs(); // Calcular 1RMs ANTES de procesar
+
+            for (const day of days) {
+                const checkedExercisesOnDay = document.querySelectorAll(`.exercise-card[data-day="${day}"] input[type="checkbox"]:checked`);
+                if (checkedExercisesOnDay.length > 0) {
+                    dayTrained = day;
+                    isBilboDay = day.includes('bilbo');
+                    checkedExercisesOnDay.forEach(checkbox => {
+                        const card = checkbox.closest('.exercise-card');
+                        const exIndex = parseInt(card.dataset.exIndex, 10);
+                        const exerciseData = workouts[dayTrained].exercises[exIndex];
+                        const seriesData = [];
+                        card.querySelectorAll('.set-row').forEach((row) => {
+                            const weightInput = row.querySelector('.weight-input');
+                            const repsInput = row.querySelector('.reps-input');
+                            seriesData.push({
+                                weight: weightInput ? weightInput.value : '0',
+                                reps: repsInput ? repsInput.value : '0'
+                            });
+                        });
+                        completedExercises.push({
+                            name: exerciseData.name,
+                            series: seriesData
+                        });
+
+                        // Lógica de progresión HD
+                        if (dayTrained.includes('hd') && exerciseData.sets.length > 0) {
+                            const exerciseName = exerciseData.name;
+                            const currentSeries = seriesData[seriesData.length - 1];
+                            let repsTargetRaw = exerciseData.sets[exerciseData.sets.length - 1].reps;
+                            if (typeof repsTargetRaw === 'number') {
+                                repsTargetRaw = repsTargetRaw.toString();
+                            }
+                            const targetReps = parseInt(repsTargetRaw.split('-')[0], 10);
+                            const currentWeight = parseFloat(currentSeries.weight);
+                            const currentReps = parseInt(currentSeries.reps, 10);
+
+                            const history = getAppData('workoutHistory'); // Usa getAppData
+                            // Nota: Aquí se debería ordenar por fecha, pero para evitar el error de Firestore
+                            // por falta de índice, asumimos que history está cargado y revisamos secuencialmente
+                            const sortedDates = Object.keys(history).sort().reverse();
+
+                            for (const date of sortedDates) {
+                                const log = history[date];
+                                if (log && Array.isArray(log.exercises)) {
+                                    const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
+                                    if (foundExercise && foundExercise.series.length > 0) {
+                                        const previousSeries = foundExercise.series[foundExercise.series.length - 1];
+                                        const prevWeight = parseFloat(previousSeries.weight);
+                                        const prevReps = parseInt(previousSeries.reps, 10);
+
+                                        if (currentWeight === prevWeight && currentReps >= targetReps && prevReps >= targetReps) {
+                                            progressionChecks.push({ name: exerciseName, type: 'hd' });
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Lógica de ciclo Bilbo
+                        if (isBilboDay && exerciseData.sets.length > 0) {
+                            const exerciseName = exerciseData.name;
+                            const currentReps = parseInt(seriesData[0].reps, 10);
+                            if (!isNaN(currentReps) && currentReps <= 15) {
+                                bilboResets.push({ name: exerciseName, type: 'bilbo' });
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+
+
+            if (dayTrained) {
+                const workoutType = workouts[dayTrained].type;
+                const workoutTitle = workouts[dayTrained].title;
+                let history = getAppData('workoutHistory');
+                let progressionFlags = getAppData('progressionFlags');
+                let bilboResetFlags = getAppData('bilboResetFlags');
+
+                let logEntry = {
+                    date: todayStr,
+                    time: finalTime,
+                    workoutType: workoutType,
+                    workoutTitle: workoutTitle,
+                    exercises: completedExercises
+                };
+
+                history[todayStr] = logEntry;
+                setAppData('workoutHistory', history);
+
+                if (isBilboDay) {
+                    let currentBilboCycle = parseInt(getAppData('bilboCycleCount'));
+                    let bilboPushCompleted = getAppData('bilboPushCycleEnded') === 'true';
+                    let bilboPullCompleted = getAppData('bilboPullCycleEnded') === 'true';
+
+                    logEntry.bilboCycle = currentBilboCycle; // Añadir ciclo al log
+
+                    if (dayTrained === 'bilbo_push' && bilboResets.length > 0) {
+                        setAppData('bilboPushCycleEnded', 'true');
+                        bilboPushCompleted = true;
+                    } else if (dayTrained === 'bilbo_pull' && bilboResets.length > 0) {
+                        setAppData('bilboPullCycleEnded', 'true');
+                        bilboPullCompleted = true;
+                    }
+
+                    if (bilboPushCompleted && bilboPullCompleted) {
+                        currentBilboCycle++;
+                        setAppData('bilboCycleCount', currentBilboCycle.toString());
+                        setAppData('bilboPushCycleEnded', 'false');
+                        setAppData('bilboPullCycleEnded', 'false');
+                        console.log("Bilbo Cycle Completed! Moving to cycle:", currentBilboCycle);
+                    }
+                }
+
+                // Guardar flags actualizados (necesarios para el modal y la próxima carga)
+                setAppData('progressionFlags', progressionFlags);
+                setAppData('bilboResetFlags', bilboResetFlags);
+
+                showNotification("Entrenamiento guardado con exito!!!");
+            } else {
+                console.log("No completed exercises to save.");
+            }
+
+            state.totalSeconds = 0;
+            state.isStopwatchRunning = false;
+            updateStopwatchDisplay();
+            DOM.stopwatchControlBtn.textContent = 'Start';
+            DOM.pauseModal.classList.add('hidden');
+
+            e1rmMap = calculateAllEstimated1RMs();
+
+            if (dayTrained && dayTrained.includes('bilbo')) {
+                showDay(dayTrained);
+            }
+            loadLastPerformance(e1rmMap);
+
+            // Mostrar Modales
+            if (progressionChecks.length > 0) {
+                setTimeout(() => {
+                    showProgressionModal(progressionChecks[0].name);
+                }, 500);
+            } else if (bilboResets.length > 0) {
+                setTimeout(() => {
+                    const exerciseName = bilboResets[0].name;
+                    const newCycle = parseInt(getAppData('bilboCycleCount'));
+                    const newWeight = (e1rmMap.get(exerciseName) || 40) * 0.5; // 40 as default e1rm if none found
+                    showBilboCycleModal(exerciseName, newCycle, newWeight);
+                }, 500);
+            }
+        }
+
+        function loadLastPerformance(e1rmMap) {
+            const history = getAppData('workoutHistory'); // Usa getAppData
+            const sortedDates = Object.keys(history).sort().reverse();
+            let progressionFlags = getAppData('progressionFlags'); // Usa getAppData
+            let bilboResetFlags = getAppData('bilboResetFlags'); // Usa getAppData
+
+            document.querySelectorAll('.exercise-card').forEach(card => {
+                const day = card.dataset.day;
+                const exIndex = parseInt(card.dataset.exIndex, 10);
+
+                if (workouts[day] && workouts[day].exercises[exIndex]) {
+                    const workoutType = workouts[day].type;
+                    const exerciseName = workouts[day].exercises[exIndex].name;
+
+                    if (workoutType === 'rest') {
+                        card.querySelectorAll('.weight-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
+                        card.querySelectorAll('.reps-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
+                        return;
+                    }
+
+                    let foundLog = false;
+                    let flagWasUsed = false;
+                    let bilboBaseWeight = 0;
+                    const rmPercentages = workouts[day].exercises[exIndex].rmPercentage.split(' / ').map(p => parseFloat(p) / 100);
+
+                    // Aplicar lógica de Bilbo primero
+                    if (day.includes('bilbo')) {
+                        const e1rm = e1rmMap.get(exerciseName) || 0;
+                        const shouldBilboReset = bilboResetFlags[exerciseName] === true;
+
+                        if (shouldBilboReset && e1rm > 0) {
+                            bilboBaseWeight = e1rm * (rmPercentages[0] || 0.5);
+                            bilboResetFlags[exerciseName] = false;
+                            flagWasUsed = true;
+                            foundLog = true;
+                        } else if (e1rm > 0) {
+                            let lastWeightNum = 0;
+                            for (const date of sortedDates) {
+                                const log = history[date];
+                                if (log && Array.isArray(log.exercises)) {
+                                    const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
+                                    if (foundExercise && foundExercise.series.length > 0) {
+                                        lastWeightNum = parseFloat(foundExercise.series[0].weight);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (lastWeightNum > 0) {
+                                bilboBaseWeight = lastWeightNum * 1.03; // +3%
+                            } else {
+                                bilboBaseWeight = e1rm * (rmPercentages[0] || 0.5);
+                            }
+                            foundLog = true;
+                        }
+
+                        // Rellenar inputs de Bilbo
+                        if (foundLog) {
+                            card.querySelectorAll('.weight-input').forEach((input, setIndex) => {
+                                const percentage = rmPercentages[setIndex] || rmPercentages[0];
+                                const suggestedWeight = (bilboBaseWeight / (rmPercentages[0] || 0.5)) * percentage;
+                                if (!input.value || input.value === '0') {
+                                    input.value = suggestedWeight.toFixed(1);
+                                }
+                            });
+                        }
+                    }
+
+                    // Lógica HD (solo si no es Bilbo o si Bilbo no encontró e1RM/log)
+                    if (!foundLog) {
+                        for (const date of sortedDates) {
+                            const log = history[date];
+                            if (log && Array.isArray(log.exercises)) {
+                                const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
+
+                                if (foundExercise && Array.isArray(foundExercise.series)) {
+                                    const weightCells = card.querySelectorAll('.last-weight-cell');
+                                    const repsCells = card.querySelectorAll('.last-reps-cell');
+                                    const weightInputs = card.querySelectorAll('.weight-input');
+                                    const shouldProgress = progressionFlags[exerciseName] === true;
+
+                                    foundExercise.series.forEach((seriesData, seriesIndex) => {
+                                        if (weightCells[seriesIndex]) weightCells[seriesIndex].textContent = `${seriesData.weight || '-'} kg`;
+                                        if (repsCells[seriesIndex]) repsCells[seriesIndex].textContent = seriesData.reps || '-';
+
+                                        if (weightInputs[seriesIndex]) {
+                                            const lastWeightNum = parseFloat(seriesData.weight);
+                                            if (!isNaN(lastWeightNum) && lastWeightNum > 0) {
+                                                let suggestedWeight = lastWeightNum;
+
+                                                if (day.includes('hd')) {
+                                                    if (seriesIndex === 2) {
+                                                        if (shouldProgress) {
+                                                            suggestedWeight = Math.round(lastWeightNum * 1.025); // 2.5%
+                                                            progressionFlags[exerciseName] = false;
+                                                            flagWasUsed = true;
+                                                        }
+                                                    }
+                                                }
+
+                                                const suggestedWeightStr = suggestedWeight.toFixed(1);
+
+                                                if (!weightInputs[seriesIndex].value || weightInputs[seriesIndex].value === '0') {
+                                                    weightInputs[seriesIndex].value = suggestedWeightStr;
+                                                }
+                                            } else {
+                                                if (!weightInputs[seriesIndex].value) weightInputs[seriesIndex].placeholder = "0";
+                                            }
+                                        }
+                                    });
+                                    foundLog = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (flagWasUsed) {
+                        setAppData('progressionFlags', progressionFlags); // Guardar flags si se usaron
+                        setAppData('bilboResetFlags', bilboResetFlags); // Guardar flags si se usaron
+                    }
+
+                    if (!foundLog) {
+                        card.querySelectorAll('.last-weight-cell').forEach(cell => cell.textContent = '-');
+                        card.querySelectorAll('.last-reps-cell').forEach(cell => cell.textContent = '-');
+                        card.querySelectorAll('.reps-input').forEach(input => input.value = '');
+
+                        if (day.includes('bilbo')) {
+                            const e1rm = e1rmMap.get(exerciseName) || 40;
+                            const rmPercentages = workouts[day].exercises[exIndex].rmPercentage.split(' / ').map(p => parseFloat(p) / 100);
+                            card.querySelectorAll('.weight-input').forEach((input, setIndex) => {
+                                const percentage = rmPercentages[setIndex] || rmPercentages[0];
+                                const suggestedWeight = e1rm * percentage;
+                                input.value = suggestedWeight.toFixed(1);
+                            });
+                        } else {
+                            card.querySelectorAll('.weight-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
+                        }
+                    }
+                }
+            });
+            loadProgress();
+        }
+
+        // --- e1RM Functions ---
+        function calculateLombardi(weight, reps) {
+            if (reps <= 0 || weight <= 0) return 0;
+            return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
+        }
+
+        function calculateAllEstimated1RMs() {
+            const history = getAppData('workoutHistory'); // Usa getAppData
+            const exercisesToTrack = [
+                "Press de banca plano (barra)",
+                "Curl en barra Z",
+                "Jalón en polea agarre neutro",
+                "Jalón al pecho agarre estrecho"
+            ];
+            const e1rmMap = new Map();
+
+            for (const date in history) {
+                const log = history[date];
+                if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
+                    log.exercises.forEach(ex => {
+                        if (exercisesToTrack.includes(ex.name) && Array.isArray(ex.series)) {
+                            ex.series.forEach(s => {
+                                const weight = parseFloat(s.weight);
+                                const reps = parseInt(s.reps, 10);
+                                if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
+                                    const e1rm = calculateLombardi(weight, reps);
+                                    const currentMax = e1rmMap.get(ex.name) || 0;
+                                    if (e1rm > currentMax) {
+                                        e1rmMap.set(ex.name, e1rm);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            return e1rmMap;
+        }
+
+        // --- Event Listeners & Initialization ---
+        function setupDOM() {
+            // 1. Inicializar referencias al DOM
+            DOM.tabsContainer = document.getElementById('tabs');
+            DOM.contentContainer = document.getElementById('workout-content');
+            DOM.mainTitle = document.getElementById('main-title');
+            DOM.workoutTitle = document.getElementById('workout-title');
+            DOM.stopwatchDisplay = document.getElementById('stopwatch-display');
+            DOM.stopwatchControlBtn = document.getElementById('stopwatch-control');
+            DOM.pauseModal = document.getElementById('pause-modal');
+            DOM.resumeBtn = document.getElementById('resume-btn');
+            DOM.finishBtn = document.getElementById('finish-btn');
+            DOM.finishConfirmModal = document.getElementById('finish-confirm-modal');
+            DOM.confirmFinishYesBtn = document.getElementById('confirm-finish-yes-btn');
+            DOM.confirmFinishNoBtn = document.getElementById('confirm-finish-no-btn');
+            DOM.notification = document.getElementById('notification');
+            DOM.progressionModal = document.getElementById('progression-modal');
+            DOM.progressionModalText = document.getElementById('progression-modal-text');
+            DOM.progressYesBtn = document.getElementById('progress-yes-btn');
+            DOM.progressNoBtn = document.getElementById('progress-no-btn');
+            DOM.bilboCycleModal = document.getElementById('bilbo-cycle-modal');
+            DOM.bilboCycleText = document.getElementById('bilbo-cycle-text');
+            DOM.bilboCycleOkBtn = document.getElementById('bilbo-cycle-ok-btn');
+            DOM.settingsBtn = document.getElementById('settings-btn');
+            DOM.settingsModal = document.getElementById('settings-modal');
+            DOM.closeSettingsModalBtn = document.getElementById('close-settings-modal');
+            DOM.resetCycleBtn = document.getElementById('reset-cycle-btn');
+            DOM.clearHistoryBtn = document.getElementById('clear-history-btn');
+            DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
+
+            // 2. Listeners
+            if (DOM.tabsContainer) {
+                DOM.tabsContainer.addEventListener('click', (e) => {
+                    const button = e.target.closest('.day-nav-button');
+                    if (button) showDay(button.dataset.day);
+                });
+            }
+
+            if (DOM.contentContainer) {
+                DOM.contentContainer.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('timer-clock')) startTimer(e.target.dataset.duration, e.target);
+                    if (e.target.classList.contains('custom-checkbox')) {
+                        e.target.closest('.exercise-card').classList.toggle('completed-card', e.target.checked);
+                        saveProgress();
+                    }
+                });
+                DOM.contentContainer.addEventListener('change', (e) => {
+                    if (e.target.classList.contains('weight-input') || e.target.classList.contains('reps-input')) saveProgress();
+                });
+            }
+
+            if (DOM.stopwatchControlBtn) {
+                DOM.stopwatchControlBtn.addEventListener('click', () => {
+                    if (state.isStopwatchRunning) {
+                        pauseStopwatch();
+                    } else {
+                        startStopwatch();
+                    }
+                });
+            }
+            if (DOM.resumeBtn) {
+                DOM.resumeBtn.addEventListener('click', () => { DOM.pauseModal.classList.add('hidden'); startStopwatch(); });
+            }
+            if (DOM.finishBtn) {
+                DOM.finishBtn.addEventListener('click', showFinishConfirmation);
+            }
+
+            if (DOM.progressYesBtn) DOM.progressYesBtn.addEventListener('click', approveWeightIncrease);
+            if (DOM.progressNoBtn) DOM.progressNoBtn.addEventListener('click', denyWeightIncrease);
+            if (DOM.bilboCycleOkBtn) DOM.bilboCycleOkBtn.addEventListener('click', closeBilboCycleModal);
+
+            if (DOM.confirmFinishYesBtn) DOM.confirmFinishYesBtn.addEventListener('click', handleConfirmFinish);
+            if (DOM.confirmFinishNoBtn) DOM.confirmFinishNoBtn.addEventListener('click', cancelFinish);
+
+            if (DOM.settingsBtn) {
+                DOM.settingsBtn.addEventListener('click', () => {
+                    DOM.settingsModal.classList.remove('hidden');
+                });
+            }
+            if (DOM.closeSettingsModalBtn) {
+                DOM.closeSettingsModalBtn.addEventListener('click', () => {
+                    DOM.settingsModal.classList.add('hidden');
+                });
+            }
+
+            if (DOM.resetCycleBtn) {
+                DOM.resetCycleBtn.addEventListener('click', () => {
+                    setAppData('bilboCycleCount', '1');
+                    setAppData('bilboPushCycleEnded', 'false');
+                    setAppData('bilboPullCycleEnded', 'false');
+                    setAppData('bilboResetFlags', {});
+                    showNotification('Ciclo Bilbo reiniciado a 1');
+                    DOM.settingsModal.classList.add('hidden');
+                    const activeDay = document.querySelector('.day-nav-button.active')?.dataset.day;
+                    if (activeDay) showDay(activeDay);
+                });
+            }
+            if (DOM.clearHistoryBtn) {
+                DOM.clearHistoryBtn.addEventListener('click', (e) => {
+                    const btn = e.target;
+                    if (btn.dataset.confirm === 'true') {
+                        // Resetear todos los datos de la aplicación
+                        setAppData('workoutHistory', {});
+                        setAppData('progressionFlags', {});
+                        setAppData('workoutProgress', null);
+                        setAppData('bilboCycleCount', '1');
+                        setAppData('bilboPushCycleEnded', 'false');
+                        setAppData('bilboPullCycleEnded', 'false');
+                        setAppData('bilboResetFlags', {});
+
+                        showNotification('Historial borrado');
+                        DOM.settingsModal.classList.add('hidden');
+                        btn.dataset.confirm = 'false';
+                        btn.textContent = 'Borrar Historial de Entrenos';
+
+                        e1rmMap = calculateAllEstimated1RMs();
+                        loadLastPerformance(e1rmMap);
+                        const activeDay = document.querySelector('.day-nav-button.active')?.dataset.day;
+                        if (activeDay) showDay(activeDay);
+                    } else {
+                        btn.textContent = '¿Seguro? Clic para confirmar';
+                        btn.dataset.confirm = 'true';
+                        setTimeout(() => {
+                            btn.dataset.confirm = 'false';
+                            btn.textContent = 'Borrar Historial de Entrenos';
+                        }, 3000);
+                    }
+                });
+            }
+            if (DOM.compactModeToggle) {
+                DOM.compactModeToggle.addEventListener('change', (e) => {
+                    const isChecked = e.target.checked;
+                    document.body.classList.toggle('compact-mode', isChecked);
+                    setAppData('compactMode', isChecked);
+                });
+            }
+        }
+
+
+        // Establece la escucha de datos para Firebase o la carga inicial local
+        function setupDataListener() {
+            if (!db || !userId) return;
+
+            if (isLoggedIn) {
+                // FIREBASE: Escucha el documento en tiempo real
+                const docRef = doc(db, DATA_DOC_PATH(userId), 'data');
+
+                onSnapshot(docRef, (docSnap) => {
+                    // Si el documento existe, actualiza el estado interno
+                    if (docSnap.exists()) {
+                        appData = docSnap.data();
+                        console.log("Datos de Firebase recibidos:", appData);
+                    } else {
+                        console.log("Documento de Firebase no existe. Usando valores por defecto o locales.");
+                        appData = loadAllLocalData();
+                        writeAllDataToFirestore(appData);
+                    }
+                    // DATA IS READY
+                    isDataReady = true;
+                    tryLaunchApp();
+
+                }, (error) => {
+                    console.error("Error en onSnapshot (Firebase):", error);
+                    // Fallback a la data local si hay error de conexión/permisos
+                    appData = loadAllLocalData();
+                    isDataReady = true;
+                    tryLaunchApp();
+                });
+            } else {
+                // LOCAL: Carga inicial de todos los datos locales para modo invitado
+                appData = loadAllLocalData();
+                isDataReady = true;
+                tryLaunchApp();
+            }
+        }
+
+        // Inicialización de Autenticación
+        function authReady(user) {
+            if (!isAuthReady) {
+                isAuthReady = true;
+                userId = user ? user.uid : crypto.randomUUID();
+                isLoggedIn = !!user;
+
+                setupDataListener(); // Inicia la carga/escucha de datos
+            }
+        }
+
+        if (firebaseConfig.apiKey) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            // 1. FORZAR PERSISTENCIA LOCAL (Crucial para que index.html pase la sesión)
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                    // Listener de estado de autenticación
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            // Usuario logueado (desde Index o caché)
+                            authReady(user);
+                        } else {
+                            // No hay usuario. Entramos en MODO INVITADO directamente.
+                            // Eliminamos signInAnonymously para evitar errores de permisos.
+                            if (authToken) {
+                                await signInWithCustomToken(auth, authToken).catch(e => console.error(e));
+                            } else {
+                                // MODO OFFLINE / INVITADO
+                                console.log("No auth user. Initializing Guest Mode.");
+                                authReady(null);
+                            }
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error setting persistence:", error);
+                });
+
+        } else {
+            // Fallback si la configuración de Firebase no está disponible
+            authReady(null);
+        }
+        // --- FIN CONFIGURACIÓN FIREBASE ---
+
+        // MANEJO ROBUSTO DE DOMCONTENTLOADED
+        function onDomReady() {
+            if (isDomReady) return; // Ya se ejecutó
+            setupDOM();
+            isDomReady = true;
+            tryLaunchApp();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onDomReady);
+        } else {
+            onDomReady();
+        }
+
+    </script>
+</body>
+
+</html>

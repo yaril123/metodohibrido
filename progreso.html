@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan de Entrenamiento - Progreso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Chart.js y adaptador de fecha -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0D;
+            color: #E0E0E0;
+            padding-bottom: 2rem;
+        }
+
+        /* Pantalla de carga */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background-color: #0D0D0D;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #333;
+            border-top: 4px solid #facc15;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Estilos de botones (copiados de entreno.html para consistencia) */
+        .day-nav-button {
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+            background: #18181b;
+            /* zinc-900 */
+            color: #e5e7eb;
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .day-nav-button span {
+            font-size: 12px;
+            font-weight: 900;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .day-nav-button-hd {
+            background: linear-gradient(90deg, #d4d4d8, #a1a1aa);
+            /* zinc-300 to zinc-400 */
+            color: black;
+            border-color: #71717a;
+            /* zinc-500 */
+        }
+
+        .day-nav-button-bilbo {
+            background: linear-gradient(90deg, #facc15, #ca8a04);
+            /* yellow-400 to yellow-600 */
+            color: black;
+            border-color: #a16207;
+            /* yellow-700 */
+        }
+
+        .day-nav-button-rest {
+            background-color: #3b82f6;
+            /* blue-500 */
+            color: white;
+            border-color: #2563eb;
+            /* blue-600 */
+        }
+
+        .day-nav-button-rest span {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+
+        .exercise-card {
+            background-color: #18181b;
+            /* zinc-900 */
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .exercise-title {
+            color: #facc15;
+            /* Gold */
+        }
+
+        .modal {
+            z-index: 50;
+            /* Ensure it's on top */
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: #18181b;
+            /* zinc-900 */
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        /* Calendar Styles */
+        #calendar-container {
+            background-color: #18181b;
+            /* zinc-900 */
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+        }
+
+        .calendar-grid {
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+        }
+
+        .calendar-day {
+            min-height: 100px;
+        }
+
+        .day-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+
+        /* HD: Gris Claro */
+        .day-number.day-hd {
+            background-color: #a1a1aa;
+            color: black;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(161, 161, 170, 0.5);
+        }
+
+        /* Bilbo: Amarillo */
+        .day-number.day-bilbo {
+            background-color: #facc15;
+            color: black;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(250, 204, 21, 0.5);
+        }
+
+        /* Rest/Cardio: Azul (CAMBIADO para mejor visibilidad) */
+        .day-number.day-rest {
+            background-color: #3b82f6;
+            /* Blue 500 */
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+        }
+
+        .other-month {
+            opacity: 0.3;
+        }
+
+        @keyframes blink {
+            50% {
+                background-color: rgba(239, 68, 68, 0.2);
+            }
+        }
+
+        .today-blink {
+            animation: blink 1.8s infinite;
+            border-radius: 0.25rem;
+        }
+
+        .today-blink .day-number:not([class*="day-"]) {
+            font-weight: bold;
+            color: #fca5a5;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* RM Record Styles */
+        .rm-card {
+            background-color: #18181b;
+            /* zinc-900 */
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rm-exercise-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e5e7eb;
+            flex-grow: 1;
+            margin-right: 1rem;
+        }
+
+        .rm-weight {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #facc15;
+            flex-shrink: 0;
+        }
+
+        /* e1RM Record Styles */
+        .e1rm-card {
+            background: linear-gradient(140deg, #ca8a04 0%, #713f12 100%);
+            /* Dark Gold */
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid #facc15;
+            /* Gold */
+            box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+        }
+
+        .e1rm-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .e1rm-exercise-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            flex-grow: 1;
+            margin-right: 1rem;
+        }
+
+        .e1rm-weight {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body class="p-4 sm:p-6 md:p-8">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p class="text-white font-bold">Cargando...</p>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- RM Records Section -->
+        <section id="rm-section" class="mt-12">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-6">PESO MAXIMO CARGADO
+            </h2>
+            <div id="rm-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Records will be generated by JS -->
+                <p class="text-zinc-500">Cargando registros...</p>
+            </div>
+        </section>
+
+        <!-- e1RM Records Section -->
+        <section id="e1rm-section" class="mt-12">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-6">REPETICION MAXIMA
+                ESTIMADA (RM)</h2>
+            <div id="e1rm-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- e1RM Records and Charts will be generated by JS -->
+            </div>
+        </section>
+
+        <!-- Chart Section -->
+        <section id="progress-charts-section" class="mt-12">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-6">Progresión semanal:
+                Peso levantado vs Repeticiones</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Gráficos HD -->
+                <div class="exercise-card">
+                    <h3 class="text-xl font-bold text-gray-300 mb-4">Progresión HD Push (Press Inclinado)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="hdPushChartCanvas"></canvas>
+                    </div>
+                </div>
+                <div class="exercise-card">
+                    <h3 class="text-xl font-bold text-gray-300 mb-4">Progresión HD Pull (Jalón Neutro)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="hdPullChartCanvas"></canvas>
+                    </div>
+                </div>
+                <!-- Gráficos Bilbo -->
+                <div class="exercise-card">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Progresión Bilbo Push (Press de Banca)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="bilboPushChartCanvas"></canvas>
+                    </div>
+                </div>
+                <div class="exercise-card">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">Progresión Bilbo Pull (Jalón al Pecho)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="bilboPullChartCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Calendar Section -->
+        <section id="calendar-section" class="mt-12">
+            <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-6">Calendario de Entrenos
+            </h2>
+            <div id="calendar-container" class="p-6 rounded-lg">
+                <div id="calendar-header" class="flex justify-between items-center mb-4">
+                    <button id="prev-month" class="p-2 rounded-full hover:bg-zinc-600">&lt;</button>
+                    <h2 id="month-year" class="text-xl font-bold"></h2>
+                    <button id="next-month" class="p-2 rounded-full hover:bg-zinc-600">&gt;</button>
+                </div>
+
+                <!-- Botón Añadir Manual -->
+                <button id="open-add-modal-btn"
+                    class="w-full mb-4 bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    AÑADIR REGISTRO MANUAL
+                </button>
+
+                <!-- Leyenda del Calendario -->
+                <div class="flex justify-center space-x-4 mb-4 text-xs sm:text-sm">
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-yellow-400 mr-1"></span> Bilbo
+                    </div>
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-zinc-400 mr-1"></span> Heavy
+                        Duty</div>
+                    <div class="flex items-center"><span class="w-3 h-3 rounded-full bg-blue-500 mr-1"></span>
+                        Cardio/Rest</div>
+                </div>
+
+                <div class="grid calendar-grid text-center font-semibold text-zinc-400 text-sm mb-2">
+                    <div>L</div>
+                    <div>M</div>
+                    <div>X</div>
+                    <div>J</div>
+                    <div>V</div>
+                    <div>S</div>
+                    <div>D</div>
+                </div>
+                <div id="calendar-grid" class="grid calendar-grid gap-1"></div>
+            </div>
+        </section>
+
+        <!-- Botón de Navegación a Inicio -->
+        <div class="mt-12 text-center">
+            <a href="index.html"
+                class="inline-block w-full max-w-md mx-auto p-4 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-white text-lg font-bold uppercase tracking-wider transition-all duration-200 hover:shadow-lg"
+                style="text-decoration: none;">
+                Inicio
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal Historial -->
+    <div id="history-modal"
+        class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden p-4">
+        <div class="modal-content max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-lg relative">
+            <button id="close-history-modal"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            <h2 id="history-modal-title" class="text-2xl font-bold mb-4 text-yellow-400"></h2>
+            <p id="history-modal-time" class="text-lg mb-6 text-gray-300"></p>
+            <p id="history-modal-cycle" class="text-md mb-6 text-gray-400"></p>
+            <div id="history-modal-content" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- Modal Añadir Día Manual -->
+    <div id="add-day-modal"
+        class="modal fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden p-4">
+        <div
+            class="modal-content max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 rounded-lg shadow-lg relative border border-zinc-700">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400 uppercase">Añadir Entrenamiento</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-zinc-400 text-sm font-bold mb-2">Fecha</label>
+                    <input type="date" id="manual-date"
+                        class="w-full bg-zinc-800 border border-zinc-600 text-white rounded p-3 focus:outline-none focus:border-yellow-400">
+                </div>
+
+                <div>
+                    <label class="block text-zinc-400 text-sm font-bold mb-2">Tipo de Entrenamiento</label>
+                    <select id="manual-type"
+                        class="w-full bg-zinc-800 border border-zinc-600 text-white rounded p-3 focus:outline-none focus:border-yellow-400">
+                        <option value="">Selecciona una rutina...</option>
+                        <option value="hd_push">HD PUSH</option>
+                        <option value="hd_pull">HD PULL</option>
+                        <option value="bilbo_push">BILBO PUSH</option>
+                        <option value="bilbo_pull">BILBO PULL</option>
+                        <option value="rest1">CARDIO / DESCANSO</option>
+                    </select>
+                </div>
+
+                <!-- Contenedor dinámico de ejercicios -->
+                <div id="manual-exercises-container" class="space-y-4 mt-4 border-t border-zinc-700 pt-4">
+                    <p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los
+                        ejercicios.</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-zinc-700">
+                <button id="cancel-manual-btn"
+                    class="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 text-white font-bold transition-colors">Cancelar</button>
+                <button id="save-manual-btn"
+                    class="px-4 py-2 rounded bg-yellow-500 hover:bg-yellow-600 text-black font-bold transition-colors">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
+        const appId = 'metodo-hibrido-data';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
+            authDomain: "metodo-hibrido.firebaseapp.com",
+            projectId: "metodo-hibrido",
+            storageBucket: "metodo-hibrido.firebasestorage.app",
+            messagingSenderId: "982967728212",
+            appId: "1:982967728212:web:b27ea198c80601fc8315c1",
+            measurementId: "G-PETF3C4DM9"
+        };
+
+        const authToken = null;
+
+        let db, auth;
+        let userId = null;
+        let isLoggedIn = false;
+        let isAuthReady = false;
+        let isDataReady = false;
+        let isDomReady = false;
+        let isAppLaunched = false;
+
+        let appData = {}; // Estado centralizado de la aplicación
+        const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
+
+        // --- Configuration (Move to module scope) ---
+        const workouts = {
+            hd_push: {
+                title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
+                    { name: "Press inclinado con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 135 },
+                    { name: "Press en suelo con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 165 },
+                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 135 },
+                    { name: "Elevaciones laterales sentado", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 105 },
+                ]
+            },
+            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            hd_pull: {
+                title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
+                    { name: "Jalón en polea agarre neutro", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 165 },
+                    { name: "Remo con barra T", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 165 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 105 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 105 },
+                ]
+            },
+            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            bilbo_push: {
+                title: "BILBO — PUSH", type: 'bilbo', exercises: [
+                    { name: "Press de banca plano (barra)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Sin bloqueo de codos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 105 },
+                    { name: "Elevaciones laterales con gomas", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 75 },
+                    { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 105 },
+                    { name: "Cruces con goma (pecho)", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 75 },
+                ]
+            },
+            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
+            bilbo_pull: {
+                title: "BILBO — PULL", type: 'bilbo', exercises: [
+                    { name: "Jalón al pecho agarre estrecho", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tira al pecho, mirada neutra. Evita sacar la cabeza al final del movimiento; hombros bajos y omóplatos juntos.", rest: 120 },
+                    { name: "Remo bajo con polea (agarre neutro)", rmPercentage: "55 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Movimiento fluido, sin arqueo lumbar. Sin arqueo lumbar. Control respiratorio, sin apnea.", rest: 120 },
+                    { name: "Remo Inclinado 30º, Mancuernas, Neutro", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tronco 30°, codos pegados, cuello neutro. Mantén columna larga, abdomen activo y cuello alineado al suelo.", rest: 120 },
+                    { name: "Curl en barra Z", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos fijos, hombros relajados. Apoya bien los pies, suelta el cuello; mueve solo antebrazos y respira lento.", rest: 75 },
+                ]
+            }
+        };
+        const days = ['hd_push', 'rest1', 'hd_pull', 'rest2', 'bilbo_push', 'rest3', 'bilbo_pull'];
+        const dayNames = { hd_push: 'HD PUSH', rest1: 'CARDIO', hd_pull: 'HD PULL', rest2: 'CARDIO', bilbo_push: 'BILBO PUSH', rest3: 'CARDIO', bilbo_pull: 'BILBO PULL' };
+
+        let bilboPushChart = null;
+        let bilboPullChart = null;
+        let hdPushChart = null;
+        let hdPullChart = null;
+        let e1rmChartPressBanca = null;
+        let e1rmChartJalonNeutro = null;
+        let e1rmChartJalonEstrecho = null;
+        let e1rmChartCurlZ = null;
+        let allExerciseNames = new Set();
+        let e1rmMap = new Map();
+
+        const state = { currentDate: new Date() };
+
+        let DOM = {}; // Se inicializa en DOMContentLoaded
+
+        // --- FUNCIONES DE PERSISTENCIA ---
+
+        function loadLocalData(key) {
+            const value = localStorage.getItem(key);
+            try {
+                return value ? JSON.parse(value) : null;
+            } catch (e) {
+                return value;
+            }
+        }
+
+        function loadAllLocalData() {
+            return {
+                workoutHistory: loadLocalData('workoutHistory') || {},
+            };
+        }
+
+        function getAppData(key) {
+            const defaultValue = {
+                workoutHistory: {},
+            };
+            const data = appData[key];
+            return data !== undefined && data !== null ? data : defaultValue[key];
+        }
+
+        async function writeAllDataToFirestore(data) {
+            if (!db || !userId) return;
+            try {
+                await setDoc(doc(db, DATA_DOC_PATH(userId), 'data'), data);
+                console.log("Datos guardados en Firestore correctamente.");
+            } catch (e) {
+                console.error("Error guardando en Firestore:", e);
+                // Fallback local si falla la red
+                localStorage.setItem('workoutHistory', JSON.stringify(data.workoutHistory));
+            }
+        }
+
+        function getTodayDateString() {
+            const today = new Date();
+            return today.toISOString().split('T')[0];
+        }
+
+        // --- RM / E1RM Calculation Functions ---
+        function calculateLombardi(weight, reps) {
+            if (reps <= 0 || weight <= 0) return 0;
+            return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
+        }
+
+        function calculateAllEstimated1RMs() {
+            const history = getAppData('workoutHistory');
+            const exercisesToTrack = [
+                "Press de banca plano (barra)",
+                "Curl en barra Z",
+                "Jalón en polea agarre neutro",
+                "Jalón al pecho agarre estrecho"
+            ];
+            const e1rmMap = new Map();
+
+            for (const date in history) {
+                const log = history[date];
+                if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
+                    log.exercises.forEach(ex => {
+                        if (exercisesToTrack.includes(ex.name) && Array.isArray(ex.series)) {
+                            ex.series.forEach(s => {
+                                const weight = parseFloat(s.weight);
+                                const reps = parseInt(s.reps, 10);
+                                if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
+                                    const e1rm = calculateLombardi(weight, reps);
+                                    const currentMax = e1rmMap.get(ex.name) || 0;
+                                    if (e1rm > currentMax) {
+                                        e1rmMap.set(ex.name, e1rm);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            return e1rmMap;
+        }
+
+        function calculateAllMaxReps() {
+            const history = getAppData('workoutHistory');
+            const maxRepMap = new Map();
+
+            days.forEach((day) => {
+                const workout = workouts[day];
+                if (workout.type !== 'rest') {
+                    workout.exercises.forEach(ex => allExerciseNames.add(ex.name));
+                }
+            });
+
+            for (const date in history) {
+                const log = history[date];
+                if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
+                    log.exercises.forEach(ex => {
+                        if (Array.isArray(ex.series)) {
+                            ex.series.forEach(s => {
+                                const weight = parseFloat(s.weight);
+                                if (!isNaN(weight)) {
+                                    const currentMax = maxRepMap.get(ex.name) || 0;
+                                    if (weight > currentMax) {
+                                        maxRepMap.set(ex.name, weight);
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+            return maxRepMap;
+        }
+
+        // --- Core UI/Rendering Functions ---
+        function renderCalendar() {
+            if (!DOM.calendarGrid) return;
+            DOM.calendarGrid.innerHTML = '';
+            const year = state.currentDate.getFullYear();
+            const month = state.currentDate.getMonth();
+            const history = getAppData('workoutHistory');
+            const todayStr = getTodayDateString();
+
+            DOM.monthYearEl.textContent = `${state.currentDate.toLocaleString('es-ES', { month: 'long' })} ${year}`;
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startDay = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+            for (let i = 0; i < startDay; i++) {
+                DOM.calendarGrid.insertAdjacentHTML('beforeend', `<div class="p-2 border border-zinc-700 rounded other-month"></div>`);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const workout = history[dateStr];
+
+                let dayNumberClasses = 'day-number flex items-center justify-center text-sm';
+                if (workout) {
+                    dayNumberClasses += ` day-${workout.workoutType}`;
+                }
+                const isTodayClass = dateStr === todayStr ? 'today-blink' : '';
+
+                const dayCellHTML = `
+                    <div data-date="${dateStr}" class="calendar-day p-2 border border-zinc-700 rounded flex flex-col items-start ${isTodayClass} ${workout ? 'cursor-pointer hover:bg-zinc-700' : ''}">
+                        <span class="${dayNumberClasses}">${day}</span>
+                    </div>`;
+                DOM.calendarGrid.insertAdjacentHTML('beforeend', dayCellHTML);
+            }
+        }
+
+        function showWorkoutDetails(workout) {
+            if (!workout) return;
+            DOM.historyModalTitle.textContent = workout.workoutTitle;
+            DOM.historyModalTime.textContent = `Tiempo total: ${workout.time}`;
+            DOM.historyModalCycle.textContent = workout.bilboCycle ? `Ciclo Bilbo: ${workout.bilboCycle}` : '';
+            DOM.historyModalCycle.style.display = workout.bilboCycle ? 'block' : 'none';
+
+            DOM.historyModalContent.innerHTML = workout.exercises.map(ex => {
+                const isRestDay = workout.workoutType === 'rest';
+
+                if (isRestDay) {
+                    const seriesData = ex.series[0] || {};
+                    const time = seriesData.weight || '0';
+                    const pulse = seriesData.reps || '0';
+                    return `
+                    <div class="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                        <h4 class="font-bold text-lg text-yellow-400 mb-2">${ex.name}</h4>
+                        <p class="text-zinc-300">Tiempo: <span class="font-bold">${time} min</span></p>
+                        <p class="text-zinc-300">Pulso Medio: <span class="font-bold">${pulse} BPM</span></p>
+                    </div>`;
+                }
+
+                const seriesRows = ex.series.map((s, i) => {
+                    let seriesName = `Serie ${i + 1}`;
+                    if (workout.workoutTitle.includes("BILBO") && i === 0) seriesName = "Serie Bilbo";
+                    // Si se añadió manualmente, intentamos deducir nombres lógicos
+                    if (workout.workoutTitle.includes("HEAVY DUTY") && i === ex.series.length - 1) seriesName = "Serie Efectiva";
+                    else if (workout.workoutTitle.includes("HEAVY DUTY") && i < ex.series.length - 1) seriesName = `Calentamiento ${i + 1}`;
+
+                    return `
+                    <tr class="border-b border-zinc-700 last:border-b-0">
+                        <td class="py-2 px-3 text-zinc-300 font-semibold">${seriesName}</td>
+                        <td class="py-2 px-3 text-center">${s.weight || '0'} kg</td>
+                        <td class="py-2 px-3 text-center">${s.reps || '0'}</td>
+                    </tr>
+                    `;
+                }).join('');
+
+
+                return `
+                    <div class="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+                        <h4 class="font-bold text-lg text-yellow-400 mb-3">${ex.name}</h4>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-zinc-600">
+                                    <th class="py-2 px-3 text-left text-zinc-400 font-semibold uppercase">Serie</th>
+                                    <th class="py-2 px-3 text-center text-zinc-400 font-semibold uppercase">Peso</th>
+                                    <th class="py-2 px-3 text-center text-zinc-400 font-semibold uppercase">Reps</th>
+                                </tr>
+                            </thead>
+                            <tbody>${seriesRows}</tbody>
+                        </table>
+                    </div>`;
+            }).join('');
+            DOM.historyModal.classList.remove('hidden');
+        }
+
+        function renderMaxReps() {
+            if (!DOM.rmList) return;
+            DOM.rmList.innerHTML = '';
+            const maxRepMap = calculateAllMaxReps();
+            const sortedExerciseNames = [...allExerciseNames].sort();
+            let hasData = false;
+
+            sortedExerciseNames.forEach(exerciseName => {
+                const maxWeight = maxRepMap.get(exerciseName);
+                if (maxWeight) {
+                    hasData = true;
+                    const cardHTML = `
+                        <div class="rm-card">
+                            <span class="rm-exercise-name">${exerciseName}</span>
+                            <span class="rm-weight">${maxWeight} kg</span>
+                        </div>
+                    `;
+                    DOM.rmList.insertAdjacentHTML('beforeend', cardHTML);
+                }
+            });
+
+            if (!hasData) DOM.rmList.innerHTML = '<p class="text-zinc-500 col-span-full text-center">No hay registros de fuerza aún.</p>';
+        }
+
+        function renderEstimated1RMs(e1rmMap) {
+            if (!DOM.e1rmList) return;
+            DOM.e1rmList.innerHTML = '';
+            const exercisesToTrack = [
+                "Press de banca plano (barra)",
+                "Jalón en polea agarre neutro",
+                "Jalón al pecho agarre estrecho",
+                "Curl en barra Z"
+            ];
+
+            exercisesToTrack.forEach(exerciseName => {
+                const maxE1RM = e1rmMap.get(exerciseName) || 0;
+                if (maxE1RM > 0) {
+                    const canvasId = `e1rmChart-${exerciseName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+                    const cardHTML = `
+                        <div class="e1rm-card p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="e1rm-exercise-name">${exerciseName}</span>
+                                <span class="e1rm-weight">${maxE1RM.toFixed(1)} kg</span>
+                            </div>
+                            <div style="height: 300px;">
+                                <canvas id="${canvasId}"></canvas>
+                            </div>
+                        </div>
+                    `;
+                    DOM.e1rmList.insertAdjacentHTML('beforeend', cardHTML);
+                }
+            });
+
+            if (DOM.e1rmList.innerHTML === '') DOM.e1rmList.innerHTML = '<p class="text-zinc-500 col-span-full text-center">No hay datos suficientes para calcular 1RM estimado.</p>';
+        }
+
+        function createProgressionChart(canvasId, chartInstance, title, data) {
+            const ctx = document.getElementById(canvasId)?.getContext('2d');
+            if (!ctx) return;
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const chartData = {
+                datasets: [
+                    {
+                        label: 'Peso (kg)',
+                        data: data.map(d => ({ x: d.x, y: d.yPeso })),
+                        yAxisID: 'yPeso',
+                        borderColor: '#3b82f6',
+                        backgroundColor: '#3b82f6',
+                        pointStyle: 'circle',
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Repeticiones',
+                        data: data.map(d => ({ x: d.x, y: d.yReps })),
+                        yAxisID: 'yReps',
+                        borderColor: '#ef4444',
+                        backgroundColor: '#ef4444',
+                        borderDash: [5, 5],
+                        pointStyle: 'rect',
+                        tension: 0.1
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: title, color: '#e5e7eb', font: { size: 16 } },
+                        legend: { labels: { color: '#94a3b8' } }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            adapter: 'date-fns',
+                            time: { unit: 'day', tooltipFormat: 'dd/MM/yy' },
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' },
+                            title: { display: true, text: 'Fecha', color: '#94a3ab' }
+                        },
+                        yPeso: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: '#334155' },
+                            ticks: { color: '#3b82f6' },
+                            title: { display: true, text: 'Peso (kg)', color: '#3b82f6' }
+                        },
+                        yReps: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#ef4444' },
+                            title: { display: true, text: 'Reps', color: '#ef4444' }
+                        }
+                    }
+                }
+            };
+
+            return new Chart(ctx, config);
+        }
+
+        function renderProgressionCharts() {
+            const history = getAppData('workoutHistory');
+            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const bilboPushData = [];
+            const bilboPullData = [];
+            const hdPushData = [];
+            const hdPullData = [];
+
+            const bilboPushExercise = "Press de banca plano (barra)";
+            const bilboPullExercise = "Jalón al pecho agarre estrecho";
+            const hdPushExercise = "Press inclinado con barra";
+            const hdPullExercise = "Jalón en polea agarre neutro";
+
+            sortedEntries.forEach(log => {
+                if (!log.exercises) return;
+
+                if (log.workoutTitle.includes("BILBO — PUSH")) {
+                    const exercise = log.exercises.find(ex => ex.name === bilboPushExercise);
+                    if (exercise && exercise.series && exercise.series.length > 0) {
+                        const series = exercise.series[0];
+                        if (series.weight && series.reps) {
+                            bilboPushData.push({
+                                x: new Date(log.date),
+                                yPeso: parseFloat(series.weight),
+                                yReps: parseInt(series.reps, 10)
+                            });
+                        }
+                    }
+                } else if (log.workoutTitle.includes("BILBO — PULL")) {
+                    const exercise = log.exercises.find(ex => ex.name === bilboPullExercise);
+                    if (exercise && exercise.series && exercise.series.length > 0) {
+                        const series = exercise.series[0];
+                        if (series.weight && series.reps) {
+                            bilboPullData.push({
+                                x: new Date(log.date),
+                                yPeso: parseFloat(series.weight),
+                                yReps: parseInt(series.reps, 10)
+                            });
+                        }
+                    }
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
+                    const exercise = log.exercises.find(ex => ex.name === hdPushExercise);
+                    if (exercise && exercise.series && exercise.series.length > 0) {
+                        const lastSeries = exercise.series[exercise.series.length - 1];
+                        if (lastSeries.weight && lastSeries.reps) {
+                            hdPushData.push({
+                                x: new Date(log.date),
+                                yPeso: parseFloat(lastSeries.weight),
+                                yReps: parseInt(lastSeries.reps, 10)
+                            });
+                        }
+                    }
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
+                    const exercise = log.exercises.find(ex => ex.name === hdPullExercise);
+                    if (exercise && exercise.series && exercise.series.length > 0) {
+                        const lastSeries = exercise.series[exercise.series.length - 1];
+                        if (lastSeries.weight && lastSeries.reps) {
+                            hdPullData.push({
+                                x: new Date(log.date),
+                                yPeso: parseFloat(lastSeries.weight),
+                                yReps: parseInt(lastSeries.reps, 10)
+                            });
+                        }
+                    }
+                }
+            });
+
+            bilboPushChart = createProgressionChart('bilboPushChartCanvas', bilboPushChart, 'Progresión Bilbo Push (Press de Banca)', bilboPushData);
+            bilboPullChart = createProgressionChart('bilboPullChartCanvas', bilboPullChart, 'Progresión Bilbo Pull (Jalón al Pecho)', bilboPullData);
+            hdPushChart = createProgressionChart('hdPushChartCanvas', hdPushChart, 'Progresión HD Push (Press Inclinado)', hdPushData);
+            hdPullChart = createProgressionChart('hdPullChartCanvas', hdPullChart, 'Progresión HD Pull (Jalón Neutro)', hdPullData);
+        }
+
+        function createE1RMChart(canvasId, chartInstance, data, color) {
+            const ctx = document.getElementById(canvasId)?.getContext('2d');
+            if (!ctx) return;
+            if (chartInstance) chartInstance.destroy();
+
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: '1RM Estimado (kg)',
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color,
+                        pointStyle: 'circle',
+                        tension: 0.1,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: false },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            adapter: 'date-fns',
+                            time: { unit: 'day', tooltipFormat: 'dd/MM/yy' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#94a3b8' },
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#e5e7eb' },
+                            title: { display: true, text: 'e1RM (kg)', color: '#e5e7eb' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderE1RMCharts() {
+            const history = getAppData('workoutHistory');
+            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const exercisesToTrack = {
+                pressBanca: "Press de banca plano (barra)",
+                jalonNeutro: "Jalón en polea agarre neutro",
+                jalonEstrecho: "Jalón al pecho agarre estrecho",
+                curlZ: "Curl en barra Z"
+            };
+
+            const data = { pressBanca: [], jalonNeutro: [], jalonEstrecho: [], curlZ: [] };
+
+            sortedEntries.forEach(log => {
+                if (!log.exercises || log.workoutType === 'rest') return;
+
+                const date = new Date(log.date);
+                let maxE1RM = { pressBanca: 0, jalonNeutro: 0, jalonEstrecho: 0, curlZ: 0 };
+
+                log.exercises.forEach(ex => {
+                    let dataKey = null;
+                    if (ex.name === exercisesToTrack.pressBanca) dataKey = 'pressBanca';
+                    else if (ex.name === exercisesToTrack.jalonNeutro) dataKey = 'jalonNeutro';
+                    else if (ex.name === exercisesToTrack.jalonEstrecho) dataKey = 'jalonEstrecho';
+                    else if (ex.name === exercisesToTrack.curlZ) dataKey = 'curlZ';
+
+                    if (dataKey && Array.isArray(ex.series)) {
+                        let maxE1RMThisDay = 0;
+                        ex.series.forEach(s => {
+                            const weight = parseFloat(s.weight);
+                            const reps = parseInt(s.reps, 10);
+                            if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
+                                const e1rm = calculateLombardi(weight, reps);
+                                if (e1rm > maxE1RMThisDay) maxE1RMThisDay = e1rm;
+                            }
+                        });
+                        if (maxE1RMThisDay > maxE1RM[dataKey]) maxE1RM[dataKey] = maxE1RMThisDay;
+                    }
+                });
+
+                if (maxE1RM.pressBanca > 0) data.pressBanca.push({ x: date, y: maxE1RM.pressBanca });
+                if (maxE1RM.jalonNeutro > 0) data.jalonNeutro.push({ x: date, y: maxE1RM.jalonNeutro });
+                if (maxE1RM.jalonEstrecho > 0) data.jalonEstrecho.push({ x: date, y: maxE1RM.jalonEstrecho });
+                if (maxE1RM.curlZ > 0) data.curlZ.push({ x: date, y: maxE1RM.curlZ });
+            });
+
+            e1rmChartPressBanca = createE1RMChart(`e1rmChart-${exercisesToTrack.pressBanca.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartPressBanca, data.pressBanca, '#3b82f6');
+            e1rmChartJalonNeutro = createE1RMChart(`e1rmChart-${exercisesToTrack.jalonNeutro.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartJalonNeutro, data.jalonNeutro, '#06b6d4');
+            e1rmChartJalonEstrecho = createE1RMChart(`e1rmChart-${exercisesToTrack.jalonEstrecho.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartJalonEstrecho, data.jalonEstrecho, '#67e8f9');
+            e1rmChartCurlZ = createE1RMChart(`e1rmChart-${exercisesToTrack.curlZ.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartCurlZ, data.curlZ, '#e5e7eb');
+        }
+
+        // --- MANEJO DE MODAL AÑADIR DÍA ---
+
+        function setupManualEntryListeners() {
+            const modal = document.getElementById('add-day-modal');
+            const openBtn = document.getElementById('open-add-modal-btn');
+            const cancelBtn = document.getElementById('cancel-manual-btn');
+            const saveBtn = document.getElementById('save-manual-btn');
+            const typeSelect = document.getElementById('manual-type');
+            const container = document.getElementById('manual-exercises-container');
+            const dateInput = document.getElementById('manual-date');
+
+            if (openBtn) {
+                openBtn.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                    dateInput.value = getTodayDateString();
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    typeSelect.value = "";
+                    container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                });
+            }
+
+            if (typeSelect) {
+                typeSelect.addEventListener('change', (e) => {
+                    const type = e.target.value;
+                    container.innerHTML = ''; // Limpiar
+
+                    if (!type) {
+                        container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                        return;
+                    }
+
+                    if (type.includes('rest')) {
+                        // Formulario de Cardio
+                        container.innerHTML = `
+                             <div class="bg-zinc-800 p-3 rounded border border-zinc-600">
+                                <h4 class="font-bold text-blue-400 mb-3">Datos Cardio/Descanso</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-zinc-400 mb-1">Tiempo (min)</label>
+                                        <input type="number" id="manual-cardio-time" class="w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-blue-500 outline-none" placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs text-zinc-400 mb-1">Pulso Medio</label>
+                                        <input type="number" id="manual-cardio-pulse" class="w-full bg-black text-white p-2 rounded border border-zinc-700 focus:border-blue-500 outline-none" placeholder="0">
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Formulario de Pesas (3 Series)
+                        const workoutConfig = workouts[type];
+                        if (workoutConfig && workoutConfig.exercises) {
+                            workoutConfig.exercises.forEach((ex, index) => {
+                                let seriesRows = '';
+                                for (let i = 1; i <= 3; i++) {
+                                    seriesRows += `
+                                        <div class="grid grid-cols-6 gap-2 items-center mb-2 series-row">
+                                            <div class="col-span-1 text-zinc-500 text-xs font-bold text-center">S${i}</div>
+                                            <div class="col-span-2">
+                                                <input type="number" step="0.5" class="manual-weight w-full bg-black text-white p-1 rounded border border-zinc-700 focus:border-yellow-500 outline-none text-center text-sm" placeholder="kg">
+                                            </div>
+                                            <div class="col-span-1 text-center text-zinc-600 text-xs">x</div>
+                                            <div class="col-span-2">
+                                                <input type="number" class="manual-reps w-full bg-black text-white p-1 rounded border border-zinc-700 focus:border-yellow-500 outline-none text-center text-sm" placeholder="reps">
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+
+                                const html = `
+                                    <div class="bg-zinc-800 p-3 rounded border border-zinc-600 exercise-input-group" data-name="${ex.name}">
+                                        <h4 class="font-bold text-yellow-500 mb-2 text-sm">${ex.name}</h4>
+                                        <div class="flex justify-between text-xs text-zinc-400 px-1 mb-1">
+                                            <span class="ml-8">Peso</span>
+                                            <span class="mr-2">Reps</span>
+                                        </div>
+                                        ${seriesRows}
+                                    </div>
+                                `;
+                                container.insertAdjacentHTML('beforeend', html);
+                            });
+                        }
+                    }
+                });
+            }
+
+            if (saveBtn) {
+                saveBtn.addEventListener('click', async () => {
+                    const date = dateInput.value;
+                    const type = typeSelect.value;
+
+                    if (!date || !type) {
+                        alert("Por favor selecciona fecha y tipo de entreno.");
+                        return;
+                    }
+
+                    let newEntry = {
+                        date: date,
+                        workoutType: type.includes('rest') ? 'rest' : (type.includes('hd') ? 'hd' : 'bilbo'),
+                        workoutTitle: type.includes('rest') ? 'CARDIO' : workouts[type].title,
+                        time: "Manual",
+                        exercises: []
+                    };
+
+                    if (type.includes('rest')) {
+                        const timeVal = document.getElementById('manual-cardio-time')?.value || 0;
+                        const pulseVal = document.getElementById('manual-cardio-pulse')?.value || 0;
+                        newEntry.exercises.push({
+                            name: "Cardio Z2",
+                            series: [{ weight: timeVal, reps: pulseVal }]
+                        });
+                    } else {
+                        const inputs = document.querySelectorAll('.exercise-input-group');
+                        inputs.forEach(group => {
+                            const name = group.dataset.name;
+                            const rows = group.querySelectorAll('.series-row');
+                            const seriesData = [];
+
+                            rows.forEach(row => {
+                                const weight = row.querySelector('.manual-weight').value;
+                                const reps = row.querySelector('.manual-reps').value;
+                                if (weight && reps) {
+                                    seriesData.push({ weight: weight, reps: reps });
+                                }
+                            });
+
+                            if (seriesData.length > 0) {
+                                newEntry.exercises.push({
+                                    name: name,
+                                    series: seriesData
+                                });
+                            }
+                        });
+                    }
+
+                    // Guardar en estado global
+                    appData.workoutHistory[date] = newEntry;
+
+                    // Persistir
+                    await writeAllDataToFirestore(appData);
+
+                    // Actualizar UI
+                    runCoreInit();
+
+                    // Cerrar Modal
+                    modal.classList.add('hidden');
+                    typeSelect.value = "";
+                    container.innerHTML = '<p class="text-zinc-500 text-center italic">Selecciona un tipo de entrenamiento para ver los ejercicios.</p>';
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            if (DOM.prevMonthBtn) DOM.prevMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() - 1); renderCalendar(); });
+            if (DOM.nextMonthBtn) DOM.nextMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() + 1); renderCalendar(); });
+            if (DOM.closeHistoryModalBtn) DOM.closeHistoryModalBtn.addEventListener('click', () => DOM.historyModal.classList.add('hidden'));
+            if (DOM.calendarGrid) {
+                DOM.calendarGrid.addEventListener('click', (e) => {
+                    const dayCell = e.target.closest('.calendar-day');
+                    if (dayCell && dayCell.dataset.date) {
+                        const history = getAppData('workoutHistory');
+                        const workout = history[dayCell.dataset.date];
+                        if (workout) showWorkoutDetails(workout);
+                    }
+                });
+            }
+
+            setupManualEntryListeners();
+        }
+
+        function runCoreInit() {
+            days.forEach((day) => {
+                const workout = workouts[day];
+                if (workout.type !== 'rest') {
+                    workout.exercises.forEach(ex => allExerciseNames.add(ex.name));
+                }
+            });
+
+            e1rmMap = calculateAllEstimated1RMs();
+            renderCalendar();
+            renderProgressionCharts();
+            renderMaxReps();
+            renderEstimated1RMs(e1rmMap);
+            renderE1RMCharts();
+        }
+
+        // Separamos la inicialización de eventos de la actualización de UI
+        function initAppLogic() {
+            setupEventListeners();
+            runCoreInit();
+        }
+
+        // Intentar lanzar la app. Solo corre si Data y DOM están listos.
+        function tryLaunchApp() {
+            if (isDataReady && isDomReady && !isAppLaunched) {
+                isAppLaunched = true;
+                console.log("Both DOM and Data are ready. Launching Core App...");
+
+                // Ocultar pantalla de carga
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) loadingScreen.style.opacity = '0';
+                setTimeout(() => { if (loadingScreen) loadingScreen.style.display = 'none'; }, 500);
+
+                initAppLogic();
+            }
+        }
+
+        function setupDataListener() {
+            if (!db || !userId) return;
+
+            if (isLoggedIn) {
+                // FIREBASE: Escucha el documento en tiempo real
+                const docRef = doc(db, DATA_DOC_PATH(userId), 'data');
+
+                onSnapshot(docRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        appData = docSnap.data();
+                        console.log("Datos de Firebase recibidos:", appData);
+                    } else {
+                        console.log("Documento de Firebase no existe. Usando datos locales o por defecto.");
+                        appData = loadAllLocalData();
+                        writeAllDataToFirestore(appData);
+                    }
+                    isDataReady = true;
+                    tryLaunchApp();
+                    // Si ya se lanzó la app, refrescar la UI con los nuevos datos
+                    if (isAppLaunched) runCoreInit();
+                }, (error) => {
+                    console.error("Error en onSnapshot (Firebase):", error);
+                    appData = loadAllLocalData();
+                    isDataReady = true;
+                    tryLaunchApp();
+                });
+            } else {
+                appData = loadAllLocalData();
+                isDataReady = true;
+                tryLaunchApp();
+            }
+        }
+
+        function authReady(user) {
+            if (!isAuthReady) {
+                isAuthReady = true;
+                userId = user ? user.uid : crypto.randomUUID();
+                isLoggedIn = !!user;
+
+                setupDataListener();
+            }
+        }
+
+        if (firebaseConfig.apiKey) {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            setPersistence(auth, browserLocalPersistence)
+                .then(() => {
+                    onAuthStateChanged(auth, async (user) => {
+                        if (user) {
+                            authReady(user);
+                        } else {
+                            // Eliminar signInAnonymously para evitar errores.
+                            // MODO OFFLINE / INVITADO DIRECTO
+                            if (authToken) {
+                                await signInWithCustomToken(auth, authToken).catch(e => console.error(e));
+                            } else {
+                                console.log("No auth user. Initializing Guest Mode.");
+                                authReady(null);
+                            }
+                        }
+                    });
+                })
+                .catch(e => console.error("Error setting persistence", e));
+        } else {
+            authReady(null);
+        }
+
+        function onDomReady() {
+            if (isDomReady) return;
+            DOM.calendarGrid = document.getElementById('calendar-grid');
+            DOM.monthYearEl = document.getElementById('month-year');
+            DOM.prevMonthBtn = document.getElementById('prev-month');
+            DOM.nextMonthBtn = document.getElementById('next-month');
+            DOM.rmList = document.getElementById('rm-list');
+            DOM.e1rmList = document.getElementById('e1rm-list');
+            DOM.historyModal = document.getElementById('history-modal');
+            DOM.historyModalTitle = document.getElementById('history-modal-title');
+            DOM.historyModalTime = document.getElementById('history-modal-time');
+            DOM.historyModalCycle = document.getElementById('history-modal-cycle');
+            DOM.historyModalContent = document.getElementById('history-modal-content');
+            DOM.closeHistoryModalBtn = document.getElementById('close-history-modal');
+
+            isDomReady = true;
+            tryLaunchApp();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', onDomReady);
+        } else {
+            onDomReady();
+        }
+
+    </script>
+</body>
+
+</html>
