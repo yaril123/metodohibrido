@@ -286,6 +286,7 @@
 
         input[type=number] {
             -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         .completed-card {
@@ -536,6 +537,12 @@
 
         <div id="tabs" class="grid grid-cols-7 gap-2 mb-8"></div>
         <main id="workout-content"></main>
+
+        <!-- Botón Start/Pause Inferior -->
+        <div class="mt-8 mb-2">
+            <button id="stopwatch-control-bottom"
+                class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg uppercase tracking-wider">Start</button>
+        </div>
 
         <!-- Botón de Navegación a Inicio -->
         <div class="mt-12 text-center">
@@ -1128,6 +1135,7 @@
             if (state.isStopwatchRunning) return;
             state.isStopwatchRunning = true;
             DOM.stopwatchControlBtn.textContent = 'Pausar';
+            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.textContent = 'Pausar';
             state.stopwatchInterval = setInterval(() => {
                 state.totalSeconds++;
                 updateStopwatchDisplay();
@@ -1389,6 +1397,7 @@
             state.isStopwatchRunning = false;
             updateStopwatchDisplay();
             DOM.stopwatchControlBtn.textContent = 'Start';
+            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.textContent = 'Start';
             DOM.pauseModal.classList.add('hidden');
 
             e1rmMap = calculateAllEstimated1RMs();
@@ -1605,6 +1614,7 @@
             DOM.workoutTitle = document.getElementById('workout-title');
             DOM.stopwatchDisplay = document.getElementById('stopwatch-display');
             DOM.stopwatchControlBtn = document.getElementById('stopwatch-control');
+            DOM.stopwatchControlBtnBottom = document.getElementById('stopwatch-control-bottom');
             DOM.pauseModal = document.getElementById('pause-modal');
             DOM.resumeBtn = document.getElementById('resume-btn');
             DOM.finishBtn = document.getElementById('finish-btn');
@@ -1647,15 +1657,15 @@
                 });
             }
 
-            if (DOM.stopwatchControlBtn) {
-                DOM.stopwatchControlBtn.addEventListener('click', () => {
-                    if (state.isStopwatchRunning) {
-                        pauseStopwatch();
-                    } else {
-                        startStopwatch();
-                    }
-                });
-            }
+            const toggleStopwatch = () => {
+                if (state.isStopwatchRunning) {
+                    pauseStopwatch();
+                } else {
+                    startStopwatch();
+                }
+            };
+            if (DOM.stopwatchControlBtn) DOM.stopwatchControlBtn.addEventListener('click', toggleStopwatch);
+            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.addEventListener('click', toggleStopwatch);
             if (DOM.resumeBtn) {
                 DOM.resumeBtn.addEventListener('click', () => { DOM.pauseModal.classList.add('hidden'); startStopwatch(); });
             }
