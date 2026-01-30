@@ -610,6 +610,27 @@
                 class="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Entendido</button>
         </div>
     </div>
+
+    <!-- Modal de Advertencia Bilbo < 15 Reps -->
+    <div id="bilbo-warning-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-lg w-full border border-yellow-500">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400 uppercase">¡Atención!</h2>
+            <p class="text-gray-300 mb-4 text-lg">
+                Felicidades por haber completado un ciclo completo de Bilbo. Es el momento de volver a bajar peso y
+                aumentar repeticiones.
+            </p>
+            <p class="text-gray-400 mb-6 text-sm">
+                Las repeticiones que se recomendarán para el siguiente entreno serán el <strong>50% de la repetición
+                    máxima estimada (RM)</strong>.
+            </p>
+            <div id="bilbo-warning-details"
+                class="text-left bg-zinc-800 p-4 rounded mb-6 text-sm text-gray-300 space-y-2">
+                <!-- Details injected here -->
+            </div>
+            <button id="bilbo-warning-ok-btn"
+                class="w-full bg-yellow-500 hover:bg-yellow-600 transition-colors text-black font-bold py-3 px-6 rounded-lg">Entendido</button>
+        </div>
+    </div>
     <!-- MODAL DE AJUSTES -->
     <div id="settings-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
         <div
@@ -674,21 +695,21 @@
         const workouts = {
             hd_push: {
                 title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
-                    { name: "Press inclinado con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 180 },
-                    { name: "Press en suelo con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 180 },
-                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 180 },
-                    { name: "Elevaciones laterales sentado", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 180 },
+                    { name: "Press inclinado con barra", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 180 },
+                    { name: "Press en suelo con barra", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 180 },
+                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 180 },
+                    { name: "Elevaciones laterales sentado", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 180 },
+                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 180 },
                 ]
             },
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             hd_pull: {
                 title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
-                    { name: "Jalón en polea agarre neutro", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 180 },
-                    { name: "Remo con barra T", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 180 },
-                    { name: "Pájaros (reverse fly)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 180 },
-                    { name: "Face Pull (polea a cara)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 180 },
+                    { name: "Jalón en polea agarre neutro", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 180 },
+                    { name: "Remo con barra T", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 180 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 180 },
+                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 180 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 180 },
                 ]
             },
             rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -698,7 +719,7 @@
                     { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 180 },
                     { name: "Elevaciones laterales con gomas", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 180 },
                     { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 180 },
-                    { name: "Cruces con goma (pecho)", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 180 },
+                    { name: "Cruces en polea alta", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 180 },
                 ]
             },
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -946,11 +967,18 @@
                     let tableHeader = '';
 
                     if (isStrengthDay) {
+                        // Header logic
+                        let dropSetHeader = '';
+                        if (day.includes('hd')) {
+                            dropSetHeader = `<th class="text-center text-[10px] uppercase text-yellow-400">Dropset</th>`;
+                        }
+
                         tableHeader = `
                             <thead>
                                 <tr>
                                     <th>Serie</th>
                                     <th class="text-center">Peso (KG)</th>
+                                    ${dropSetHeader}
                                     <th class="text-center">Reps</th>
                                     <th class="text-center">Últ. Peso</th>
                                     <th class="text-center">Últ. Reps</th>
@@ -962,6 +990,7 @@
                         const rmValues = exercise.rmPercentage ? exercise.rmPercentage.replace(/%/g, '').split('/').map(v => v.trim()) : [];
                         exercise.sets.forEach((set, setIndex) => {
                             const isBilboDay = day.includes('bilbo');
+                            const isHdDay = day.includes('hd');
                             const isEffectiveSet = (isBilboDay && setIndex === 0) || (!isBilboDay && setIndex === exercise.sets.length - 1);
                             const currentRm = rmValues[setIndex] || (rmValues.length === 1 ? rmValues[0] : '');
                             const rmDisplay = currentRm ? (isNaN(currentRm) ? currentRm : `${currentRm}%`) : '';
@@ -974,13 +1003,24 @@
                             if (isBilboDay) {
                                 if (setIndex === 0) { seriesName = 'Serie Bilbo'; } else { seriesName = `Serie ${setIndex + 1}`; }
                             } else {
-                                if (isEffectiveSet) { seriesName = 'Serie'; } else { seriesName = `Calentamiento ${setIndex + 1}`; }
+                                if (isEffectiveSet) { seriesName = 'Serie'; } else { seriesName = 'Calentamiento'; }
+                            }
+
+                            // Dropset Cell Logic (Only for HD and only for Main Series)
+                            let dropSetCell = '';
+                            if (isHdDay) {
+                                if (isEffectiveSet) {
+                                    dropSetCell = `<td class="text-center"><input type="checkbox" class="dropset-checkbox accent-yellow-400 w-5 h-5 cursor-pointer" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>`;
+                                } else {
+                                    dropSetCell = `<td></td>`;
+                                }
                             }
 
                             seriesBody += `
                                 <tr class="set-row ${rowClass}">
                                     <td class="${seriesTdClass}">${seriesName}</td>
                                     <td class="text-center"><input type="number" step="0.5" class="weight-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
+                                    ${dropSetCell}
                                     <td class="text-center"><input type="number" class="reps-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
                                     <td class="text-center text-gray-400 last-weight-cell">-</td>
                                     <td class="text-center text-gray-400 last-reps-cell">-</td>
@@ -1163,7 +1203,9 @@
                     card.querySelectorAll('.weight-input').forEach(input => { weights.push(input.value); });
                     const reps = [];
                     card.querySelectorAll('.reps-input').forEach(input => { reps.push(input.value); });
-                    progress.workouts[day][exIndex] = { completed: isCompleted, weights: weights, reps: reps };
+                    const dropsets = [];
+                    card.querySelectorAll('.dropset-checkbox').forEach(input => { dropsets.push(input.checked); }); // Capture Drop Sets (may be fewer than sets if only effective)
+                    progress.workouts[day][exIndex] = { completed: isCompleted, weights: weights, reps: reps, dropsets: dropsets };
                 });
             });
             setAppData('workoutProgress', progress); // Usa setAppData
@@ -1191,6 +1233,17 @@
                         card.querySelectorAll('.reps-input').forEach((input, setIndex) => {
                             input.value = (data.reps && data.reps[setIndex]) ? data.reps[setIndex] : '';
                         });
+                        // Load Drop Sets
+                        // Note: dropset-checkboxes are fewer than sets (only 1 for HD). We need to match by index if we were robust, 
+                        // but here we just iterate the checkboxes found.
+                        // However, since we recreate HTML, the checkbox index 0 corresponds to the Effective Set.
+                        // data.dropsets is array of booleans.
+                        if (data.dropsets) {
+                            const checkboxes = card.querySelectorAll('.dropset-checkbox');
+                            checkboxes.forEach((cb, i) => {
+                                if (data.dropsets[0]) cb.checked = true; // Simplified: Only 1 dropset per exercise possible in current logic
+                            });
+                        }
                     });
                 }
             });
@@ -1283,9 +1336,11 @@
                         card.querySelectorAll('.set-row').forEach((row) => {
                             const weightInput = row.querySelector('.weight-input');
                             const repsInput = row.querySelector('.reps-input');
+                            const dropSetInput = row.querySelector('.dropset-checkbox');
                             seriesData.push({
                                 weight: weightInput ? weightInput.value : '0',
-                                reps: repsInput ? repsInput.value : '0'
+                                reps: repsInput ? repsInput.value : '0',
+                                isDropSet: dropSetInput ? dropSetInput.checked : false
                             });
                         });
                         completedExercises.push({
@@ -1330,10 +1385,24 @@
 
                         // Lógica de ciclo Bilbo
                         if (isBilboDay && exerciseData.sets.length > 0) {
+                            const mainExercises = [
+                                "Press de banca plano (barra)",
+                                "Jalón en polea agarre neutro",
+                                "Jalón al pecho agarre estrecho"
+                            ];
+
                             const exerciseName = exerciseData.name;
                             const currentReps = parseInt(seriesData[0].reps, 10);
-                            if (!isNaN(currentReps) && currentReps <= 15) {
-                                bilboResets.push({ name: exerciseName, type: 'bilbo' });
+
+                            if (mainExercises.includes(exerciseName)) {
+                                if (!isNaN(currentReps) && currentReps < 15) {
+                                    bilboResets.push({ name: exerciseName, type: 'bilbo_main_reset' });
+                                }
+                            } else {
+                                // Default logic for other exercises if needed, or just leave it for now
+                                if (!isNaN(currentReps) && currentReps <= 15) {
+                                    // Logic for secondary exercises if we wanted to track them too
+                                }
                             }
                         }
                     });
@@ -1414,153 +1483,209 @@
                 }, 500);
             } else if (bilboResets.length > 0) {
                 setTimeout(() => {
-                    const exerciseName = bilboResets[0].name;
-                    const newCycle = parseInt(getAppData('bilboCycleCount'));
-                    const newWeight = (e1rmMap.get(exerciseName) || 40) * 0.5; // 40 as default e1rm if none found
-                    showBilboCycleModal(exerciseName, newCycle, newWeight);
+                    // Check if it's the special main reset (<15 reps)
+                    const specialResets = bilboResets.filter(r => r.type === 'bilbo_main_reset');
+
+                    if (specialResets.length > 0) {
+                        let detailsHTML = '';
+                        specialResets.forEach(reset => {
+                            const name = reset.name;
+                            const e1rm = e1rmMap.get(name) || 0;
+                            let nextWeight = 0;
+                            if (e1rm > 0) {
+                                nextWeight = e1rm * 0.5;
+                            } else {
+                                nextWeight = 20; // Fallback
+                            }
+
+                            let flags = getAppData('bilboResetFlags');
+                            flags[name] = true;
+                            setAppData('bilboResetFlags', flags);
+
+                            detailsHTML += `<div class="flex justify-between"><span>${name}:</span> <span class="text-yellow-400 font-bold">~${nextWeight.toFixed(1)} kg</span></div>`;
+                        });
+
+                        document.getElementById('bilbo-warning-details').innerHTML = detailsHTML;
+                        document.getElementById('bilbo-warning-modal').classList.remove('hidden');
+
+                    } else {
+                        // Standard reset logic
+                        const exerciseName = bilboResets[0].name;
+                        const newCycle = parseInt(getAppData('bilboCycleCount'));
+                        const newWeight = (e1rmMap.get(exerciseName) || 40) * 0.5;
+                        showBilboCycleModal(exerciseName, newCycle, newWeight);
+                    }
                 }, 500);
             }
         }
 
+
         function loadLastPerformance(e1rmMap) {
-            const history = getAppData('workoutHistory'); // Usa getAppData
-            const sortedDates = Object.keys(history).sort().reverse();
-            let progressionFlags = getAppData('progressionFlags'); // Usa getAppData
-            let bilboResetFlags = getAppData('bilboResetFlags'); // Usa getAppData
+            const history = getAppData('workoutHistory');
+            // Robust date sorting
+            const sortedDates = Object.keys(history).sort((a, b) => {
+                const dateA = new Date(history[a].date || a);
+                const dateB = new Date(history[b].date || b);
+                return dateB - dateA;
+            });
+
+            let progressionFlags = getAppData('progressionFlags');
+            let bilboResetFlags = getAppData('bilboResetFlags');
+
+            // Custom Rounding Function
+            const roundWeight = (val) => {
+                if (val <= 0) return 0;
+                const integer = Math.floor(val);
+                const decimal = val - integer;
+                // "redondeados al alza si mas de 0.5 y a la baja si son de menos"
+                if (decimal > 0.5001) return integer + 1;
+                // 0.5 or less -> floor (or keep .5? "a la baja" usually implies floor integer, 
+                // but standard plates have 0.5kg? User didn't specify keeping 0.5. 
+                // "a la baja si son de menos". 
+                // Let's assume strict integer rounding logic as implied by "al alza/a la baja".
+                // Or maybe they want to keep 0.5? Usually Gym apps round to nearest 0.5 or 0.25.
+                // The user phrasing "redondeados al alza... a la baja" sounds like rounding to integer.
+                // But let's check: "10.4 -> 10". "10.6 -> 11". "10.5 -> 10.5"?
+                // Most safe bet: Round to nearest 0.5, but apply the ceil/floor logic specifically for the >0.5 splitting.
+                // Simplified per instructions:
+                if (decimal > 0.5) return Math.ceil(val);
+                return Math.floor(val);
+            };
 
             document.querySelectorAll('.exercise-card').forEach(card => {
                 const day = card.dataset.day;
                 const exIndex = parseInt(card.dataset.exIndex, 10);
 
-                if (workouts[day] && workouts[day].exercises[exIndex]) {
-                    const workoutType = workouts[day].type;
-                    const exerciseName = workouts[day].exercises[exIndex].name;
+                if (!workouts[day] || !workouts[day].exercises[exIndex]) return;
 
-                    if (workoutType === 'rest') {
-                        card.querySelectorAll('.weight-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
-                        card.querySelectorAll('.reps-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
-                        return;
-                    }
+                const workoutType = workouts[day].type;
+                const exerciseName = workouts[day].exercises[exIndex].name;
+                const exerciseDataDef = workouts[day].exercises[exIndex];
 
-                    let foundLog = false;
-                    let flagWasUsed = false;
-                    let bilboBaseWeight = 0;
-                    const rmPercentages = workouts[day].exercises[exIndex].rmPercentage.split(' / ').map(p => parseFloat(p) / 100);
+                if (workoutType === 'rest') {
+                    card.querySelectorAll('.weight-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
+                    return;
+                }
 
-                    // Aplicar lógica de Bilbo primero
-                    if (day.includes('bilbo')) {
-                        const e1rm = e1rmMap.get(exerciseName) || 0;
-                        const shouldBilboReset = bilboResetFlags[exerciseName] === true;
-
-                        if (shouldBilboReset && e1rm > 0) {
-                            bilboBaseWeight = e1rm * (rmPercentages[0] || 0.5);
-                            bilboResetFlags[exerciseName] = false;
-                            flagWasUsed = true;
-                            foundLog = true;
-                        } else if (e1rm > 0) {
-                            let lastWeightNum = 0;
-                            for (const date of sortedDates) {
-                                const log = history[date];
-                                if (log && Array.isArray(log.exercises)) {
-                                    const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
-                                    if (foundExercise && foundExercise.series.length > 0) {
-                                        lastWeightNum = parseFloat(foundExercise.series[0].weight);
-                                        break;
-                                    }
-                                }
-                            }
-
-                            if (lastWeightNum > 0) {
-                                bilboBaseWeight = lastWeightNum * 1.03; // +3%
-                            } else {
-                                bilboBaseWeight = e1rm * (rmPercentages[0] || 0.5);
-                            }
-                            foundLog = true;
-                        }
-
-                        // Rellenar inputs de Bilbo
-                        if (foundLog) {
-                            card.querySelectorAll('.weight-input').forEach((input, setIndex) => {
-                                const percentage = rmPercentages[setIndex] || rmPercentages[0];
-                                const suggestedWeight = (bilboBaseWeight / (rmPercentages[0] || 0.5)) * percentage;
-                                if (!input.value || input.value === '0') {
-                                    input.value = suggestedWeight.toFixed(1);
-                                }
-                            });
+                // --- FIND LAST LOG ---
+                let lastSessionData = null;
+                for (const dateKey of sortedDates) {
+                    const log = history[dateKey];
+                    if (log && log.exercises) {
+                        const exLog = log.exercises.find(e => e.name === exerciseName);
+                        if (exLog && exLog.series && exLog.series.length > 0) {
+                            lastSessionData = exLog;
+                            break;
                         }
                     }
+                }
 
-                    // Lógica HD (solo si no es Bilbo o si Bilbo no encontró e1RM/log)
-                    if (!foundLog) {
-                        for (const date of sortedDates) {
-                            const log = history[date];
-                            if (log && Array.isArray(log.exercises)) {
-                                const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
+                // --- DISPLAY LAST DATA (Gray Columns) ---
+                if (lastSessionData) {
+                    const weightCells = card.querySelectorAll('.last-weight-cell');
+                    const repsCells = card.querySelectorAll('.last-reps-cell');
 
-                                if (foundExercise && Array.isArray(foundExercise.series)) {
-                                    const weightCells = card.querySelectorAll('.last-weight-cell');
-                                    const repsCells = card.querySelectorAll('.last-reps-cell');
-                                    const weightInputs = card.querySelectorAll('.weight-input');
-                                    const shouldProgress = progressionFlags[exerciseName] === true;
+                    // Fill columns matching indices as best as possible
+                    weightCells.forEach((cell, i) => {
+                        // Use series at index, or if out of bounds, use the *last* available series (often effective)
+                        // or keep blank? The user complained data wasn't showing.
+                        // Showing the last effective details in all rows is less confusing than blank rows.
+                        // But accurate matching is better.
+                        const sData = lastSessionData.series[i] || lastSessionData.series[lastSessionData.series.length - 1];
+                        cell.textContent = sData ? `${sData.weight} kg` : '-';
+                    });
+                    repsCells.forEach((cell, i) => {
+                        const sData = lastSessionData.series[i] || lastSessionData.series[lastSessionData.series.length - 1];
+                        cell.textContent = sData ? sData.reps : '-';
+                    });
+                } else {
+                    card.querySelectorAll('.last-weight-cell').forEach(c => c.textContent = '-');
+                    card.querySelectorAll('.last-reps-cell').forEach(c => c.textContent = '-');
+                }
 
-                                    foundExercise.series.forEach((seriesData, seriesIndex) => {
-                                        if (weightCells[seriesIndex]) weightCells[seriesIndex].textContent = `${seriesData.weight || '-'} kg`;
-                                        if (repsCells[seriesIndex]) repsCells[seriesIndex].textContent = seriesData.reps || '-';
+                // --- SUGGEST WEIGHTS (Inputs) ---
+                let baseWeight = 0;
+                let flagUsed = false;
 
-                                        if (weightInputs[seriesIndex]) {
-                                            const lastWeightNum = parseFloat(seriesData.weight);
-                                            if (!isNaN(lastWeightNum) && lastWeightNum > 0) {
-                                                let suggestedWeight = lastWeightNum;
+                const inputs = card.querySelectorAll('.weight-input');
 
-                                                if (day.includes('hd')) {
-                                                    if (seriesIndex === 2) {
-                                                        if (shouldProgress) {
-                                                            suggestedWeight = Math.round(lastWeightNum * 1.025); // 2.5%
-                                                            progressionFlags[exerciseName] = false;
-                                                            flagWasUsed = true;
-                                                        }
-                                                    }
-                                                }
+                if (day.includes('bilbo')) {
+                    const e1rm = e1rmMap.get(exerciseName) || 0;
+                    const shouldReset = bilboResetFlags[exerciseName] === true;
 
-                                                const suggestedWeightStr = suggestedWeight.toFixed(1);
+                    if (shouldReset && e1rm > 0) {
+                        baseWeight = e1rm * 0.5;
+                        // We don't clear flag here to keep it persistent until save, or we clear it if we generated?
+                        // User experience: if they refresh, it should still suggest reset until they do it.
+                        // Cleaning here might be risky if they don't save.
+                        // But existing code cleaned it. Let's keep it clean if we used it.
+                        bilboResetFlags[exerciseName] = false;
+                        flagUsed = true;
+                    } else if (lastSessionData) {
+                        // Default Bilbo progression: Suggest last weight used in effective series
+                        // Bilbo effective is always index 0 (first series in storage)
+                        baseWeight = parseFloat(lastSessionData.series[0].weight || 0);
+                    } else if (e1rm > 0) {
+                        baseWeight = e1rm * 0.5;
+                    }
 
-                                                if (!weightInputs[seriesIndex].value || weightInputs[seriesIndex].value === '0') {
-                                                    weightInputs[seriesIndex].value = suggestedWeightStr;
-                                                }
-                                            } else {
-                                                if (!weightInputs[seriesIndex].value) weightInputs[seriesIndex].placeholder = "0";
-                                            }
-                                        }
-                                    });
-                                    foundLog = true;
-                                    break;
-                                }
+                    if (baseWeight > 0) {
+                        baseWeight = roundWeight(baseWeight);
+                        // Apply percentages
+                        // Bilbo Def: rmPercentage: "50 / 65 / 75". But this is for warmup?
+                        // In Bilbo, Series 0 is the main one.
+                        inputs.forEach((input, i) => {
+                            if (i === 0) input.value = baseWeight;
+                            else {
+                                // If there are other series (backoff?), we might calculate them.
+                                // Assuming standard behavior: suggestion only for main, or repeat.
+                                // Let's leave secondary empty or percentage?
+                                // Current HTML structure for Bilbo has 3 series.
+                                // If we assumed baseWeight is the '100% target' (Series 0), 
+                                // others might be lighter? "10-15", "8-12".
+                                // Let's just fill the first one to be safe, others blank or same?
+                                // User requirement: "que salga bien en todos los ejercicios".
+                                // Let's fill all with baseWeight or leave others blank.
+                                if (i === 0) input.value = baseWeight;
                             }
-                        }
+                        });
                     }
 
-                    if (flagWasUsed) {
-                        setAppData('progressionFlags', progressionFlags); // Guardar flags si se usaron
-                        setAppData('bilboResetFlags', bilboResetFlags); // Guardar flags si se usaron
-                    }
+                } else if (day.includes('hd')) {
+                    // HD Logic
+                    const shouldProgress = progressionFlags[exerciseName] === true;
 
-                    if (!foundLog) {
-                        card.querySelectorAll('.last-weight-cell').forEach(cell => cell.textContent = '-');
-                        card.querySelectorAll('.last-reps-cell').forEach(cell => cell.textContent = '-');
-                        card.querySelectorAll('.reps-input').forEach(input => input.value = '');
-
-                        if (day.includes('bilbo')) {
-                            const e1rm = e1rmMap.get(exerciseName) || 40;
-                            const rmPercentages = workouts[day].exercises[exIndex].rmPercentage.split(' / ').map(p => parseFloat(p) / 100);
-                            card.querySelectorAll('.weight-input').forEach((input, setIndex) => {
-                                const percentage = rmPercentages[setIndex] || rmPercentages[0];
-                                const suggestedWeight = e1rm * percentage;
-                                input.value = suggestedWeight.toFixed(1);
-                            });
+                    if (lastSessionData) {
+                        // Effective is last
+                        let lastEffective = parseFloat(lastSessionData.series[lastSessionData.series.length - 1].weight || 0);
+                        if (shouldProgress) {
+                            let increased = lastEffective + 2.5; // Standard increment
+                            // Or percentage? User didn't specify. 2.5 is safe.
+                            baseWeight = roundWeight(increased);
+                            progressionFlags[exerciseName] = false;
+                            flagUsed = true;
                         } else {
-                            card.querySelectorAll('.weight-input').forEach(input => { input.value = ''; input.placeholder = '0'; });
+                            baseWeight = roundWeight(lastEffective);
                         }
                     }
+
+                    if (baseWeight > 0) {
+                        // Calculate Warmups
+                        // HD Def: rmPercentage: "50 / 80". Effective is last (80).
+                        const rmPercs = exerciseDataDef.rmPercentage.split('/').map(s => parseInt(s.trim()));
+                        const effectivePerc = rmPercs[rmPercs.length - 1]; // e.g. 80
+
+                        inputs.forEach((input, i) => {
+                            const thisPerc = rmPercs[i] || effectivePerc;
+                            const w = (baseWeight * thisPerc) / effectivePerc;
+                            input.value = roundWeight(w);
+                        });
+                    }
+                }
+
+                if (flagUsed) {
+                    setAppData('progressionFlags', progressionFlags);
+                    setAppData('bilboResetFlags', bilboResetFlags);
                 }
             });
             loadProgress();
@@ -1653,7 +1778,7 @@
                     }
                 });
                 DOM.contentContainer.addEventListener('change', (e) => {
-                    if (e.target.classList.contains('weight-input') || e.target.classList.contains('reps-input')) saveProgress();
+                    if (e.target.classList.contains('weight-input') || e.target.classList.contains('reps-input') || e.target.classList.contains('dropset-checkbox')) saveProgress();
                 });
             }
 
@@ -1688,6 +1813,13 @@
             if (DOM.closeSettingsModalBtn) {
                 DOM.closeSettingsModalBtn.addEventListener('click', () => {
                     DOM.settingsModal.classList.add('hidden');
+                });
+            }
+
+            const bilboWarningOkBtn = document.getElementById('bilbo-warning-ok-btn');
+            if (bilboWarningOkBtn) {
+                bilboWarningOkBtn.addEventListener('click', () => {
+                    document.getElementById('bilbo-warning-modal').classList.add('hidden');
                 });
             }
 

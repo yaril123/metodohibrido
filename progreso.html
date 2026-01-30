@@ -177,6 +177,15 @@
             box-shadow: 0 0 5px rgba(250, 204, 21, 0.5);
         }
 
+        /* Test: Rojo */
+        .day-number.day-test {
+            background-color: #ef4444;
+            /* red-500 */
+            color: #fff;
+            font-weight: 900;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+        }
+
         /* Rest/Cardio: Azul (CAMBIADO para mejor visibilidad) */
         .day-number.day-rest {
             background-color: #3b82f6;
@@ -670,6 +679,8 @@
 
                 let dayNumberClasses = 'day-number flex items-center justify-center text-sm';
                 if (workout) {
+                    // Check for test specifically if needed, or rely on workoutType.
+                    // Test saves as 'test' type, so class will be 'day-test'. CSS handles it.
                     dayNumberClasses += ` day-${workout.workoutType}`;
                 }
                 const isTodayClass = dateStr === todayStr ? 'today-blink' : '';
@@ -704,17 +715,36 @@
                     </div>`;
                 }
 
+                const isHD = workout.workoutTitle.includes("HEAVY DUTY");
+                let dropSetHeader = isHD ? `<th class="py-2 px-3 text-center text-zinc-400 font-semibold uppercase text-yellow-400 text-xs">Drop</th>` : '';
+
                 const seriesRows = ex.series.map((s, i) => {
                     let seriesName = `Serie ${i + 1}`;
                     if (workout.workoutTitle.includes("BILBO") && i === 0) seriesName = "Serie Bilbo";
-                    // Si se añadió manualmente, intentamos deducir nombres lógicos
                     if (workout.workoutTitle.includes("HEAVY DUTY") && i === ex.series.length - 1) seriesName = "Serie Efectiva";
                     else if (workout.workoutTitle.includes("HEAVY DUTY") && i < ex.series.length - 1) seriesName = `Calentamiento ${i + 1}`;
+
+                    // Simplificar nombre calentamiento si solo hay 1
+                    if (workout.workoutTitle.includes("HEAVY DUTY") && ex.series.length === 2 && i === 0) seriesName = "Calentamiento";
+                    if (workout.workoutTitle.includes("HEAVY DUTY") && ex.series.length === 2 && i === 1) seriesName = "Serie";
+
+
+                    let dropSetCell = '';
+                    if (isHD) {
+                        // Check if this series has dropset marked
+                        const isDrop = s.isDropSet ? '✅' : '-';
+                        dropSetCell = `<td class="py-2 px-3 text-center text-xs">${isDrop}</td>`;
+                        // Align with empty cells for warmup if needed, assuming warmup never has dropset
+                        if (i < ex.series.length - 1) dropSetCell = `<td class="py-2 px-3 text-center">-</td>`;
+                        else if (s.isDropSet) dropSetCell = `<td class="py-2 px-3 text-center">✅</td>`;
+                        else dropSetCell = `<td class="py-2 px-3 text-center">-</td>`;
+                    }
 
                     return `
                     <tr class="border-b border-zinc-700 last:border-b-0">
                         <td class="py-2 px-3 text-zinc-300 font-semibold">${seriesName}</td>
                         <td class="py-2 px-3 text-center">${s.weight || '0'} kg</td>
+                        ${dropSetCell}
                         <td class="py-2 px-3 text-center">${s.reps || '0'}</td>
                     </tr>
                     `;
@@ -729,6 +759,7 @@
                                 <tr class="border-b border-zinc-600">
                                     <th class="py-2 px-3 text-left text-zinc-400 font-semibold uppercase">Serie</th>
                                     <th class="py-2 px-3 text-center text-zinc-400 font-semibold uppercase">Peso</th>
+                                    ${dropSetHeader}
                                     <th class="py-2 px-3 text-center text-zinc-400 font-semibold uppercase">Reps</th>
                                 </tr>
                             </thead>

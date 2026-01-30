@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Inicial - Método Híbrido</title>
+    <title>Test - Método Híbrido</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -113,7 +113,7 @@
     <div class="max-w-3xl mx-auto">
 
         <header class="mb-6 text-center">
-            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Test Inicial</h1>
+            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Test</h1>
             <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Método Bilbo (Lombardi)</p>
         </header>
 
@@ -268,7 +268,7 @@
         <!-- NUEVO: Registro de Tests Anteriores -->
         <div id="test-history-section" class="mt-6">
             <h2 class="text-2xl sm:text-3xl font-black text-white uppercase tracking-wider mb-4 text-center">Registro de
-                Test Inicial</h2>
+                Test</h2>
             <div id="test-history-content" class="space-y-4">
                 <!-- El historial se inyectará aquí -->
             </div>
@@ -317,7 +317,7 @@
 
                 const testLogs = Object.entries(history)
                     .filter(([key, log]) =>
-                        log.workoutTitle === 'Test RM Inicial' || key.endsWith('_TEST_INICIAL')
+                        log.workoutTitle === 'Test RM' || key.endsWith('_TEST')
                     )
                     .sort((a, b) => new Date(b[1].date) - new Date(a[1].date)); // [key, log]
 
@@ -413,14 +413,14 @@
                     try {
                         const today = new Date();
                         // Creamos una clave única para el test
-                        const testKey = `${today.toISOString()}_TEST_INICIAL`;
+                        const testKey = `${today.toISOString()}_TEST`;
                         let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
 
                         const logEntry = {
                             date: today.toISOString().split('T')[0],
                             time: "00:00:00", // Test no cronometrado
-                            workoutType: 'bilbo', // Lo marcamos como tipo Bilbo
-                            workoutTitle: 'Test RM Inicial',
+                            workoutType: 'test', // Lo marcamos como tipo Test
+                            workoutTitle: 'Test RM',
                             exercises: exercisesToLog
                         };
 
