@@ -740,7 +740,115 @@
         let e1rmMap = new Map(); // Mapa de 1RM estimado
         let DOM = {}; // Se llenará en DOMContentLoaded
 
-        const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false };
+        const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false, recognition: null };
+
+        // --- SPEECH RECOGNITION & TTS UTILS ---
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                // Cancelar cualquier cosa que se esté diciendo
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "es-ES";
+                utterance.rate = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function startVoiceRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.warn("Speech Recognition API not supported in this browser.");
+                return;
+            }
+
+            if (!state.recognition) {
+                state.recognition = new SpeechRecognition();
+                state.recognition.lang = 'es-ES';
+                // Cambiar a true. 'false' requiere reinicio constante y podemos perder la palabra mientras reinicia.
+                state.recognition.continuous = true;
+                state.recognition.interimResults = false;
+
+                state.recognition.onresult = (event) => {
+                    // Iterar sobre los resultados, el ultimo suele ser el mas reciente
+                    const lastResultIndex = event.results.length - 1;
+                    const transcript = event.results[lastResultIndex][0].transcript.toLowerCase();
+                    console.log("Voice recognized:", transcript);
+
+                    if (transcript.includes("tiempo") || transcript.includes("time") || transcript.includes("descanso") || transcript.includes("ya")) {
+                        triggerNextRestTimer();
+                    }
+                };
+
+                state.recognition.onend = () => {
+                    console.log("Recognition ended. Restarting if stopwatch running...");
+                    // Reiniciar si el cronómetro sigue corriendo para escucha continua
+                    if (state.isStopwatchRunning) {
+                        try {
+                            state.recognition.start();
+                        } catch (e) {
+                            console.log("Already started");
+                        }
+                    }
+                };
+
+                state.recognition.onerror = (event) => {
+                    console.error("Speech recognition error", event.error);
+                    if (event.error === 'no-speech') {
+                        // Ignorar error de silencio, que siga intentando en onend
+                    }
+                };
+            }
+
+            try {
+                console.log("Starting recognition...");
+                state.recognition.start();
+            } catch (e) {
+                // Ignore if already started
+            }
+        }
+
+        function stopVoiceRecognition() {
+            if (state.recognition) {
+                state.recognition.stop();
+            }
+        }
+
+        function triggerNextRestTimer() {
+            // Verificar si YA hay un temporizador corriendo
+            const runningTimerKey = Object.keys(state.activeTimers).find(key => {
+                // Verificar si el intervalo sigue activo (por seguridad)
+                return state.activeTimers[key] && state.activeTimers[key].interval;
+            });
+
+            if (runningTimerKey) {
+                console.log("Ya hay un temporizador corriendo. Ignorando comando de voz.");
+                // Opcional: Feedback de voz "Ya hay un descanso activo"
+                return;
+            }
+
+            // Estrategia: Buscar el primer temporizador visible que NO esté corriendo y que corresponda a un ejercicio visible.
+            // Asumimos que el usuario va en orden.
+            const activeDay = document.querySelector('.day-nav-button.active')?.dataset.day;
+            if (!activeDay) return;
+
+            const visibleTimers = document.querySelectorAll(`#${activeDay} .timer-clock`);
+            for (let timer of visibleTimers) {
+                // Si no está corriendo, lo activamos
+                if (!timer.classList.contains('timer-running')) {
+                    // Opcional: Verificar si el ejercicio ya se completó?
+                    // Por ahora, activamos el primero disponible (siguiente serie/ejercicio)
+
+                    // Simular click
+                    timer.click();
+
+                    // Feedback visual/sonoro extra si se desea
+                    speak("Cuenta atrás iniciada");
+                    return; // Solo activar uno
+                }
+            }
+            speak("No quedan descansos pendientes en esta vista");
+        }
 
 
         // --- FUNCIONES DE PERSISTENCIA (Prioridad: Firebase si logueado, sino localStorage) ---
@@ -994,6 +1102,13 @@
                             const isEffectiveSet = (isBilboDay && setIndex === 0) || (!isBilboDay && setIndex === exercise.sets.length - 1);
                             const currentRm = rmValues[setIndex] || (rmValues.length === 1 ? rmValues[0] : '');
                             const rmDisplay = currentRm ? (isNaN(currentRm) ? currentRm : `${currentRm}%`) : '';
+
+                            // Lógica de dropset para marcarlo en la UI
+                            // Para HD: La última serie (effective) es la que suele llevar dropsets.
+                            // Si dropSet es true, y estamos en effective set, pintamos checkbox.
+                            // PERO: Si el usuario quiere dropset, lo marcamos. La "serieCount" en HD es 2 (1 warm, 1 effective).
+                            // Así que setIndex 1 es effective.
+
                             const rowClass = isEffectiveSet ? 'effective-set' : '';
                             const seriesTdClass = isEffectiveSet ? 'text-white font-semibold text-lg' : 'text-[#c6c6c6] font-semibold';
                             const rmTdClass = isEffectiveSet ? 'text-white font-medium text-lg' : 'text-[#c6c6c6] font-medium';
@@ -1147,6 +1262,9 @@
                     const synth = new Tone.Synth().toDestination();
                     synth.triggerAttackRelease("C5", "8n", Tone.now());
                     synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
+
+                    // Voz: Descanso finalizado
+                    speak("Descanso finalizado");
                 }
             }, 1000);
             state.activeTimers[timerId] = { interval, element: timerElement };
@@ -1180,6 +1298,12 @@
                 state.totalSeconds++;
                 updateStopwatchDisplay();
             }, 1000);
+
+            // Voz: Mensaje inicial
+            if (state.totalSeconds === 0) {
+                speak("Entrenamiento iniciado, cuando hayas acabado una serie, dí tiempo! y empezará a contar la cuenta atras del descanso");
+            }
+            startVoiceRecognition();
         }
 
         function pauseStopwatch() {
@@ -1187,6 +1311,8 @@
             state.isStopwatchRunning = false;
             clearInterval(state.stopwatchInterval);
             DOM.pauseModal.classList.remove('hidden');
+            stopVoiceRecognition(); // Parar reconocimiento
+            speak("Entrenamiento pausado");
         }
 
 
@@ -1312,6 +1438,8 @@
         function finishWorkout() {
             clearInterval(state.stopwatchInterval);
             state.isStopwatchRunning = false;
+            stopVoiceRecognition();
+            speak("Entrenamiento finalizado. ¡Buen trabajo!");
 
             const todayStr = getTodayDateString();
             const finalTime = DOM.stopwatchDisplay.textContent;
