@@ -256,22 +256,42 @@
 
             .series-table th,
             .series-table td {
-                padding: 0.5rem 0.1rem;
-                font-size: 0.75rem;
+                padding: 0.25rem 0;
+                /* Padding lateral 0 para ganar espacio */
+                font-size: 0.70rem;
+                /* Fuente más pequeña */
             }
 
-            /* Ocultar etiquetas largas en móvil, usar versiones cortas si posible o solo iconos */
+            .series-table {
+                table-layout: fixed;
+                /* Forzar celdas iguales/controladas */
+                width: 100%;
+            }
+
+            /* Inputs más compactos en móvil */
+            .weight-input,
+            .reps-input {
+                padding: 0.2rem 0;
+                font-size: 14px;
+                /* Un poco menos de 16px, user tiene q sacrificar zoom vs espacio */
+                min-width: 0;
+                /* Permitir contracción */
+                width: 90%;
+                /* No ocupar 100% para dejar aire */
+                height: 30px;
+            }
+
+            .dropset-checkbox {
+                transform: scale(0.8);
+                /* Checkbox más pequeño */
+            }
+
             .header-long {
                 display: none;
             }
 
             .header-short {
                 display: inline;
-            }
-
-            .weight-input,
-            .reps-input {
-                padding: 0.4rem 0;
             }
         }
 
@@ -285,27 +305,23 @@
             }
         }
 
+        /* Eliminamos scroll container forzado que pusimos antes */
         .table-scroll-container {
             width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .weight-input,
         .reps-input {
             background-color: #0D0D0D;
             border: 1px solid #3f3f46;
-            /* zinc-700 */
-            border-radius: 0.375rem;
+            border-radius: 0.25rem;
+            /* Radio más pequeño */
             color: #E0E0E0;
             padding: 0.5rem 0.2rem;
             width: 100%;
-            min-width: 45px;
-            /* Evitar que se aplaste demasiado */
+            /* min-width quitado para móvil arriba */
             max-width: 70px;
             text-align: center;
-            font-size: 16px;
-            /* Prevenir zoom en iOS */
         }
 
         .weight-input:focus,
@@ -1131,22 +1147,24 @@
 
                     if (isStrengthDay) {
                         // Header logic
+                        // Header logic
                         let dropSetHeader = '';
                         if (day.includes('hd')) {
-                            dropSetHeader = `<th class="text-center text-[10px] uppercase text-yellow-400">Dropset</th>`;
+                            // "DS" instead of Dropset, strict width
+                            dropSetHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-yellow-400">DS</th>`;
                         }
 
                         tableHeader = `
                             <thead>
                                 <tr>
-                                    <th>Serie</th>
-                                    <th class="text-center"><span class="header-long">Peso (KG)</span><span class="header-short">Kg</span></th>
+                                    <th class="w-[10%] text-center px-0 text-[10px] sm:text-xs">Serie</th>
+                                    <th class="w-[18%] text-center px-0 text-[10px] sm:text-xs"><span class="header-long">Peso</span><span class="header-short">Kg</span></th>
                                     ${dropSetHeader}
-                                    <th class="text-center">Reps</th>
-                                    <th class="text-center"><span class="header-long">Últ. Peso</span><span class="header-short">Últ.Kg</span></th>
-                                    <th class="text-center"><span class="header-long">Últ. Reps</span><span class="header-short">Últ.Rp</span></th>
-                                    <th class="text-center"><span class="header-long">Reps Acons.</span><span class="header-short">Obj.</span></th>
-                                    <th><span class="header-long">% 1RM</span><span class="header-short">%</span></th>
+                                    <th class="w-[18%] text-center px-0 text-[10px] sm:text-xs">Reps</th>
+                                    <th class="w-[12%] text-center px-0 text-[10px] sm:text-xs text-gray-500"><span class="header-long">Últ.P</span><span class="header-short">UKG</span></th>
+                                    <th class="w-[10%] text-center px-0 text-[10px] sm:text-xs text-gray-500"><span class="header-long">Últ.R</span><span class="header-short">URP</span></th>
+                                    <th class="w-[10%] text-center px-0 text-[10px] sm:text-xs"><span class="header-long">Obj.</span><span class="header-short">Obj</span></th>
+                                    <th class="w-[12%] text-center px-0 text-[10px] sm:text-xs"><span class="header-long">%RM</span><span class="header-short">%</span></th>
                                 </tr>
                             </thead>`;
                         let seriesBody = '';
