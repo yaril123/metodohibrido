@@ -1241,27 +1241,30 @@
                     const dropSetHTML = (exercise.dropSet === true && isStrengthDay) ? `<span><strong class="text-gray-400 font-medium">Drop Set:</strong> ✅ Sí</span>` : '';
 
                     card.innerHTML = `
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="flex-grow">
-                                <h3 class="exercise-title text-xl font-bold mb-4">${exercise.name}</h3>
-                                <div class="exercise-tips space-y-2">
-                                ${isStrengthDay ? `
-                                    <div class="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-300">
-                                        <span><strong class="text-gray-400 font-medium">% 1RM:</strong> ${exercise.rmPercentage}</span>
-                                        <span><strong class="text-gray-400 font-medium">Series:</strong> ${exercise.seriesCount}</span>
-                                        ${dropSetHTML}
-                                    </div>
-                                    <p class="text-sm text-gray-300"><strong class="text-gray-400 font-medium">Consejo técnico:</strong> ${exercise.tip}</p>
-                                ` : `
-                                     <p class="text-sm text-gray-300"><strong class="text-gray-400 font-medium">Consejo técnico:</strong> ${exercise.tip}</p>
-                                    ${exercise.antiMigraineTip ? `<p class="text-sm text-gray-300">${exercise.antiMigraineTip}</p>` : ''}
-                                `}
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-4 flex-shrink-0">
+                        <!-- Fila Superior: Título y Reloj -->
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="exercise-title text-xl font-bold flex-grow pr-2">${exercise.name}</h3>
+                            <div class="flex-shrink-0">
                                 ${isStrengthDay ? `<div class="timer-clock timer-yellow" data-duration="${exercise.rest}" data-day="${day}" data-ex-index="${exIndex}">${restTimeFormatted}</div>` : ''}
                             </div>
                         </div>
+
+                         <!-- Fila Media: Consejos (Full Width) -->
+                         <div class="exercise-tips mb-4 text-sm text-gray-300 bg-zinc-800/50 p-3 rounded-lg border border-zinc-700/50">
+                            ${isStrengthDay ? `
+                                <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mb-2 border-b border-zinc-700 pb-2">
+                                    <span><strong class="text-gray-400 font-medium">% 1RM:</strong> ${exercise.rmPercentage}</span>
+                                    <span><strong class="text-gray-400 font-medium">Series:</strong> ${exercise.seriesCount}</span>
+                                    ${dropSetHTML}
+                                </div>
+                                <p><strong class="text-yellow-500 font-medium">Tip:</strong> ${exercise.tip}</p>
+                            ` : `
+                                    <p><strong class="text-yellow-500 font-medium">Tip:</strong> ${exercise.tip}</p>
+                                ${exercise.antiMigraineTip ? `<p class="mt-1 text-xs text-gray-400">${exercise.antiMigraineTip}</p>` : ''}
+                            `}
+                        </div>
+
+                        <!-- Fila Inferior: Tabla -->
                         <div class="table-scroll-container">
                             <table class="series-table">
                                 ${tableHeader}
