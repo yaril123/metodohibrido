@@ -658,6 +658,17 @@
     </div>
 
 
+    <!-- Rest Full Screen Overlay -->
+    <div id="rest-overlay" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center hidden">
+        <div class="absolute top-10 text-gray-500 font-bold uppercase tracking-widest">Descanso</div>
+        <div id="rest-overlay-timer"
+            class="text-[8rem] sm:text-[12rem] font-bold text-yellow-400 tabular-nums leading-none">00:00</div>
+        <button id="skip-rest-btn"
+            class="mt-12 px-10 py-5 bg-zinc-800 text-white rounded-full text-xl font-bold border border-zinc-700 hover:bg-zinc-700 transition-colors shadow-lg hover:shadow-yellow-500/20">
+            Finalizar Descanso
+        </button>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -740,7 +751,7 @@
         let e1rmMap = new Map(); // Mapa de 1RM estimado
         let DOM = {}; // Se llenará en DOMContentLoaded
 
-        const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false, recognition: null };
+        const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false, recognition: null, currentRestTimerId: null };
 
         // --- SPEECH RECOGNITION & TTS UTILS ---
 
@@ -1241,17 +1252,61 @@
             DOM.workoutTitle.innerHTML = subtitleHTML;
         }
 
+        // --- Rest Overlay Functions ---
+        function showRestOverlay(duration) {
+            DOM.restOverlay.classList.remove('hidden');
+            updateRestOverlayDisplay(duration);
+        }
+
+        function hideRestOverlay() {
+            DOM.restOverlay.classList.add('hidden');
+        }
+
+        function updateRestOverlayDisplay(totalSeconds) {
+            if (totalSeconds < 0) totalSeconds = 0;
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            DOM.restOverlayTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function skipRest() {
+            hideRestOverlay();
+            if (state.currentRestTimerId && state.activeTimers[state.currentRestTimerId]) {
+                const { interval, element } = state.activeTimers[state.currentRestTimerId];
+                clearInterval(interval);
+                element.classList.remove('timer-running');
+
+                // Reset small timer UI
+                const duration = parseInt(element.dataset.duration, 10);
+                const originalMinutes = Math.floor(duration / 60);
+                const originalSeconds = duration % 60;
+                element.textContent = `${originalMinutes}:${originalSeconds.toString().padStart(2, '0')}`;
+
+                delete state.activeTimers[state.currentRestTimerId];
+                state.currentRestTimerId = null;
+            }
+        }
+
         function startTimer(duration, timerElement) {
             const timerId = `${timerElement.dataset.day}-${timerElement.dataset.exIndex}`;
             if (state.activeTimers[timerId]) {
                 clearInterval(state.activeTimers[timerId].interval);
             }
             timerElement.classList.add('timer-running');
+
+            // Start Overlay
+            showRestOverlay(duration);
+            state.currentRestTimerId = timerId;
+
             let timer = duration;
             const interval = setInterval(() => {
                 const minutes = parseInt(timer / 60, 10);
                 const seconds = parseInt(timer % 60, 10);
-                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                timerElement.textContent = timeStr;
+                updateRestOverlayDisplay(timer); // Update Overlay
+
                 if (--timer < 0) {
                     clearInterval(interval);
                     timerElement.classList.remove('timer-running');
@@ -1259,12 +1314,15 @@
                     const originalSeconds = duration % 60;
                     timerElement.textContent = `${originalMinutes}:${originalSeconds.toString().padStart(2, '0')}`;
                     delete state.activeTimers[timerId];
+                    if (state.currentRestTimerId === timerId) state.currentRestTimerId = null;
+
                     const synth = new Tone.Synth().toDestination();
                     synth.triggerAttackRelease("C5", "8n", Tone.now());
                     synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
 
                     // Voz: Descanso finalizado
                     speak("Descanso finalizado");
+                    hideRestOverlay(); // Hide on finish
                 }
             }, 1000);
             state.activeTimers[timerId] = { interval, element: timerElement };
@@ -1889,6 +1947,15 @@
             DOM.clearHistoryBtn = document.getElementById('clear-history-btn');
             DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
 
+            // Rest Overlay
+            DOM.restOverlay = document.getElementById('rest-overlay');
+            DOM.restOverlayTimer = document.getElementById('rest-overlay-timer');
+            DOM.skipRestBtn = document.getElementById('skip-rest-btn');
+
+            if (DOM.skipRestBtn) {
+                DOM.skipRestBtn.addEventListener('click', skipRest);
+            }
+
             // 2. Listeners
             if (DOM.tabsContainer) {
                 DOM.tabsContainer.addEventListener('click', (e) => {
@@ -1899,7 +1966,11 @@
 
             if (DOM.contentContainer) {
                 DOM.contentContainer.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('timer-clock')) startTimer(e.target.dataset.duration, e.target);
+                    if (e.target.classList.contains('timer-clock')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        startTimer(e.target.dataset.duration, e.target);
+                    }
                     if (e.target.classList.contains('custom-checkbox')) {
                         e.target.closest('.exercise-card').classList.toggle('completed-card', e.target.checked);
                         saveProgress();
