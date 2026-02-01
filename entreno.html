@@ -719,13 +719,18 @@
 
 
     <!-- Rest Full Screen Overlay -->
-    <div id="rest-overlay" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center hidden">
-        <div class="absolute top-10 text-gray-500 font-bold uppercase tracking-widest">Descanso</div>
+    <!-- Rest Full Screen Overlay -->
+    <!-- bg-black/50: mucho más transparente. Quitamos backdrop-blur para legibilidad máxima -->
+    <div id="rest-overlay" class="fixed inset-0 bg-black/50 z-[100] flex flex-col items-center justify-center hidden">
+        <div class="absolute top-10 text-gray-400 font-bold uppercase tracking-widest text-sm">Descanso en curso</div>
+        <!-- Texto reducido a la mitad aprox: text-6xl (movil) y text-8xl (escritorio) -->
         <div id="rest-overlay-timer"
-            class="text-[8rem] sm:text-[12rem] font-bold text-yellow-400 tabular-nums leading-none">00:00</div>
+            class="text-7xl sm:text-9xl font-bold text-yellow-400 tabular-nums leading-none drop-shadow-lg">00:00</div>
+
+        <!-- Botón un poco más discreto también -->
         <button id="skip-rest-btn"
-            class="mt-12 px-10 py-5 bg-zinc-800 text-white rounded-full text-xl font-bold border border-zinc-700 hover:bg-zinc-700 transition-colors shadow-lg hover:shadow-yellow-500/20">
-            Finalizar Descanso
+            class="mt-8 px-8 py-3 bg-zinc-800/80 text-white rounded-full text-lg font-bold border border-zinc-600 hover:bg-zinc-700 transition-colors shadow-lg hover:shadow-yellow-500/10 backdrop-blur-md">
+            Saltar Descanso
         </button>
     </div>
 
@@ -788,7 +793,7 @@
                 title: "BILBO — PUSH", type: 'bilbo', exercises: [
                     { name: "Press de banca plano (barra)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Sin bloqueo de codos. Control respiratorio, sin apnea.", rest: 180 },
                     { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 180 },
-                    { name: "Elevaciones laterales con gomas", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 180 },
+                    { name: "Elevaciones laterales en polea", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 180 },
                     { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 180 },
                     { name: "Cruces en polea alta", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 180 },
                 ]
@@ -1820,12 +1825,20 @@
                     return;
                 }
 
-                // --- FIND LAST LOG ---
+                // --- FIND LAST LOG (w/ Legacy Support) ---
                 let lastSessionData = null;
+                const legacyMapping = { "Elevaciones laterales en polea": "Elevaciones laterales con gomas" };
+                const legacyName = legacyMapping[exerciseName];
+
                 for (const dateKey of sortedDates) {
                     const log = history[dateKey];
                     if (log && log.exercises) {
-                        const exLog = log.exercises.find(e => e.name === exerciseName);
+                        let exLog = log.exercises.find(e => e.name === exerciseName);
+                        // Si no encuentra con el nombre nuevo, intenta con el viejo
+                        if (!exLog && legacyName) {
+                            exLog = log.exercises.find(e => e.name === legacyName);
+                        }
+
                         if (exLog && exLog.series && exLog.series.length > 0) {
                             lastSessionData = exLog;
                             break;
