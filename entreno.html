@@ -771,40 +771,40 @@
         const workouts = {
             hd_push: {
                 title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
-                    { name: "Press inclinado con barra", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 180 },
-                    { name: "Press en suelo con barra", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 180 },
-                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 180 },
-                    { name: "Elevaciones laterales sentado", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 180 },
+                    // Añadimos restPause: true para activar la columna RP
+                    { name: "Press Inclinado con Barra", rmPercentage: "50 / 70", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-9' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>AL FALLO ABSOLUTO.</strong> Cadencia: 4s↓ / 2s↑. Calentamiento lento. En la efectiva: <strong>REST PAUSE</strong> (al fallo, descansa 15s, saca 1 rep más).", rest: 120 },
+                    { name: "Landmine", rmPercentage: "50 / 75 / 75", seriesCount: 3, sets: [{ reps: 8 }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO TÉCNICO.</strong> Cadencia: 4s↓ / 2s↑. Mantén abdomen apretado, no arquees espalda baja. Empuja con el deltoides.", rest: 180 },
+                    { name: "Elevaciones Laterales en Polea", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. <strong>REST PAUSE:</strong> Al fallar, descansa 10s y saca un par más.", rest: 180 },
+                    // ISO support
+                    { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, isometric: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s↓ / 2s↑.</strong> Al fallar, mantén <strong>ISOMÉTRICO</strong> 10-15s hasta que arda.", rest: 180 },
                 ]
             },
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             hd_pull: {
                 title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
-                    { name: "Jalón en polea agarre neutro", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 180 },
-                    { name: "Remo con barra T", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 180 },
-                    { name: "Pájaros (reverse fly)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: true, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 180 },
-                    { name: "Face Pull (polea a cara)", rmPercentage: "50 / 80", seriesCount: 2, sets: [{ reps: 10 }, { reps: 6 }], dropSet: false, tip: "<strong class='text-yellow-400'>Bajar lento. Ir al fallo.</strong> 2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 180 },
+                    { name: "Jalón en Polea al Pecho (Agarre Neutro)", rmPercentage: "50 / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-10' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. Pausa 1s abajo. No uses inercia.", rest: 120 },
+                    { name: "Remo en Barra T", rmPercentage: "60 / 70", seriesCount: 2, sets: [{ reps: 6 }, { reps: '6-10' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. Crucial para grosor. Cuidado con la espalda baja.", rest: 180 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, allSetsEffective: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia lenta. 3s↓ / 1s↑ / 1s pausa.", rest: 180 },
+                    { name: "Curl de Bíceps Mentzer", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '6-10' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s bajada.</strong> Barra recta pref. Cuerpo estricto. <strong>REST PAUSE</strong> al fallo.", rest: 180 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 12 }, { reps: 12 }], dropSet: false, tip: "<strong class='text-yellow-400'>Ejercicio correctivo.</strong> Mucho cuidado con la técnica, pulgares siempre señalando hacia atrás y llegando con las manos por detrás de la cabeza.", rest: 180 },
                 ]
             },
             rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             bilbo_push: {
                 title: "BILBO — PUSH", type: 'bilbo', exercises: [
-                    { name: "Press de banca plano (barra)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Sin bloqueo de codos. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 180 },
-                    { name: "Elevaciones laterales en polea", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 180 },
-                    { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 180 },
-                    { name: "Cruces en polea alta", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 180 },
+                    { name: "Press de Banca Plano con Barra", rmPercentage: "Barr / 40 / Bilbo / 70", seriesCount: 4, sets: [{ reps: 15 }, { reps: 6 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calent: Barra 15reps + 40% 6reps. <strong class='text-yellow-400'>Serie Bilbo:</strong> Explosiva, NO fallo (RIR 1-3). Serie extra: 70%.", rest: 180 },
+                    { name: "Landmine", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Busca congestión y control, no velocidad. Descansos cortos (90s).", rest: 90 },
+                    { name: "Fondos", rmPercentage: "Lastr", seriesCount: 3, sets: [{ reps: '>15' }, { reps: '>15' }, { reps: '>15' }], dropSet: false, tip: "Al fallo o RIR 0-1. Si haces >15, lastre 5kg.", rest: 180 },
+                    { name: "Cruces en Polea Alta (Pecho)", rmPercentage: "60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejercicio de detalle. Cruza las manos abajo para apretar el pecho. Mantén la contracción 1 segundo.", rest: 120 },
                 ]
             },
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             bilbo_pull: {
                 title: "BILBO — PULL", type: 'bilbo', exercises: [
-                    { name: "Jalón al pecho agarre estrecho", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tira al pecho, mirada neutra. Evita sacar la cabeza al final del movimiento; hombros bajos y omóplatos juntos.", rest: 180 },
-                    { name: "Remo bajo con polea (agarre neutro)", rmPercentage: "55 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Movimiento fluido, sin arqueo lumbar. Sin arqueo lumbar. Control respiratorio, sin apnea.", rest: 180 },
-                    { name: "Remo Inclinado 30º, Mancuernas, Neutro", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tronco 30°, codos pegados, cuello neutro. Mantén columna larga, abdomen activo y cuello alineado al suelo.", rest: 180 },
-                    { name: "Curl en barra Z", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos fijos, hombros relajados. Apoya bien los pies, suelta el cuello; mueve solo antebrazos y respira lento.", rest: 180 },
+                    { name: "Jalón al Pecho (Agarre Estrecho)", rmPercentage: "30 / Bilbo / 70", seriesCount: 3, sets: [{ reps: 12 }, { reps: 'Bilbo' }, { reps: '8-12' }], dropSet: false, tip: "Calent: 30% 12reps. <strong class='text-yellow-400'>Serie Bilbo:</strong> 15-30 reps, carga moderada. No estires brazos del todo (tensión constante). Vel máx. RIR 2.", rest: 180 },
+                    { name: "Remo Bajo en Polea (Agarre Neutro)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Codos hacia la cadera.", rest: 180 },
+                    { name: "Remo Inclinado con Mancuernas (Apoyo banco)", rmPercentage: "65", seriesCount: 3, sets: [{ reps: '10-12' }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "Apoya pecho en banco a 30º.", rest: 180 },
+                    { name: "Curl con Barra Z", rmPercentage: "60", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "Bombeo puro. Descansos cortos (45s). Que fluya la sangre.", rest: 45 },
                 ]
             }
         };
@@ -1153,18 +1153,33 @@
                     if (isStrengthDay) {
                         // Header logic
                         // Header logic
-                        let dropSetHeader = '';
+                        let specialTechHeader = '';
                         if (day.includes('hd')) {
-                            // "DS" instead of Dropset, strict width
-                            dropSetHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-yellow-400">DS</th>`;
+                            // Prioridad: Rest Pause > Isotemtric > Dropset
+                            if (exercise.restPause) {
+                                specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-red-500">RP</th>`;
+                            } else if (exercise.isometric) {
+                                specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-blue-400">ISO</th>`;
+                            } else {
+                                // Default a DS (Dropset)
+                                specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-yellow-400">DS</th>`;
+                            }
+                        }
+
+                        // Custom Weight Header for Fondos
+                        let weightLabelLong = "Peso";
+                        let weightLabelShort = "Kg";
+                        if (exercise.name.toLowerCase().includes("fondos")) {
+                            weightLabelLong = "Peso Lastre";
+                            weightLabelShort = "Lastre";
                         }
 
                         tableHeader = `
                             <thead>
                                 <tr>
                                     <th class="w-[10%] text-center px-0 text-[10px] sm:text-xs">Serie</th>
-                                    <th class="w-[18%] text-center px-0 text-[10px] sm:text-xs"><span class="header-long">Peso</span><span class="header-short">Kg</span></th>
-                                    ${dropSetHeader}
+                                    <th class="w-[18%] text-center px-0 text-[10px] sm:text-xs"><span class="header-long">${weightLabelLong}</span><span class="header-short">${weightLabelShort}</span></th>
+                                    ${specialTechHeader}
                                     <th class="w-[18%] text-center px-0 text-[10px] sm:text-xs">Reps</th>
                                     <th class="w-[12%] text-center px-0 text-[10px] sm:text-xs text-gray-500"><span class="header-long">Últ.P</span><span class="header-short">UKG</span></th>
                                     <th class="w-[10%] text-center px-0 text-[10px] sm:text-xs text-gray-500"><span class="header-long">Últ.R</span><span class="header-short">URP</span></th>
@@ -1177,7 +1192,10 @@
                         exercise.sets.forEach((set, setIndex) => {
                             const isBilboDay = day.includes('bilbo');
                             const isHdDay = day.includes('hd');
-                            const isEffectiveSet = (isBilboDay && setIndex === 0) || (!isBilboDay && setIndex === exercise.sets.length - 1);
+                            // Logic update: If allSetsEffective is true, treat all as effective.
+                            const isEffectiveSet = (isBilboDay && setIndex === 0)
+                                || (!isBilboDay && (exercise.allSetsEffective || setIndex === exercise.sets.length - 1));
+
                             const currentRm = rmValues[setIndex] || (rmValues.length === 1 ? rmValues[0] : '');
                             const rmDisplay = currentRm ? (isNaN(currentRm) ? currentRm : `${currentRm}%`) : '';
 
@@ -1187,33 +1205,71 @@
                             // PERO: Si el usuario quiere dropset, lo marcamos. La "serieCount" en HD es 2 (1 warm, 1 effective).
                             // Así que setIndex 1 es effective.
 
+
                             const rowClass = isEffectiveSet ? 'effective-set' : '';
-                            const seriesTdClass = isEffectiveSet ? 'text-white font-semibold text-lg' : 'text-[#c6c6c6] font-semibold';
+                            let seriesTdClass = isEffectiveSet ? 'text-white font-semibold text-lg' : 'text-[#c6c6c6] font-semibold';
                             const rmTdClass = isEffectiveSet ? 'text-white font-medium text-lg' : 'text-[#c6c6c6] font-medium';
                             const repsTdClass = isEffectiveSet ? 'text-white font-bold text-lg text-center' : 'text-[#c6c6c6] font-bold text-center';
 
-                            let seriesName;
-                            if (isBilboDay) {
-                                if (setIndex === 0) { seriesName = '<span class="header-long">Serie </span>Bilbo'; } else { seriesName = `<span class="header-long">Serie </span>${setIndex + 1}`; }
-                            } else {
-                                if (isEffectiveSet) { seriesName = 'Serie'; } else { seriesName = 'Calent.'; }
+                            // Special Bilbo Row Styling
+                            let finalRowClass = rowClass;
+                            if (set.reps === 'Bilbo') {
+                                finalRowClass = 'bg-yellow-500/10 border-yellow-500/30'; // Highlight row
+                                seriesTdClass = 'text-yellow-400 font-bold text-xl'; // Highlight text
                             }
 
-                            // Dropset Cell Logic (Only for HD and only for Main Series)
-                            let dropSetCell = '';
-                            if (isHdDay) {
-                                if (isEffectiveSet) {
-                                    dropSetCell = `<td class="text-center"><input type="checkbox" class="dropset-checkbox accent-yellow-400 w-5 h-5 cursor-pointer" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>`;
+                            let seriesName;
+                            if (isBilboDay) {
+                                if (set.reps === 'Bilbo') {
+                                    seriesName = '<span class="text-yellow-400 uppercase tracking-wider">Serie Bilbo</span>';
                                 } else {
-                                    dropSetCell = `<td></td>`;
+                                    // Check location relative to Bilbo set
+                                    const bilboIndex = exercise.sets.findIndex(s => s.reps === 'Bilbo');
+                                    // If there is a Bilbo set and this is before it, it's Calentamiento
+                                    if (bilboIndex !== -1 && setIndex < bilboIndex) {
+                                        seriesName = 'Calent.';
+                                    } else {
+                                        // Effective series (post-bilbo or just normal series)
+                                        // Use global index + 1 or logical numbering? 
+                                        // For Jalón: 1. Calent(0), 2. Bilbo(1), 3. Effective(2) -> User wants "Serie 2" (which is index+1=3?) No, "Serie 2".
+                                        // Likely he implies Calent isn't counted. 
+                                        // But Press Banca had: Calent 1, Calent 2, Bilbo, Serie Extra (4).
+                                        // Let's use generic "Serie X" where X is setIndex + 1 for now, 
+                                        // but if it's the very last set and not Bilbo, maybe just "Serie"?
+                                        // Let's stick to standard numbering "Serie {i+1}" for non-calentamiento sets in Bilbo day EXCEPT the Bilbo one.
+                                        seriesName = `<span class="header-long">Serie </span>${setIndex + 1}`;
+                                    }
+                                }
+                            } else {
+                                if (isEffectiveSet) {
+                                    // If multiple effective sets, number them. If just one (typical HD), call it "Serie"
+                                    if (exercise.seriesCount > 1 && exercise.allSetsEffective) {
+                                        seriesName = `Serie ${setIndex + 1}`;
+                                    } else {
+                                        seriesName = 'Serie';
+                                    }
+                                } else { seriesName = 'Calent.'; }
+                            }
+
+                            // Dropset / RestPause / ISO Cell Logic
+                            let specialTechCell = '';
+                            if (isHdDay) {
+                                if (isEffectiveSet && (exercise.dropSet || exercise.restPause || exercise.isometric)) {
+                                    let inputType = 'accent-yellow-400';
+                                    if (exercise.restPause) inputType = 'accent-red-500';
+                                    if (exercise.isometric) inputType = 'accent-blue-400';
+
+                                    specialTechCell = `<td class="text-center"><input type="checkbox" class="dropset-checkbox ${inputType} w-5 h-5 cursor-pointer" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>`;
+                                } else {
+                                    specialTechCell = `<td></td>`;
                                 }
                             }
 
                             seriesBody += `
-                                <tr class="set-row ${rowClass}">
+                                <tr class="set-row ${finalRowClass}">
                                     <td class="${seriesTdClass} text-xs sm:text-lg">${seriesName}</td>
                                     <td class="text-center"><input type="number" step="0.5" class="weight-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
-                                    ${dropSetCell}
+                                    ${specialTechCell}
                                     <td class="text-center"><input type="number" class="reps-input mx-auto" placeholder="0" data-day="${day}" data-ex-index="${exIndex}" data-set-index="${setIndex}"></td>
                                     <td class="text-center text-gray-400 last-weight-cell">-</td>
                                     <td class="text-center text-gray-400 last-reps-cell">-</td>
@@ -1260,7 +1316,9 @@
                                 <div class="flex items-center flex-wrap gap-x-4 gap-y-1 mb-2 border-b border-zinc-700 pb-2">
                                     <span><strong class="text-gray-400 font-medium">% 1RM:</strong> ${exercise.rmPercentage}</span>
                                     <span><strong class="text-gray-400 font-medium">Series:</strong> ${exercise.seriesCount}</span>
-                                    ${dropSetHTML}
+                                    ${(exercise.dropSet && isStrengthDay) ? `<span><strong class="text-gray-400 font-medium">Drop Set:</strong> ✅</span>` : ''}
+                                    ${(exercise.restPause && isStrengthDay) ? `<span><strong class="text-red-400 font-medium">Rest Pause:</strong> ✅</span>` : ''}
+                                    ${(exercise.isometric && isStrengthDay) ? `<span><strong class="text-blue-400 font-medium">Isométrico:</strong> ✅</span>` : ''}
                                 </div>
                                 <p><strong class="text-yellow-500 font-medium">Tip:</strong> ${exercise.tip}</p>
                             ` : `
@@ -1827,16 +1885,45 @@
 
                 // --- FIND LAST LOG (w/ Legacy Support) ---
                 let lastSessionData = null;
-                const legacyMapping = { "Elevaciones laterales en polea": "Elevaciones laterales con gomas" };
-                const legacyName = legacyMapping[exerciseName];
+                const legacyMapping = {
+                    "Press Inclinado con Barra": "Press inclinado con barra",
+                    "Press Inclinado con Barra": "Press Inclinado con Barra", // Self-map just in case
+                    "Landmine": ["Landmine Diagonal de Pie (Hombro–Techo)", "Landmine Rodilla al Suelo (Cintura–Cabeza)"], // Array support check?
+                    "Elevaciones Laterales en Polea": ["Elevaciones laterales con gomas", "Elevaciones laterales sentado"],
+                    "Extensión de Tríceps en Polea con Cuerda": "Extensión de tríceps en polea con cuerda",
+
+                    "Jalón en Polea al Pecho (Agarre Neutro)": "Jalón en polea agarre neutro",
+                    "Remo en Barra T": "Remo con barra T",
+                    "Pájaros (reverse fly)": ["Pájaros (reverse fly)", "Face Pull"], // Map back to Face Pull if Pajaros missing? No, user separated. Keep simple.
+                    "Face Pull (polea a cara)": ["Face Pull (polea a cara)", "Face Pull"],
+                    "Curl de Bíceps Mentzer": ["Curl de bíceps Mentzer (polea baja)", "Curl de Bíceps Mentzer"],
+
+                    "Press de Banca Plano con Barra": "Press de banca plano (barra)",
+                    "Fondos": ["Fondos agarre neutro (cerrado)", "Fondos"],
+                    "Cruces en Polea Alta (Pecho)": ["Cruces en Polea Alta", "Cruces en polea alta"],
+
+                    "Jalón al Pecho (Agarre Estrecho)": "Jalón al pecho agarre estrecho",
+                    "Remo Bajo en Polea (Agarre Neutro)": "Remo bajo con polea (agarre neutro)",
+                    "Remo Inclinado con Mancuernas (Apoyo banco)": ["Remo Inclinado 30º, Mancuernas, Neutro", "Remo Inclinado con Mancuernas"],
+                    "Curl con Barra Z": "Curl en barra Z"
+                };
+
+                // Logic update to handle array or string in legacyMapping
+                let legacyNames = legacyMapping[exerciseName];
+                if (typeof legacyNames === 'string') legacyNames = [legacyNames];
+                if (!legacyNames) legacyNames = [];
 
                 for (const dateKey of sortedDates) {
                     const log = history[dateKey];
                     if (log && log.exercises) {
                         let exLog = log.exercises.find(e => e.name === exerciseName);
-                        // Si no encuentra con el nombre nuevo, intenta con el viejo
-                        if (!exLog && legacyName) {
-                            exLog = log.exercises.find(e => e.name === legacyName);
+
+                        // Try legacy names if not found
+                        if (!exLog && legacyNames.length > 0) {
+                            for (const legacy of legacyNames) {
+                                exLog = log.exercises.find(e => e.name === legacy);
+                                if (exLog) break;
+                            }
                         }
 
                         if (exLog && exLog.series && exLog.series.length > 0) {
