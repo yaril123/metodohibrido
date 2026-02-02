@@ -1676,26 +1676,9 @@
                             const currentWeight = parseFloat(currentSeries.weight);
                             const currentReps = parseInt(currentSeries.reps, 10);
 
-                            const history = getAppData('workoutHistory'); // Usa getAppData
-                            // Nota: Aquí se debería ordenar por fecha, pero para evitar el error de Firestore
-                            // por falta de índice, asumimos que history está cargado y revisamos secuencialmente
-                            const sortedDates = Object.keys(history).sort().reverse();
-
-                            for (const date of sortedDates) {
-                                const log = history[date];
-                                if (log && Array.isArray(log.exercises)) {
-                                    const foundExercise = log.exercises.find(ex => ex.name === exerciseName);
-                                    if (foundExercise && foundExercise.series.length > 0) {
-                                        const previousSeries = foundExercise.series[foundExercise.series.length - 1];
-                                        const prevWeight = parseFloat(previousSeries.weight);
-                                        const prevReps = parseInt(previousSeries.reps, 10);
-
-                                        if (currentWeight === prevWeight && currentReps >= targetReps && prevReps >= targetReps) {
-                                            progressionChecks.push({ name: exerciseName, type: 'hd' });
-                                        }
-                                        break;
-                                    }
-                                }
+                            // NEW RULE: If >= 10 Reps -> Propose Increase
+                            if (currentReps >= 10) {
+                                progressionChecks.push({ name: exerciseName, type: 'hd' });
                             }
                         }
 
@@ -1886,8 +1869,7 @@
                 // --- FIND LAST LOG (w/ Legacy Support) ---
                 let lastSessionData = null;
                 const legacyMapping = {
-                    "Press Inclinado con Barra": "Press inclinado con barra",
-                    "Press Inclinado con Barra": "Press Inclinado con Barra", // Self-map just in case
+                    "Press Inclinado con Barra": ["Press inclinado con barra", "Press Inclinado", "Press inclinado", "Press Inclinado (barra)"],
                     "Landmine": ["Landmine Diagonal de Pie (Hombro–Techo)", "Landmine Rodilla al Suelo (Cintura–Cabeza)"], // Array support check?
                     "Elevaciones Laterales en Polea": ["Elevaciones laterales con gomas", "Elevaciones laterales sentado"],
                     "Extensión de Tríceps en Polea con Cuerda": "Extensión de tríceps en polea con cuerda",
@@ -1899,8 +1881,8 @@
                     "Curl de Bíceps Mentzer": ["Curl de bíceps Mentzer (polea baja)", "Curl de Bíceps Mentzer"],
 
                     "Press de Banca Plano con Barra": "Press de banca plano (barra)",
-                    "Fondos": ["Fondos agarre neutro (cerrado)", "Fondos"],
-                    "Cruces en Polea Alta (Pecho)": ["Cruces en Polea Alta", "Cruces en polea alta"],
+                    "Fondos": ["Fondos agarre neutro (cerrado)", "Fondos", "FONDOS"],
+                    "Cruces en Polea Alta (Pecho)": ["Cruces con goma pecho", "Cruces con goma (pecho)", "Cruce con goma", "Cruces con gomas pecho", "Cruces en polea alta", "Cruces en Polea Alta", "Cruce"],
 
                     "Jalón al Pecho (Agarre Estrecho)": "Jalón al pecho agarre estrecho",
                     "Remo Bajo en Polea (Agarre Neutro)": "Remo bajo con polea (agarre neutro)",
@@ -1934,7 +1916,62 @@
                 }
 
                 // --- DISPLAY LAST DATA (Gray Columns) ---
-                if (lastSessionData) {
+                // Special handling for Press Banca Bilbo to fix row mismatch
+                if (exerciseName === "Press de Banca Plano con Barra" && lastSessionData) {
+                    const weightCells = card.querySelectorAll('.last-weight-cell');
+                    const repsCells = card.querySelectorAll('.last-reps-cell');
+
+                    // Find the heavy set (Bilbo) by max Volume (Weight * Reps) to distinguish from heavy low-rep sets
+                    let maxVol = 0;
+                    let bestSet = null;
+                    if (lastSessionData.series) {
+                        lastSessionData.series.forEach(s => {
+                            const w = parseFloat(s.weight || 0);
+                            const r = parseFloat(s.reps || 0);
+                            const vol = w * r;
+                            if (vol > maxVol) { maxVol = vol; bestSet = s; }
+                        });
+                    }
+
+                    // Clear all first
+                    weightCells.forEach(c => c.textContent = '-');
+                    repsCells.forEach(c => c.textContent = '-');
+
+                    // Assign Max Weight to Row 2 (Index 2 - Serie Bilbo)
+                    // Note: If previous data had warmups, we might want to map them, but user focuses on Bilbo set.
+                    // Let's simple-map the big set to the big row.
+                    if (bestSet && weightCells[2]) {
+                        weightCells[2].textContent = `${bestSet.weight} kg`;
+                        if (repsCells[2]) repsCells[2].textContent = bestSet.reps;
+                    }
+
+                } else if (exerciseName === "Jalón al Pecho (Agarre Estrecho)" && lastSessionData) {
+                    const weightCells = card.querySelectorAll('.last-weight-cell');
+                    const repsCells = card.querySelectorAll('.last-reps-cell');
+
+                    // Find the best set (Bilbo) by max Volume
+                    let maxVol = 0;
+                    let bestSet = null;
+                    if (lastSessionData.series) {
+                        lastSessionData.series.forEach(s => {
+                            const w = parseFloat(s.weight || 0);
+                            const r = parseFloat(s.reps || 0);
+                            const vol = w * r;
+                            if (vol > maxVol) { maxVol = vol; bestSet = s; }
+                        });
+                    }
+
+                    // Clear all
+                    weightCells.forEach(c => c.textContent = '-');
+                    repsCells.forEach(c => c.textContent = '-');
+
+                    // Assign Max Volume Set to Row 1 (Index 1 - Serie Bilbo for Jalón)
+                    if (bestSet && weightCells[1]) {
+                        weightCells[1].textContent = `${bestSet.weight} kg`;
+                        if (repsCells[1]) repsCells[1].textContent = bestSet.reps;
+                    }
+
+                } else if (lastSessionData) {
                     const weightCells = card.querySelectorAll('.last-weight-cell');
                     const repsCells = card.querySelectorAll('.last-reps-cell');
 
@@ -1975,32 +2012,113 @@
                         bilboResetFlags[exerciseName] = false;
                         flagUsed = true;
                     } else if (lastSessionData) {
-                        // Default Bilbo progression: Suggest last weight used in effective series
-                        // Bilbo effective is always index 0 (first series in storage)
+                        // Default Bilbo progression
                         baseWeight = parseFloat(lastSessionData.series[0].weight || 0);
                     } else if (e1rm > 0) {
                         baseWeight = e1rm * 0.5;
                     }
 
-                    if (baseWeight > 0) {
-                        baseWeight = roundWeight(baseWeight);
-                        // Apply percentages
-                        // Bilbo Def: rmPercentage: "50 / 65 / 75". But this is for warmup?
-                        // In Bilbo, Series 0 is the main one.
+                    // Special Logic for Press Banca Plano (Bilbo)
+                    if (exerciseName === "Press de Banca Plano con Barra") {
+                        // Robustly find Last Bilbo Weight (Max Volume)
+                        let lastBilboWeight = 0;
+                        let lastBilboReps = 0;
+                        let maxVol = 0;
+                        if (lastSessionData && lastSessionData.series) {
+                            lastSessionData.series.forEach(s => {
+                                const w = parseFloat(s.weight || 0);
+                                const r = parseFloat(s.reps || 0);
+                                const vol = w * r;
+                                if (vol > maxVol) { maxVol = vol; lastBilboWeight = w; lastBilboReps = r; }
+                            });
+                        }
+
                         inputs.forEach((input, i) => {
-                            if (i === 0) input.value = baseWeight;
-                            else {
-                                // If there are other series (backoff?), we might calculate them.
-                                // Assuming standard behavior: suggestion only for main, or repeat.
-                                // Let's leave secondary empty or percentage?
-                                // Current HTML structure for Bilbo has 3 series.
-                                // If we assumed baseWeight is the '100% target' (Series 0), 
-                                // others might be lighter? "10-15", "8-12".
-                                // Let's just fill the first one to be safe, others blank or same?
-                                // User requirement: "que salga bien en todos los ejercicios".
-                                // Let's fill all with baseWeight or leave others blank.
-                                if (i === 0) input.value = baseWeight;
+                            if (i === 0) {
+                                // Calentamiento 1: Barra (0)
+                                input.value = 0;
+                            } else if (i === 1) {
+                                // Calentamiento 2: 40% of Last Bilbo Weight
+                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 0.40);
+                            } else if (i === 2) {
+                                // Serie Bilbo: Last + 5%
+                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 1.05);
+                            } else if (i === 3) {
+                                // Serie 4: 70% of GLOBAL Estimated RM (User preference: use historical max)
+                                // e.g. 95.7kg -> 70% = ~67kg
+                                if (e1rm > 0) {
+                                    input.value = roundWeight(e1rm * 0.70);
+                                } else if (lastBilboWeight > 0 && lastBilboReps > 0) {
+                                    // Fallback to local if no global found (unlikely if history exists)
+                                    const localRM = lastBilboWeight * Math.pow(lastBilboReps, 0.10);
+                                    input.value = roundWeight(localRM * 0.70);
+                                }
                             }
+                        });
+
+
+                    } else if (exerciseName === "Jalón al Pecho (Agarre Estrecho)") {
+                        // Special Logic for Jalón al Pecho (Agarre Estrecho) - Bilbo Pull Main
+
+                        let lastBilboWeight = 0;
+                        let lastBilboReps = 0;
+                        let maxVol = 0;
+
+                        // Find Last Bilbo Weight (Max Volume)
+                        if (lastSessionData && lastSessionData.series) {
+                            lastSessionData.series.forEach(s => {
+                                const w = parseFloat(s.weight || 0);
+                                const r = parseFloat(s.reps || 0);
+                                const vol = w * r;
+                                if (vol > maxVol) { maxVol = vol; lastBilboWeight = w; lastBilboReps = r; }
+                            });
+                        }
+
+                        inputs.forEach((input, i) => {
+                            if (i === 0) {
+                                // Calentamiento: 30% of Last Bilbo Weight
+                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 0.30);
+                            } else if (i === 1) {
+                                // Serie Bilbo: Last + 5%
+                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 1.05);
+                            } else if (i === 2) {
+                                // Serie 3: 70% of RM + 4kg increment
+                                if (e1rm > 0) {
+                                    input.value = roundWeight((e1rm * 0.70) + 4);
+                                } else if (lastBilboWeight > 0 && lastBilboReps > 0) {
+                                    const localRM = lastBilboWeight * Math.pow(lastBilboReps, 0.10);
+                                    input.value = roundWeight((localRM * 0.70) + 4);
+                                }
+                            }
+                        });
+
+                    } else if (baseWeight > 0) {
+                        // Logic for Bilbo Accessories (Non-Main)
+                        // User Rule: If prev reps >= 12 -> Increase 2/4kg.
+
+                        let suggestion = baseWeight;
+
+                        // Check historical performance for suggestion
+                        if (lastSessionData && lastSessionData.series) {
+                            const lastSet = lastSessionData.series[lastSessionData.series.length - 1];
+                            const lastReps = parseInt(lastSet.reps || 0);
+                            const lastWeight = parseFloat(lastSet.weight || 0);
+
+                            if (lastWeight > 0 && lastReps >= 12) {
+                                if (lastWeight < 40) {
+                                    suggestion = lastWeight + 2;
+                                } else {
+                                    suggestion = lastWeight + 4;
+                                }
+                            } else if (lastWeight > 0) {
+                                suggestion = lastWeight; // Maintain
+                            }
+                        }
+
+                        suggestion = roundWeight(suggestion);
+                        inputs.forEach((input, i) => {
+                            // Apply suggestion to all sets of accessory
+                            input.value = suggestion;
                         });
                     }
 
@@ -2012,9 +2130,13 @@
                         // Effective is last
                         let lastEffective = parseFloat(lastSessionData.series[lastSessionData.series.length - 1].weight || 0);
                         if (shouldProgress) {
-                            let increased = lastEffective + 2.5; // Standard increment
-                            // Or percentage? User didn't specify. 2.5 is safe.
+                            let increased = lastEffective * 1.05; // 5% increase
                             baseWeight = roundWeight(increased);
+                            // Flag is consumed (set to true) here, user accepted it previously.
+                            // But wait, user says "el peso aparecerá ya marcado".
+                            // If flag is true, we calculate increase. Correct.
+                            // We consume the flag so it doesn't keep increasing endlessly if reloading?
+                            // Logic: progressionFlags[exerciseName] = false; is correct to act as "one-time" apply.
                             progressionFlags[exerciseName] = false;
                             flagUsed = true;
                         } else {
@@ -2052,11 +2174,20 @@
 
         function calculateAllEstimated1RMs() {
             const history = getAppData('workoutHistory'); // Usa getAppData
+            // Aliases: Map Legacy Name -> New Name (to ensure new logic finds the RM under the new key)
+            const aliases = {
+                "Press de banca plano (barra)": "Press de Banca Plano con Barra",
+                "Jalón en polea agarre neutro": "Jalón en Polea al Pecho (Agarre Neutro)",
+                "Jalón al pecho agarre estrecho": "Jalón al Pecho (Agarre Estrecho)"
+            };
             const exercisesToTrack = [
                 "Press de banca plano (barra)",
+                "Press de Banca Plano con Barra",
                 "Curl en barra Z",
                 "Jalón en polea agarre neutro",
-                "Jalón al pecho agarre estrecho"
+                "Jalón en Polea al Pecho (Agarre Neutro)",
+                "Jalón al pecho agarre estrecho",
+                "Jalón al Pecho (Agarre Estrecho)"
             ];
             const e1rmMap = new Map();
 
@@ -2070,9 +2201,19 @@
                                 const reps = parseInt(s.reps, 10);
                                 if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
                                     const e1rm = calculateLombardi(weight, reps);
+
+                                    // Update for the specific name found
                                     const currentMax = e1rmMap.get(ex.name) || 0;
                                     if (e1rm > currentMax) {
                                         e1rmMap.set(ex.name, e1rm);
+                                    }
+
+                                    // Update alias if exists (Legacy -> New)
+                                    if (aliases[ex.name]) {
+                                        const currentMaxAlias = e1rmMap.get(aliases[ex.name]) || 0;
+                                        if (e1rm > currentMaxAlias) {
+                                            e1rmMap.set(aliases[ex.name], e1rm);
+                                        }
                                     }
                                 }
                             });
