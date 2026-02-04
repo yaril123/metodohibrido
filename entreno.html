@@ -566,6 +566,61 @@
             margin-top: 1.5rem;
             margin-bottom: 0.5rem;
         }
+
+        /* History Editor Styles */
+        .history-list-item {
+            background-color: #27272a;
+            /* zinc-800 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #3f3f46;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-list-item:hover {
+            background-color: #3f3f46;
+            border-color: #facc15;
+        }
+
+        .history-date {
+            color: #facc15;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .history-title {
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .edit-form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .edit-input {
+            background-color: #0d0d0d;
+            border: 1px solid #3f3f46;
+            color: white;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .edit-label {
+            font-size: 0.75rem;
+            color: #a1a1aa;
+            margin-bottom: 0.25rem;
+        }
     </style>
 </head>
 
@@ -708,7 +763,43 @@
                 </div>
 
                 <button id="reset-cycle-btn" class="settings-button">Reiniciar Ciclo Bilbo</button>
+                <button id="edit-history-btn" class="settings-button">Editar Historial</button>
                 <button id="clear-history-btn" class="settings-button danger">Borrar Historial de Entrenos</button>
+            </div>
+        </div>
+    </div>
+
+    </div>
+
+    <!-- Modal Editar Historial -->
+    <div id="history-edit-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
+        <div
+            class="modal-content max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col rounded-lg shadow-lg relative bg-zinc-900 border border-zinc-700">
+            <div class="p-4 border-b border-zinc-700 flex justify-between items-center bg-zinc-800">
+                <h2 id="history-modal-title" class="text-xl font-bold text-yellow-400">Historial</h2>
+                <button id="close-history-modal"
+                    class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+            </div>
+
+            <!-- Lista de Entrenos -->
+            <div id="history-list-view" class="flex-1 overflow-y-auto p-4 space-y-2">
+                <!-- Injected via JS -->
+            </div>
+
+            <!-- Vista de Edición -->
+            <div id="history-edit-view" class="flex-1 overflow-y-auto p-4 hidden">
+                <div id="edit-workout-container" class="space-y-4">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <div id="history-edit-actions" class="p-4 border-t border-zinc-700 bg-zinc-800 hidden flex gap-3">
+                <button id="delete-history-btn"
+                    class="flex-1 bg-red-900/50 border border-red-700 text-red-100 hover:bg-red-800 py-2 rounded font-semibold">Borrar</button>
+                <button id="back-history-btn"
+                    class="flex-1 bg-zinc-700 hover:bg-zinc-600 text-white py-2 rounded font-semibold">Volver</button>
+                <button id="save-history-btn"
+                    class="flex-1 bg-green-600 hover:bg-green-700 text-white py-2 rounded font-semibold">Guardar</button>
             </div>
         </div>
     </div>
@@ -1052,6 +1143,23 @@
                 setTimeout(() => { if (loadingScreen) loadingScreen.style.display = 'none'; }, 500);
 
                 coreAppInit();
+
+                // Check for deep link actions (like opening History Editor)
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('action') === 'edit_history') {
+                    // Remove param from URL without reload
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.pushState({ path: newUrl }, '', newUrl);
+
+                    // Open Modal
+                    setTimeout(() => {
+                        if (DOM.settingsModal) DOM.settingsModal.classList.add('hidden'); // Ensure settings is closed
+                        if (DOM.historyModal) {
+                            DOM.historyModal.classList.remove('hidden');
+                            renderHistoryList();
+                        }
+                    }, 500); // Small delay to ensure render
+                }
             } else {
                 console.log(`Waiting... DataReady: ${isDataReady}, DomReady: ${isDomReady}`);
             }
@@ -2224,6 +2332,149 @@
             return e1rmMap;
         }
 
+        // --- History Editor Functions ---
+        let currentEditDate = null;
+
+        function renderHistoryList() {
+            const history = getAppData('workoutHistory');
+            const container = document.getElementById('history-list-view');
+            container.innerHTML = '';
+
+            const sortedDates = Object.keys(history).sort((a, b) => new Date(b) - new Date(a));
+
+            if (sortedDates.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">No hay entrenos registrados.</p>';
+                return;
+            }
+
+            sortedDates.forEach(date => {
+                const log = history[date];
+                const div = document.createElement('div');
+                div.className = 'history-list-item';
+                div.innerHTML = `
+                    <div>
+                        <div class="history-date">${date}</div>
+                        <div class="history-title">${log.workoutTitle || log.workoutType}</div>
+                    </div>
+                    <div class="text-gray-400 text-sm">➜</div>
+                `;
+                div.addEventListener('click', () => loadWorkoutForEdit(date));
+                container.appendChild(div);
+            });
+        }
+
+        function loadWorkoutForEdit(date) {
+            currentEditDate = date;
+            const history = getAppData('workoutHistory');
+            const log = history[date];
+            const container = document.getElementById('edit-workout-container');
+
+            document.getElementById('history-list-view').classList.add('hidden');
+            document.getElementById('history-edit-view').classList.remove('hidden');
+            document.getElementById('history-edit-actions').classList.remove('hidden');
+            document.getElementById('history-edit-actions').classList.add('flex');
+            document.getElementById('history-modal-title').textContent = `Editar: ${date}`;
+
+            container.innerHTML = '';
+
+            if (log.exercises) {
+                log.exercises.forEach((ex, exIndex) => {
+                    const exDiv = document.createElement('div');
+                    exDiv.className = 'bg-zinc-800 p-3 rounded border border-zinc-700';
+                    exDiv.innerHTML = `<h4 class="text-yellow-500 font-bold mb-2 text-sm">${ex.name}</h4>`;
+
+                    if (ex.series) {
+                        // Header
+                        const header = document.createElement('div');
+                        header.className = 'edit-form-row';
+                        header.innerHTML = `
+                             <span class="edit-label text-left">Serie</span>
+                             <span class="edit-label">Kg</span>
+                             <span class="edit-label">Reps</span>
+                        `;
+                        exDiv.appendChild(header);
+
+                        ex.series.forEach((s, sIndex) => {
+                            const row = document.createElement('div');
+                            row.className = 'edit-form-row';
+                            row.innerHTML = `
+                                <span class="text-gray-300 text-xs">Serie ${sIndex + 1}</span>
+                                <input type="number" step="0.5" class="edit-input edit-weight" value="${s.weight || 0}" data-ex="${exIndex}" data-s="${sIndex}">
+                                <input type="number" class="edit-input edit-reps" value="${s.reps || 0}" data-ex="${exIndex}" data-s="${sIndex}">
+                            `;
+                            exDiv.appendChild(row);
+                        });
+                    }
+                    container.appendChild(exDiv);
+                });
+            }
+        }
+
+        function saveHistoryChanges() {
+            if (!currentEditDate) return;
+            let history = getAppData('workoutHistory');
+            const log = history[currentEditDate];
+            const container = document.getElementById('edit-workout-container');
+
+            // Iterate inputs to update log
+            // We rebuilt the DOM based on log structure, so indices match
+            const exDivs = container.children;
+            // Note: exDivs matches log.exercises length
+            // But we must be careful if we have logic that depends on structure.
+            // Let's iterate using data attributes we enriched inputs with.
+
+            const inputs = container.querySelectorAll('input');
+            inputs.forEach(input => {
+                const exIndex = parseInt(input.dataset.ex);
+                const sIndex = parseInt(input.dataset.s);
+
+                if (log.exercises[exIndex] && log.exercises[exIndex].series[sIndex]) {
+                    if (input.classList.contains('edit-weight')) {
+                        log.exercises[exIndex].series[sIndex].weight = input.value;
+                    } else if (input.classList.contains('edit-reps')) {
+                        log.exercises[exIndex].series[sIndex].reps = input.value;
+                    }
+                }
+            });
+
+            // Persist
+            history[currentEditDate] = log;
+            setAppData('workoutHistory', history);
+            showNotification('Cambios guardados');
+
+            // Recalculate RMs just in case
+            e1rmMap = calculateAllEstimated1RMs();
+            loadLastPerformance(e1rmMap); // Live update background if relevant
+
+            goBackToHistoryList();
+        }
+
+        function deleteHistoryEntry() {
+            if (!currentEditDate) return;
+            if (confirm("¿Estás seguro de que quieres eliminar este entreno del registro?")) {
+                let history = getAppData('workoutHistory');
+                delete history[currentEditDate];
+                setAppData('workoutHistory', history);
+                showNotification('Entreno eliminado');
+
+                // Recalculate
+                e1rmMap = calculateAllEstimated1RMs();
+                loadLastPerformance(e1rmMap);
+
+                goBackToHistoryList();
+            }
+        }
+
+        function goBackToHistoryList() {
+            currentEditDate = null;
+            document.getElementById('history-edit-view').classList.add('hidden');
+            document.getElementById('history-edit-actions').classList.add('hidden');
+            document.getElementById('history-edit-actions').classList.remove('flex');
+            document.getElementById('history-list-view').classList.remove('hidden');
+            document.getElementById('history-modal-title').textContent = 'Historial';
+            renderHistoryList();
+        }
+
         // --- Event Listeners & Initialization ---
         function setupDOM() {
             // 1. Inicializar referencias al DOM
@@ -2252,7 +2503,16 @@
             DOM.settingsModal = document.getElementById('settings-modal');
             DOM.closeSettingsModalBtn = document.getElementById('close-settings-modal');
             DOM.resetCycleBtn = document.getElementById('reset-cycle-btn');
+            DOM.editHistoryBtn = document.getElementById('edit-history-btn');
             DOM.clearHistoryBtn = document.getElementById('clear-history-btn');
+
+            // History Modal Logic
+            DOM.historyModal = document.getElementById('history-edit-modal');
+            DOM.closeHistoryModalBtn = document.getElementById('close-history-modal');
+            DOM.saveHistoryBtn = document.getElementById('save-history-btn');
+            DOM.backHistoryBtn = document.getElementById('back-history-btn');
+            DOM.deleteHistoryBtn = document.getElementById('delete-history-btn');
+
             DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
 
             // Rest Overlay
@@ -2342,6 +2602,31 @@
                     if (activeDay) showDay(activeDay);
                 });
             }
+
+            // History Editor Listeners
+            if (DOM.editHistoryBtn) {
+                DOM.editHistoryBtn.addEventListener('click', () => {
+                    DOM.settingsModal.classList.add('hidden');
+                    DOM.historyModal.classList.remove('hidden');
+                    renderHistoryList();
+                });
+            }
+            if (DOM.closeHistoryModalBtn) {
+                DOM.closeHistoryModalBtn.addEventListener('click', () => {
+                    DOM.historyModal.classList.add('hidden');
+                    goBackToHistoryList(); // Reset view state
+                });
+            }
+            if (DOM.backHistoryBtn) {
+                DOM.backHistoryBtn.addEventListener('click', goBackToHistoryList);
+            }
+            if (DOM.saveHistoryBtn) {
+                DOM.saveHistoryBtn.addEventListener('click', saveHistoryChanges);
+            }
+            if (DOM.deleteHistoryBtn) {
+                DOM.deleteHistoryBtn.addEventListener('click', deleteHistoryEntry);
+            }
+
             if (DOM.clearHistoryBtn) {
                 DOM.clearHistoryBtn.addEventListener('click', (e) => {
                     const btn = e.target;

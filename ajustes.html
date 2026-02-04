@@ -192,6 +192,13 @@
                         al terminar una macro-rutina.</p>
                 </div>
 
+                <!-- Editar Historial -->
+                <div>
+                    <button id="edit-history-link-btn" class="settings-button">Editar Historial de Entrenos</button>
+                    <p class="text-xs text-gray-400 mt-1 pl-1">Corrige pesos o repeticiones de entrenamientos pasados.
+                    </p>
+                </div>
+
                 <!-- Borrar Historial de Entrenos -->
                 <div>
                     <button id="clear-history-btn" class="settings-button danger">Borrar TODO el Historial de
@@ -299,6 +306,14 @@
                     showNotification('Ciclo Bilbo reiniciado a 1');
                 }
             });
+
+            // Ir a Editar Historial
+            const editHistoryLinkBtn = document.getElementById('edit-history-link-btn');
+            if (editHistoryLinkBtn) {
+                editHistoryLinkBtn.addEventListener('click', () => {
+                    window.location.href = 'entreno.html?action=edit_history';
+                });
+            }
 
             // Borrar TODO el historial
             clearHistoryBtn.addEventListener('click', () => {
