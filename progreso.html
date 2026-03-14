@@ -487,38 +487,40 @@
         const workouts = {
             hd_push: {
                 title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
-                    { name: "Press Inclinado con Barra", rmPercentage: "50 / 70", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-9' }], dropSet: false, tip: "AL FALLO ABSOLUTO. Cadencia: 4s↓ / 2s↑.", rest: 120 },
-                    { name: "Landmine", rmPercentage: "50 / 75 / 75", seriesCount: 3, sets: [{ reps: 8 }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "AL FALLO TÉCNICO. Cadencia: 4s↓ / 2s↑.", rest: 180 },
-                    { name: "Elevaciones Laterales en Polea", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "AL FALLO. Cadencia: 4s↓ / 2s↑.", rest: 180 },
-                    { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "Cadencia: 4s↓ / 2s↑.", rest: 180 },
+                    { name: "Press inclinado con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1-2s↑. Evita mirar arriba; foco en control. Siente los pies firmes y el glúteo activo: la fuerza nace desde abajo, no desde el cuello.", rest: 135 },
+                    { name: "Press en suelo con barra", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1s↑. Cuello neutro, pectoral pleno. Mantén el abdomen firme y la espalda pegada al suelo — no arquees ni saques cabeza; empuja “desde el pecho”.", rest: 165 },
+                    { name: "Landmine Diagonal de Pie (Hombro–Techo)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Empuje diagonal hasta línea de ojos. Mira al frente, no hacia la barra. Exhala al empujar para no comprimir la cervical.", rest: 135 },
+                    { name: "Elevaciones laterales sentado", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Movimiento limpio, hombros bajos. Hombros bajos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Extensión de tríceps en polea con cuerda", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "2s↓ / 1s↑. Hombros bajos, respiración fluida. Sujeta el abdomen y deja el cuello relajado; imagina que tiras “hacia el suelo” desde el ombligo, no desde los hombros.", rest: 105 },
                 ]
             },
-            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             hd_pull: {
                 title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
-                    { name: "Jalón en Polea al Pecho (Agarre Neutro)", rmPercentage: "50 / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-10' }], dropSet: false, tip: "AL FALLO. Cadencia: 4s↓ / 2s↑.", rest: 120 },
-                    { name: "Remo en Barra T", rmPercentage: "60 / 70", seriesCount: 2, sets: [{ reps: 6 }, { reps: '6-10' }], dropSet: false, tip: "AL FALLO. Cadencia: 4s↓ / 2s↑.", rest: 180 },
-                    { name: "Pájaros (reverse fly)", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "AL FALLO. Cadencia lenta.", rest: 180 },
-                    { name: "Curl de Bíceps Mentzer", rmPercentage: "70", seriesCount: 1, sets: [{ reps: '6-10' }], dropSet: false, tip: "Cadencia: 4s bajada.", rest: 180 },
-                    { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 12 }, { reps: 12 }], dropSet: false, tip: "Ejercicio correctivo.", rest: 180 },
+                    { name: "Jalón en polea agarre neutro", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s pausa / 1-2s↑. Controla la subida, mirada neutra. Mira un punto fijo al frente; hombros bajos al bajar la barra. No saques pecho ni levantes la barbilla.", rest: 165 },
+                    { name: "Remo con barra T", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "3s↓ / 1s↑. Espalda recta, mirada al suelo. Abdomen apretado y espalda larga, no redondees. Piensa en “tirar los codos atrás” sin mover el tronco.", rest: 165 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s pausa. Cuello neutro, sin impulso. Cuello neutro. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Curl de bíceps Mentzer (polea baja)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: true, tip: "3s↓ / 1s↑ / 1s contracción. Codos móviles, apretando arriba. Mantén los codos fijos y la mirada baja. Evita apretar el cuello al final del movimiento.", rest: 105 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "30 / 50 / 80", seriesCount: 3, sets: [{ reps: 15 }, { reps: 10 }, { reps: 6 }], dropSet: false, tip: "2s↓ / 1s↑. Rotación externa, hombros bajos. Imagina que separas la cuerda con los codos, no con las manos; exhala largo para relajar trapecios.", rest: 105 },
                 ]
             },
-            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             bilbo_push: {
                 title: "BILBO — PUSH", type: 'bilbo', exercises: [
-                    { name: "Press de Banca Plano con Barra", rmPercentage: "Barr / 40 / Bilbo / 70", seriesCount: 4, sets: [{ reps: 15 }, { reps: 6 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Serie Bilbo: Explosiva, NO fallo.", rest: 180 },
-                    { name: "Landmine", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Busca congestión y control.", rest: 90 },
-                    { name: "Fondos", rmPercentage: "Lastr", seriesCount: 3, sets: [{ reps: '>15' }, { reps: '>15' }, { reps: '>15' }], dropSet: false, tip: "Al fallo o RIR 0-1.", rest: 180 },
-                    { name: "Cruces en Polea Alta (Pecho)", rmPercentage: "60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejercicio de detalle.", rest: 120 },
+                    { name: "Press de banca plano (barra)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Sin bloqueo de codos. Control respiratorio, sin apnea.", rest: 105 },
+                    { name: "Landmine Rodilla al Suelo (Cintura–Cabeza)", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Empuje diagonal amplio, activa oblicuos. Activa glúteo y abdomen para mantener pelvis neutra; no empujes con la espalda.", rest: 105 },
+                    { name: "Elevaciones laterales con gomas", rmPercentage: "60 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Hombros bajos, sin impulso. Brazos sueltos, cuello relajado; no subas más allá de la línea de los hombros.", rest: 75 },
+                    { name: "Fondos agarre neutro (cerrado)", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos pegados, rango medio. Mantén el cuello alineado al tronco y los codos pegados; exhala al subir.", rest: 105 },
+                    { name: "Cruces con goma (pecho)", rmPercentage: "55 / 65 / 70", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Cruza al centro, aprieta 1s. Aprieta el abdomen al cerrar los brazos, no el pecho; mantén hombros bajos.", rest: 75 },
                 ]
             },
-            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
             bilbo_pull: {
                 title: "BILBO — PULL", type: 'bilbo', exercises: [
-                    { name: "Jalón al Pecho (Agarre Estrecho)", rmPercentage: "30 / Bilbo / 70", seriesCount: 3, sets: [{ reps: 12 }, { reps: 'Bilbo' }, { reps: '8-12' }], dropSet: false, tip: "Serie Bilbo: 15-30 reps.", rest: 180 },
-                    { name: "Remo Bajo en Polea (Agarre Neutro)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Codos hacia la cadera.", rest: 180 },
-                    { name: "Remo Inclinado con Mancuernas (Apoyo banco)", rmPercentage: "65", seriesCount: 3, sets: [{ reps: '10-12' }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "Apoya pecho en banco a 30º.", rest: 180 },
-                    { name: "Curl con Barra Z", rmPercentage: "60", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "Bombeo puro.", rest: 45 },
+                    { name: "Jalón al pecho agarre estrecho", rmPercentage: "50 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tira al pecho, mirada neutra. Evita sacar la cabeza al final del movimiento; hombros bajos y omóplatos juntos.", rest: 120 },
+                    { name: "Remo bajo con polea (agarre neutro)", rmPercentage: "55 / 70 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Movimiento fluido, sin arqueo lumbar. Sin arqueo lumbar. Control respiratorio, sin apnea.", rest: 120 },
+                    { name: "Remo Inclinado 30º, Mancuernas, Neutro", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Tronco 30°, codos pegados, cuello neutro. Mantén columna larga, abdomen activo y cuello alineado al suelo.", rest: 120 },
+                    { name: "Curl en barra Z", rmPercentage: "55 / 65 / 75", seriesCount: 3, sets: [{ reps: '15-50' }, { reps: '10-15' }, { reps: '8-12' }], dropSet: false, tip: "Ejecución rápida. Codos fijos, hombros relajados. Apoya bien los pies, suelta el cuello; mueve solo antebrazos y respira lento.", rest: 75 },
                 ]
             }
         };
@@ -568,7 +570,7 @@
         async function writeAllDataToFirestore(data) {
             if (!db || !userId) return;
             try {
-                await setDoc(doc(db, DATA_DOC_PATH(userId), 'data'), data, { merge: true });
+                await setDoc(doc(db, DATA_DOC_PATH(userId), 'data'), data);
                 console.log("Datos guardados en Firestore correctamente.");
             } catch (e) {
                 console.error("Error guardando en Firestore:", e);
@@ -583,24 +585,18 @@
         }
 
         // --- RM / E1RM Calculation Functions ---
-        // Helper to normalize names for matching
-        function normalizeName(name) {
-            if (!name) return "";
-            return name.toLowerCase()
-                .replace(/[()]/g, "") // remove parentheses
-                .replace(/[-—]/g, " ") // replace dashes/em-dashes with space
-                .replace(/\b(con|al|el|de|en|y|del|pecho|barra|polea|mancuernas|agarre)\b/g, " ") // remove fillers & equipment
-                .replace(/\s+/g, " ") // normalize whitespace
-                .trim();
+        function calculateLombardi(weight, reps) {
+            if (reps <= 0 || weight <= 0) return 0;
+            return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
         }
 
         function calculateAllEstimated1RMs() {
             const history = getAppData('workoutHistory');
             const exercisesToTrack = [
-                normalizeName("Press de Banca Plano con Barra"),
-                normalizeName("Curl con Barra Z"),
-                normalizeName("Jalón en Polea al Pecho (Agarre Neutro)"),
-                normalizeName("Jalón al Pecho (Agarre Estrecho)")
+                "Press de banca plano (barra)",
+                "Curl en barra Z",
+                "Jalón en polea agarre neutro",
+                "Jalón al pecho agarre estrecho"
             ];
             const e1rmMap = new Map();
 
@@ -608,16 +604,15 @@
                 const log = history[date];
                 if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
                     log.exercises.forEach(ex => {
-                        const normName = normalizeName(ex.name);
-                        if (exercisesToTrack.includes(normName) && Array.isArray(ex.series)) {
+                        if (exercisesToTrack.includes(ex.name) && Array.isArray(ex.series)) {
                             ex.series.forEach(s => {
                                 const weight = parseFloat(s.weight);
                                 const reps = parseInt(s.reps, 10);
                                 if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
                                     const e1rm = calculateLombardi(weight, reps);
-                                    const currentMax = e1rmMap.get(normName) || 0;
+                                    const currentMax = e1rmMap.get(ex.name) || 0;
                                     if (e1rm > currentMax) {
-                                        e1rmMap.set(normName, e1rm);
+                                        e1rmMap.set(ex.name, e1rm);
                                     }
                                 }
                             });
@@ -630,24 +625,26 @@
 
         function calculateAllMaxReps() {
             const history = getAppData('workoutHistory');
-            const maxRepMap = new Map(); // normalizedName -> maxWeight
-            const originalNameMap = new Map(); // normalizedName -> original display name
+            const maxRepMap = new Map();
+
+            days.forEach((day) => {
+                const workout = workouts[day];
+                if (workout.type !== 'rest') {
+                    workout.exercises.forEach(ex => allExerciseNames.add(ex.name));
+                }
+            });
 
             for (const date in history) {
                 const log = history[date];
                 if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
                     log.exercises.forEach(ex => {
                         if (Array.isArray(ex.series)) {
-                            const normName = normalizeName(ex.name);
-                            if (!originalNameMap.has(normName)) {
-                                originalNameMap.set(normName, ex.name);
-                            }
                             ex.series.forEach(s => {
                                 const weight = parseFloat(s.weight);
                                 if (!isNaN(weight)) {
-                                    const currentMax = maxRepMap.get(normName) || 0;
+                                    const currentMax = maxRepMap.get(ex.name) || 0;
                                     if (weight > currentMax) {
-                                        maxRepMap.set(normName, weight);
+                                        maxRepMap.set(ex.name, weight);
                                     }
                                 }
                             });
@@ -655,7 +652,7 @@
                     });
                 }
             }
-            return { maxRepMap, originalNameMap };
+            return maxRepMap;
         }
 
         // --- Core UI/Rendering Functions ---
@@ -776,13 +773,12 @@
         function renderMaxReps() {
             if (!DOM.rmList) return;
             DOM.rmList.innerHTML = '';
-            const { maxRepMap, originalNameMap } = calculateAllMaxReps();
-            const sortedNormNames = [...maxRepMap.keys()].sort();
+            const maxRepMap = calculateAllMaxReps();
+            const sortedExerciseNames = [...allExerciseNames].sort();
             let hasData = false;
 
-            sortedNormNames.forEach(normName => {
-                const maxWeight = maxRepMap.get(normName);
-                const exerciseName = originalNameMap.get(normName);
+            sortedExerciseNames.forEach(exerciseName => {
+                const maxWeight = maxRepMap.get(exerciseName);
                 if (maxWeight) {
                     hasData = true;
                     const cardHTML = `
@@ -902,93 +898,66 @@
             return new Chart(ctx, config);
         }
 
-        // Helper: parse a date string like '2026-02-15' as LOCAL time (not UTC)
-        function parseDateLocal(dateStr) {
-            if (!dateStr) return new Date(NaN);
-            const parts = dateStr.split('-');
-            if (parts.length === 3) {
-                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-            }
-            return new Date(dateStr);
-        }
-
         function renderProgressionCharts() {
             const history = getAppData('workoutHistory');
-            const sortedEntries = Object.entries(history)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([, v]) => v);
+            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const bilboPushData = [];
             const bilboPullData = [];
             const hdPushData = [];
             const hdPullData = [];
 
-            const bilboPushExercise = "Press de Banca Plano con Barra";
-            const bilboPullExercise = "Jalón al Pecho (Agarre Estrecho)";
-            const hdPushExercise = "Press Inclinado con Barra";
-            const hdPullExercise = "Jalón en Polea al Pecho (Agarre Neutro)";
+            const bilboPushExercise = "Press de banca plano (barra)";
+            const bilboPullExercise = "Jalón al pecho agarre estrecho";
+            const hdPushExercise = "Press inclinado con barra";
+            const hdPullExercise = "Jalón en polea agarre neutro";
 
             sortedEntries.forEach(log => {
                 if (!log.exercises) return;
 
-                // Determine day type using workoutType (reliable) or fallback to workoutTitle
-                const isBilboPush = log.workoutType === 'bilbo' && (log.workoutTitle || '').toLowerCase().includes('push');
-                const isBilboPull = log.workoutType === 'bilbo' && (log.workoutTitle || '').toLowerCase().includes('pull');
-                const isHdPush = log.workoutType === 'hd' && (log.workoutTitle || '').toLowerCase().includes('push');
-                const isHdPull = log.workoutType === 'hd' && (log.workoutTitle || '').toLowerCase().includes('pull');
-
-                // Fallback: if workoutType not set, use workoutTitle string matching (including em dash variants)
-                const title = (log.workoutTitle || '');
-                const isBilboPushFallback = title.includes('BILBO') && title.toLowerCase().includes('push');
-                const isBilboPullFallback = title.includes('BILBO') && title.toLowerCase().includes('pull');
-                const isHdPushFallback = title.includes('HEAVY DUTY') && title.toLowerCase().includes('push');
-                const isHdPullFallback = title.includes('HEAVY DUTY') && title.toLowerCase().includes('pull');
-
-                const dateX = parseDateLocal(log.date);
-
-                if (isBilboPush || isBilboPushFallback) {
-                    const exercise = log.exercises.find(ex => normalizeName(ex.name) === normalizeName(bilboPushExercise));
+                if (log.workoutTitle.includes("BILBO — PUSH")) {
+                    const exercise = log.exercises.find(ex => ex.name === bilboPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
                             bilboPushData.push({
-                                x: dateX,
+                                x: new Date(log.date),
                                 yPeso: parseFloat(series.weight),
                                 yReps: parseInt(series.reps, 10)
                             });
                         }
                     }
-                } else if (isBilboPull || isBilboPullFallback) {
-                    const exercise = log.exercises.find(ex => normalizeName(ex.name) === normalizeName(bilboPullExercise));
+                } else if (log.workoutTitle.includes("BILBO — PULL")) {
+                    const exercise = log.exercises.find(ex => ex.name === bilboPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
                             bilboPullData.push({
-                                x: dateX,
+                                x: new Date(log.date),
                                 yPeso: parseFloat(series.weight),
                                 yReps: parseInt(series.reps, 10)
                             });
                         }
                     }
-                } else if (isHdPush || isHdPushFallback) {
-                    const exercise = log.exercises.find(ex => normalizeName(ex.name) === normalizeName(hdPushExercise));
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
+                    const exercise = log.exercises.find(ex => ex.name === hdPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
                             hdPushData.push({
-                                x: dateX,
+                                x: new Date(log.date),
                                 yPeso: parseFloat(lastSeries.weight),
                                 yReps: parseInt(lastSeries.reps, 10)
                             });
                         }
                     }
-                } else if (isHdPull || isHdPullFallback) {
-                    const exercise = log.exercises.find(ex => normalizeName(ex.name) === normalizeName(hdPullExercise));
+                } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
+                    const exercise = log.exercises.find(ex => ex.name === hdPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
                             hdPullData.push({
-                                x: dateX,
+                                x: new Date(log.date),
                                 yPeso: parseFloat(lastSeries.weight),
                                 yReps: parseInt(lastSeries.reps, 10)
                             });
@@ -1050,15 +1019,13 @@
 
         function renderE1RMCharts() {
             const history = getAppData('workoutHistory');
-            const sortedEntries = Object.entries(history)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([, v]) => v);
+            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const exercisesToTrack = {
-                pressBanca: "Press de Banca Plano con Barra",
-                jalonNeutro: "Jalón en Polea al Pecho (Agarre Neutro)",
-                jalonEstrecho: "Jalón al Pecho (Agarre Estrecho)",
-                curlZ: "Curl con Barra Z"
+                pressBanca: "Press de banca plano (barra)",
+                jalonNeutro: "Jalón en polea agarre neutro",
+                jalonEstrecho: "Jalón al pecho agarre estrecho",
+                curlZ: "Curl en barra Z"
             };
 
             const data = { pressBanca: [], jalonNeutro: [], jalonEstrecho: [], curlZ: [] };
@@ -1066,16 +1033,15 @@
             sortedEntries.forEach(log => {
                 if (!log.exercises || log.workoutType === 'rest') return;
 
-                const date = parseDateLocal(log.date);
+                const date = new Date(log.date);
                 let maxE1RM = { pressBanca: 0, jalonNeutro: 0, jalonEstrecho: 0, curlZ: 0 };
 
                 log.exercises.forEach(ex => {
                     let dataKey = null;
-                    const normalizedExName = normalizeName(ex.name);
-                    if (normalizedExName === normalizeName(exercisesToTrack.pressBanca)) dataKey = 'pressBanca';
-                    else if (normalizedExName === normalizeName(exercisesToTrack.jalonNeutro)) dataKey = 'jalonNeutro';
-                    else if (normalizedExName === normalizeName(exercisesToTrack.jalonEstrecho)) dataKey = 'jalonEstrecho';
-                    else if (normalizedExName === normalizeName(exercisesToTrack.curlZ)) dataKey = 'curlZ';
+                    if (ex.name === exercisesToTrack.pressBanca) dataKey = 'pressBanca';
+                    else if (ex.name === exercisesToTrack.jalonNeutro) dataKey = 'jalonNeutro';
+                    else if (ex.name === exercisesToTrack.jalonEstrecho) dataKey = 'jalonEstrecho';
+                    else if (ex.name === exercisesToTrack.curlZ) dataKey = 'curlZ';
 
                     if (dataKey && Array.isArray(ex.series)) {
                         let maxE1RMThisDay = 0;
