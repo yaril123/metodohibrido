@@ -898,9 +898,21 @@
             return new Chart(ctx, config);
         }
 
+        // Helper: parse a date string like '2026-02-15' as LOCAL time (not UTC)
+        function parseDateLocal(dateStr) {
+            if (!dateStr) return new Date(NaN);
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+            return new Date(dateStr);
+        }
+
         function renderProgressionCharts() {
             const history = getAppData('workoutHistory');
-            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
+            const sortedEntries = Object.entries(history)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([, v]) => v);
 
             const bilboPushData = [];
             const bilboPullData = [];
@@ -915,49 +927,64 @@
             sortedEntries.forEach(log => {
                 if (!log.exercises) return;
 
-                if (log.workoutTitle.includes("BILBO — PUSH")) {
+                // Determine day type using workoutType (reliable) or fallback to workoutTitle
+                const isBilboPush = log.workoutType === 'bilbo' && (log.workoutTitle || '').toLowerCase().includes('push');
+                const isBilboPull = log.workoutType === 'bilbo' && (log.workoutTitle || '').toLowerCase().includes('pull');
+                const isHdPush = log.workoutType === 'hd' && (log.workoutTitle || '').toLowerCase().includes('push');
+                const isHdPull = log.workoutType === 'hd' && (log.workoutTitle || '').toLowerCase().includes('pull');
+
+                // Fallback: if workoutType not set, use workoutTitle string matching (including em dash variants)
+                const title = (log.workoutTitle || '');
+                const isBilboPushFallback = title.includes('BILBO') && title.toLowerCase().includes('push');
+                const isBilboPullFallback = title.includes('BILBO') && title.toLowerCase().includes('pull');
+                const isHdPushFallback = title.includes('HEAVY DUTY') && title.toLowerCase().includes('push');
+                const isHdPullFallback = title.includes('HEAVY DUTY') && title.toLowerCase().includes('pull');
+
+                const dateX = parseDateLocal(log.date);
+
+                if (isBilboPush || isBilboPushFallback) {
                     const exercise = log.exercises.find(ex => ex.name === bilboPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
                             bilboPushData.push({
-                                x: new Date(log.date),
+                                x: dateX,
                                 yPeso: parseFloat(series.weight),
                                 yReps: parseInt(series.reps, 10)
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("BILBO — PULL")) {
+                } else if (isBilboPull || isBilboPullFallback) {
                     const exercise = log.exercises.find(ex => ex.name === bilboPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
                             bilboPullData.push({
-                                x: new Date(log.date),
+                                x: dateX,
                                 yPeso: parseFloat(series.weight),
                                 yReps: parseInt(series.reps, 10)
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
+                } else if (isHdPush || isHdPushFallback) {
                     const exercise = log.exercises.find(ex => ex.name === hdPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
                             hdPushData.push({
-                                x: new Date(log.date),
+                                x: dateX,
                                 yPeso: parseFloat(lastSeries.weight),
                                 yReps: parseInt(lastSeries.reps, 10)
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
+                } else if (isHdPull || isHdPullFallback) {
                     const exercise = log.exercises.find(ex => ex.name === hdPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
                             hdPullData.push({
-                                x: new Date(log.date),
+                                x: dateX,
                                 yPeso: parseFloat(lastSeries.weight),
                                 yReps: parseInt(lastSeries.reps, 10)
                             });
@@ -1019,7 +1046,9 @@
 
         function renderE1RMCharts() {
             const history = getAppData('workoutHistory');
-            const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
+            const sortedEntries = Object.entries(history)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([, v]) => v);
 
             const exercisesToTrack = {
                 pressBanca: "Press de banca plano (barra)",
@@ -1033,7 +1062,7 @@
             sortedEntries.forEach(log => {
                 if (!log.exercises || log.workoutType === 'rest') return;
 
-                const date = new Date(log.date);
+                const date = parseDateLocal(log.date);
                 let maxE1RM = { pressBanca: 0, jalonNeutro: 0, jalonEstrecho: 0, curlZ: 0 };
 
                 log.exercises.forEach(ex => {
