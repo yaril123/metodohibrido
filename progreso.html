@@ -598,9 +598,10 @@
         }
 
         // --- RM / E1RM Calculation Functions ---
-        function calculateLombardi(weight, reps) {
+        function calculateRM(weight, reps) {
             if (reps <= 0 || weight <= 0) return 0;
-            return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
+            // Fórmula de Epley: escala mejor para altas repeticiones (ej. Método Bilbo)
+            return parseFloat(weight) * (1 + parseFloat(reps) / 30);
         }
 
         function normalizeExerciseName(name) {
@@ -634,7 +635,7 @@
                                 const weight = parseFloat(s.weight);
                                 const reps = parseInt(s.reps, 10);
                                 if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
-                                    const e1rm = calculateLombardi(weight, reps);
+                                    const e1rm = calculateRM(weight, reps);
                                     const currentMax = e1rmMap.get(normalizedName) || 0;
                                     if (e1rm > currentMax) {
                                         e1rmMap.set(normalizedName, e1rm);
@@ -1123,7 +1124,7 @@
                             const weight = parseFloat(s.weight);
                             const reps = parseInt(s.reps, 10);
                             if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
-                                const e1rm = calculateLombardi(weight, reps);
+                                const e1rm = calculateRM(weight, reps);
                                 if (e1rm > maxE1RMThisDay.e1rm) {
                                     maxE1RMThisDay = { e1rm: e1rm, weight: weight, reps: reps };
                                 }
