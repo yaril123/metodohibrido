@@ -868,6 +868,8 @@
                     { name: "Elevaciones Laterales en Polea", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. <strong>REST PAUSE:</strong> Al fallar, descansa 10s y saca un par más.", rest: 180 },
                     // ISO support
                     { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, isometric: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s↓ / 2s↑.</strong> Al fallar, mantén <strong>ISOMÉTRICO</strong> 10-15s hasta que arda.", rest: 180 },
+                    { name: "Patada de glúteo en polea", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejecución: Torso ligeramente inclinado. Rodilla ligeramente flexionada. Empuja el talón hacia atrás sin arquear la zona lumbar. Aprieta el glúteo 1-2 s arriba. Objetivo: descargar cadena posterior.", rest: 120 },
+                    { name: "Gemelos", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-20' }, { reps: '12-20' }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
                 ]
             },
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -887,6 +889,8 @@
                     { name: "Landmine", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Busca congestión y control, no velocidad. Descansos cortos (90s).", rest: 90 },
                     { name: "Fondos", rmPercentage: "Lastr", seriesCount: 3, sets: [{ reps: '>15' }, { reps: '>15' }, { reps: '>15' }], dropSet: false, tip: "Al fallo o RIR 0-1. Si haces >15, lastre 5kg.", rest: 180 },
                     { name: "Cruces en Polea Alta (Pecho)", rmPercentage: "60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejercicio de detalle. Cruza las manos abajo para apretar el pecho. Mantén la contracción 1 segundo.", rest: 120 },
+                    { name: "Sentadilla adelantada en barra guiada", rmPercentage: "70", seriesCount: 3, sets: [{ reps: 10 }, { reps: 10 }, { reps: 10 }], dropSet: false, tip: "Pies 15-25 cm adelantados respecto a la barra. Tibias casi verticales. Baja 3 segundos sin sobrepasar donde la pelvis se mete. Empuja el suelo con todo el pie.", rest: 180 },
+                    { name: "Gemelos en barra guiada", rmPercentage: "70", seriesCount: 2, sets: [{ reps: 15 }, { reps: 15 }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
                 ]
             },
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -909,113 +913,7 @@
 
         const state = { activeTimers: {}, stopwatchInterval: null, totalSeconds: 0, isStopwatchRunning: false, recognition: null, currentRestTimerId: null };
 
-        // --- SPEECH RECOGNITION & TTS UTILS ---
-
-        function speak(text) {
-            if ('speechSynthesis' in window) {
-                // Cancelar cualquier cosa que se esté diciendo
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = "es-ES";
-                utterance.rate = 1;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        function startVoiceRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn("Speech Recognition API not supported in this browser.");
-                return;
-            }
-
-            if (!state.recognition) {
-                state.recognition = new SpeechRecognition();
-                state.recognition.lang = 'es-ES';
-                // Cambiar a true. 'false' requiere reinicio constante y podemos perder la palabra mientras reinicia.
-                state.recognition.continuous = true;
-                state.recognition.interimResults = false;
-
-                state.recognition.onresult = (event) => {
-                    // Iterar sobre los resultados, el ultimo suele ser el mas reciente
-                    const lastResultIndex = event.results.length - 1;
-                    const transcript = event.results[lastResultIndex][0].transcript.toLowerCase();
-                    console.log("Voice recognized:", transcript);
-
-                    if (transcript.includes("tiempo") || transcript.includes("time") || transcript.includes("descanso") || transcript.includes("ya")) {
-                        triggerNextRestTimer();
-                    }
-                };
-
-                state.recognition.onend = () => {
-                    console.log("Recognition ended. Restarting if stopwatch running...");
-                    // Reiniciar si el cronómetro sigue corriendo para escucha continua
-                    if (state.isStopwatchRunning) {
-                        try {
-                            state.recognition.start();
-                        } catch (e) {
-                            console.log("Already started");
-                        }
-                    }
-                };
-
-                state.recognition.onerror = (event) => {
-                    console.error("Speech recognition error", event.error);
-                    if (event.error === 'no-speech') {
-                        // Ignorar error de silencio, que siga intentando en onend
-                    }
-                };
-            }
-
-            try {
-                console.log("Starting recognition...");
-                state.recognition.start();
-            } catch (e) {
-                // Ignore if already started
-            }
-        }
-
-        function stopVoiceRecognition() {
-            if (state.recognition) {
-                state.recognition.stop();
-            }
-        }
-
-        function triggerNextRestTimer() {
-            // Verificar si YA hay un temporizador corriendo
-            const runningTimerKey = Object.keys(state.activeTimers).find(key => {
-                // Verificar si el intervalo sigue activo (por seguridad)
-                return state.activeTimers[key] && state.activeTimers[key].interval;
-            });
-
-            if (runningTimerKey) {
-                console.log("Ya hay un temporizador corriendo. Ignorando comando de voz.");
-                // Opcional: Feedback de voz "Ya hay un descanso activo"
-                return;
-            }
-
-            // Estrategia: Buscar el primer temporizador visible que NO esté corriendo y que corresponda a un ejercicio visible.
-            // Asumimos que el usuario va en orden.
-            const activeDay = document.querySelector('.day-nav-button.active')?.dataset.day;
-            if (!activeDay) return;
-
-            const visibleTimers = document.querySelectorAll(`#${activeDay} .timer-clock`);
-            for (let timer of visibleTimers) {
-                // Si no está corriendo, lo activamos
-                if (!timer.classList.contains('timer-running')) {
-                    // Opcional: Verificar si el ejercicio ya se completó?
-                    // Por ahora, activamos el primero disponible (siguiente serie/ejercicio)
-
-                    // Simular click
-                    timer.click();
-
-                    // Feedback visual/sonoro extra si se desea
-                    speak("Cuenta atrás iniciada");
-                    return; // Solo activar uno
-                }
-            }
-            speak("No quedan descansos pendientes en esta vista");
-        }
+        // --- SPEECH RECOGNITION & TTS UTILS REMOVED FOR PERFORMANCE ---
 
 
         // --- FUNCIONES DE PERSISTENCIA (Prioridad: Firebase si logueado, sino localStorage) ---
@@ -1558,8 +1456,6 @@
                     synth.triggerAttackRelease("C5", "8n", Tone.now());
                     synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
 
-                    // Voz: Descanso finalizado
-                    speak("Descanso finalizado");
                     hideRestOverlay(); // Hide on finish
                 }
             }, 1000);
@@ -1594,12 +1490,6 @@
                 state.totalSeconds++;
                 updateStopwatchDisplay();
             }, 1000);
-
-            // Voz: Mensaje inicial
-            if (state.totalSeconds === 0) {
-                speak("Entrenamiento iniciado, cuando hayas acabado una serie, dí tiempo! y empezará a contar la cuenta atras del descanso");
-            }
-            startVoiceRecognition();
         }
 
         function pauseStopwatch() {
@@ -1607,8 +1497,6 @@
             state.isStopwatchRunning = false;
             clearInterval(state.stopwatchInterval);
             DOM.pauseModal.classList.remove('hidden');
-            stopVoiceRecognition(); // Parar reconocimiento
-            speak("Entrenamiento pausado");
         }
 
 
@@ -1734,8 +1622,6 @@
         function finishWorkout() {
             clearInterval(state.stopwatchInterval);
             state.isStopwatchRunning = false;
-            stopVoiceRecognition();
-            speak("Entrenamiento finalizado. ¡Buen trabajo!");
 
             const todayStr = getTodayDateString();
             const finalTime = DOM.stopwatchDisplay.textContent;
@@ -2006,12 +1892,12 @@
                 for (const dateKey of sortedDates) {
                     const log = history[dateKey];
                     if (log && log.exercises) {
-                        let exLog = log.exercises.find(e => e.name === exerciseName);
+                        let exLog = log.exercises.find(e => e.name.toLowerCase() === exerciseName.toLowerCase());
 
                         // Try legacy names if not found
                         if (!exLog && legacyNames.length > 0) {
                             for (const legacy of legacyNames) {
-                                exLog = log.exercises.find(e => e.name === legacy);
+                                exLog = log.exercises.find(e => e.name.toLowerCase() === legacy.toLowerCase());
                                 if (exLog) break;
                             }
                         }
@@ -2101,174 +1987,129 @@
                     card.querySelectorAll('.last-reps-cell').forEach(c => c.textContent = '-');
                 }
 
-                // --- SUGGEST WEIGHTS (Inputs) ---
-                let baseWeight = 0;
-                let flagUsed = false;
-
+                // --- SUGGEST WEIGHTS & REPS (Inputs) ---
                 const inputs = card.querySelectorAll('.weight-input');
+                const repsInputs = card.querySelectorAll('.reps-input');
 
-                if (day.includes('bilbo')) {
-                    const e1rm = e1rmMap.get(exerciseName) || 0;
-                    const shouldReset = bilboResetFlags[exerciseName] === true;
-
-                    if (shouldReset && e1rm > 0) {
-                        baseWeight = e1rm * 0.5;
-                        // We don't clear flag here to keep it persistent until save, or we clear it if we generated?
-                        // User experience: if they refresh, it should still suggest reset until they do it.
-                        // Cleaning here might be risky if they don't save.
-                        // But existing code cleaned it. Let's keep it clean if we used it.
-                        bilboResetFlags[exerciseName] = false;
-                        flagUsed = true;
-                    } else if (lastSessionData) {
-                        // Default Bilbo progression
-                        baseWeight = parseFloat(lastSessionData.series[0].weight || 0);
-                    } else if (e1rm > 0) {
-                        baseWeight = e1rm * 0.5;
+                if (lastSessionData && workoutType !== 'rest') {
+                    // Utility info
+                    const lastSetIdx = lastSessionData.series.length - 1;
+                    const lastSet = lastSessionData.series[lastSetIdx];
+                    const lastWeight = parseFloat(lastSet.weight || 0);
+                    const lastReps = parseInt(lastSet.reps || 0);
+                    
+                    // Parse target max reps from exercise definition (e.g. from "8-12" -> 12)
+                    let maxTargetReps = 100;
+                    if (exerciseDataDef.sets && exerciseDataDef.sets.length > 0) {
+                        const repsStr = exerciseDataDef.sets[exerciseDataDef.sets.length - 1].reps.toString();
+                        const targetNums = repsStr.match(/\d+/g);
+                        if (targetNums) maxTargetReps = Math.max(...targetNums.map(Number));
                     }
 
-                    // Special Logic for Press Banca Plano (Bilbo)
-                    if (exerciseName === "Press de Banca Plano con Barra") {
-                        // Robustly find Last Bilbo Weight (Max Volume)
-                        let lastBilboWeight = 0;
-                        let lastBilboReps = 0;
-                        let maxVol = 0;
-                        if (lastSessionData && lastSessionData.series) {
-                            lastSessionData.series.forEach(s => {
-                                const w = parseFloat(s.weight || 0);
-                                const r = parseFloat(s.reps || 0);
-                                const vol = w * r;
-                                if (vol > maxVol) { maxVol = vol; lastBilboWeight = w; lastBilboReps = r; }
-                            });
-                        }
+                    if (day.includes('hd')) {
+                        // REGLAS HEAVY DUTY
+                        const rule2KgGroup = ["Press Inclinado con Barra", "Jalón en Polea al Pecho (Agarre Neutro)", "Curl de Bíceps Mentzer"];
+                        let suggestedEffectiveWeight = lastWeight;
 
-                        inputs.forEach((input, i) => {
-                            if (i === 0) {
-                                // Calentamiento 1: Barra (0)
-                                input.value = 0;
-                            } else if (i === 1) {
-                                // Calentamiento 2: 40% of Last Bilbo Weight
-                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 0.40);
-                            } else if (i === 2) {
-                                // Serie Bilbo: Last + 5%
-                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 1.05);
-                            } else if (i === 3) {
-                                // Serie 4: 70% of GLOBAL Estimated RM (User preference: use historical max)
-                                // e.g. 95.7kg -> 70% = ~67kg
-                                if (e1rm > 0) {
-                                    input.value = roundWeight(e1rm * 0.70);
-                                } else if (lastBilboWeight > 0 && lastBilboReps > 0) {
-                                    // Fallback to local if no global found (unlikely if history exists)
-                                    const localRM = lastBilboWeight * Math.pow(lastBilboReps, 0.10);
-                                    input.value = roundWeight(localRM * 0.70);
-                                }
+                        if (rule2KgGroup.includes(exerciseName)) {
+                            // "si paso de 10 repeticiones en la serie mas pesada, aumentas 2 kilos"
+                            if (lastReps > 10 && lastWeight > 0) {
+                                suggestedEffectiveWeight = lastWeight + 2;
                             }
-                        });
-
-
-                    } else if (exerciseName === "Jalón al Pecho (Agarre Estrecho)") {
-                        // Special Logic for Jalón al Pecho (Agarre Estrecho) - Bilbo Pull Main
-
-                        let lastBilboWeight = 0;
-                        let lastBilboReps = 0;
-                        let maxVol = 0;
-
-                        // Find Last Bilbo Weight (Max Volume)
-                        if (lastSessionData && lastSessionData.series) {
-                            lastSessionData.series.forEach(s => {
-                                const w = parseFloat(s.weight || 0);
-                                const r = parseFloat(s.reps || 0);
-                                const vol = w * r;
-                                if (vol > maxVol) { maxVol = vol; lastBilboWeight = w; lastBilboReps = r; }
-                            });
-                        }
-
-                        inputs.forEach((input, i) => {
-                            if (i === 0) {
-                                // Calentamiento: 30% of Last Bilbo Weight
-                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 0.30);
-                            } else if (i === 1) {
-                                // Serie Bilbo: Last + 5%
-                                if (lastBilboWeight > 0) input.value = roundWeight(lastBilboWeight * 1.05);
-                            } else if (i === 2) {
-                                // Serie 3: 70% of RM + 4kg increment
-                                if (e1rm > 0) {
-                                    input.value = roundWeight((e1rm * 0.70) + 4);
-                                } else if (lastBilboWeight > 0 && lastBilboReps > 0) {
-                                    const localRM = lastBilboWeight * Math.pow(lastBilboReps, 0.10);
-                                    input.value = roundWeight((localRM * 0.70) + 4);
-                                }
-                            }
-                        });
-
-                    } else if (baseWeight > 0) {
-                        // Logic for Bilbo Accessories (Non-Main)
-                        // User Rule: If prev reps >= 12 -> Increase 2/4kg.
-
-                        let suggestion = baseWeight;
-
-                        // Check historical performance for suggestion
-                        if (lastSessionData && lastSessionData.series) {
-                            const lastSet = lastSessionData.series[lastSessionData.series.length - 1];
-                            const lastReps = parseInt(lastSet.reps || 0);
-                            const lastWeight = parseFloat(lastSet.weight || 0);
-
-                            if (lastWeight > 0 && lastReps >= 12) {
-                                if (lastWeight < 40) {
-                                    suggestion = lastWeight + 2;
-                                } else {
-                                    suggestion = lastWeight + 4;
-                                }
-                            } else if (lastWeight > 0) {
-                                suggestion = lastWeight; // Maintain
-                            }
-                        }
-
-                        suggestion = roundWeight(suggestion);
-                        inputs.forEach((input, i) => {
-                            // Apply suggestion to all sets of accessory
-                            input.value = suggestion;
-                        });
-                    }
-
-                } else if (day.includes('hd')) {
-                    // HD Logic
-                    const shouldProgress = progressionFlags[exerciseName] === true;
-
-                    if (lastSessionData) {
-                        // Effective is last
-                        let lastEffective = parseFloat(lastSessionData.series[lastSessionData.series.length - 1].weight || 0);
-                        if (shouldProgress) {
-                            let increased = lastEffective * 1.05; // 5% increase
-                            baseWeight = roundWeight(increased);
-                            // Flag is consumed (set to true) here, user accepted it previously.
-                            // But wait, user says "el peso aparecerá ya marcado".
-                            // If flag is true, we calculate increase. Correct.
-                            // We consume the flag so it doesn't keep increasing endlessly if reloading?
-                            // Logic: progressionFlags[exerciseName] = false; is correct to act as "one-time" apply.
-                            progressionFlags[exerciseName] = false;
-                            flagUsed = true;
                         } else {
-                            baseWeight = roundWeight(lastEffective);
+                            // "resto de ejercicios: si se ha acanzado numero maximo de repeticiones objetivo, subes 1 kilo"
+                            if (lastReps >= maxTargetReps && lastWeight > 0) {
+                                suggestedEffectiveWeight = lastWeight + 1;
+                            }
                         }
-                    }
 
-                    if (baseWeight > 0) {
-                        // Calculate Warmups
-                        // HD Def: rmPercentage: "50 / 80". Effective is last (80).
+                        // Calcular según porcentaje de la efectiva
                         const rmPercs = exerciseDataDef.rmPercentage.split('/').map(s => parseInt(s.trim()));
-                        const effectivePerc = rmPercs[rmPercs.length - 1]; // e.g. 80
+                        const effectivePerc = rmPercs[rmPercs.length - 1]; // ej. 80
 
                         inputs.forEach((input, i) => {
                             const thisPerc = rmPercs[i] || effectivePerc;
-                            const w = (baseWeight * thisPerc) / effectivePerc;
-                            input.value = roundWeight(w);
+                            const w = (suggestedEffectiveWeight * thisPerc) / effectivePerc;
+                            if (w > 0) input.value = roundWeight(w);
                         });
-                    }
-                }
+                        repsInputs.forEach((input, i) => {
+                            const prevSeries = lastSessionData.series[i] || lastSet;
+                            if (prevSeries.reps) input.value = prevSeries.reps;
+                        });
 
-                if (flagUsed) {
-                    setAppData('progressionFlags', progressionFlags);
-                    setAppData('bilboResetFlags', bilboResetFlags);
+                    } else if (day.includes('bilbo')) {
+                        // REGLAS BILBO
+                        
+                        // Check manual reset
+                        const shouldReset = bilboResetFlags[exerciseName] === true;
+                        
+                        if (exerciseName === "Press de Banca Plano con Barra" || exerciseName === "Jalón al Pecho (Agarre Estrecho)") {
+                            // Buscar Serie Bilbo (máximo volumen = weight * reps)
+                            let lastBilboWeight = 0;
+                            let lastBilboReps = 0;
+                            let maxVol = 0;
+                            lastSessionData.series.forEach(s => {
+                                const w = parseFloat(s.weight || 0);
+                                const r = parseInt(s.reps || 0);
+                                if (w * r > maxVol) { maxVol = w * r; lastBilboWeight = w; lastBilboReps = r; }
+                            });
+                            
+                            let newBilboWeight = lastBilboWeight > 0 ? (lastBilboWeight + 4) : 0;
+                            
+                            // Si se pidió un reseteo en el modal
+                            if (shouldReset) {
+                                const e1rm = e1rmMap.get(exerciseName) || 0;
+                                if (e1rm > 0) newBilboWeight = e1rm * 0.5;
+                                bilboResetFlags[exerciseName] = false;
+                                setAppData('bilboResetFlags', bilboResetFlags);
+                            }
+
+                            inputs.forEach((input, i) => {
+                                if (exerciseName === "Press de Banca Plano con Barra") {
+                                    if (i === 0) input.value = 0;
+                                    else if (i === 1) input.value = roundWeight(newBilboWeight * 0.40);
+                                    else if (i === 2) input.value = roundWeight(newBilboWeight); // Bilbo row
+                                    else if (i === 3) {
+                                        const globalE1rm = e1rmMap.get(exerciseName) || 0;
+                                        if (globalE1rm > 0) input.value = roundWeight(globalE1rm * 0.70);
+                                        else input.value = roundWeight(newBilboWeight * 0.70);
+                                    }
+                                } else { // Jalón
+                                    if (i === 0) input.value = roundWeight(newBilboWeight * 0.30);
+                                    else if (i === 1) input.value = roundWeight(newBilboWeight); // Bilbo row
+                                    else if (i === 2) {
+                                        const globalE1rm = e1rmMap.get(exerciseName) || 0;
+                                        if (globalE1rm > 0) input.value = roundWeight((globalE1rm * 0.70) + 4);
+                                        else input.value = roundWeight((newBilboWeight * 0.70) + 4);
+                                    }
+                                }
+                            });
+                            repsInputs.forEach((input, i) => {
+                                const prevSeries = lastSessionData.series[i] || lastSet;
+                                if (prevSeries && prevSeries.reps) input.value = prevSeries.reps;
+                            });
+
+                        } else if (exerciseName === "Remo Bajo en Polea (Agarre Neutro)") {
+                            let suggestedWeight = lastWeight;
+                            if (lastReps >= maxTargetReps && lastWeight > 0) {
+                                suggestedWeight = lastWeight + 2;
+                            }
+                            inputs.forEach(input => { if (suggestedWeight > 0) input.value = suggestedWeight; });
+                            repsInputs.forEach((input, i) => {
+                                const prevSeries = lastSessionData.series[i] || lastSet;
+                                if (prevSeries.reps) input.value = prevSeries.reps;
+                            });
+
+                        } else {
+                            // Demás ejercicios de Bilbo (Aumento 1kg incondicional pedido)
+                            let suggestedWeight = lastWeight > 0 ? (lastWeight + 1) : 0;
+                            inputs.forEach(input => { if (suggestedWeight > 0) input.value = suggestedWeight; });
+                            repsInputs.forEach((input, i) => {
+                                const prevSeries = lastSessionData.series[i] || lastSet;
+                                if (prevSeries.reps) input.value = prevSeries.reps;
+                            });
+                        }
+                    }
                 }
             });
             loadProgress();
