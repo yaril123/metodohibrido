@@ -451,6 +451,19 @@
         </div>
     </div>
 
+    <!-- Modal Gráfico RM Expandido -->
+    <div id="e1rm-fullscreen-modal" class="modal fixed inset-0 bg-black bg-opacity-90 flex flex-col items-center justify-center hidden p-2 sm:p-6 z-[100]">
+        <div class="w-full max-w-6xl flex flex-col justify-between bg-zinc-900 rounded-lg border border-zinc-700 relative h-[80vh] shadow-lg">
+            <div class="w-full flex justify-between items-center p-4 border-b border-zinc-700 shrink-0">
+                <h2 id="e1rm-fullscreen-title" class="text-xl sm:text-2xl font-bold text-yellow-400"></h2>
+                <button id="close-e1rm-fullscreen" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+            </div>
+            <div class="w-full h-full min-h-0 relative p-4 bg-zinc-800 rounded-b-lg">
+                <canvas id="e1rmFullscreenCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -822,12 +835,12 @@
                 if (maxE1RM > 0) {
                     const canvasId = `e1rmChart-${exerciseName.replace(/[^a-zA-Z0-9]/g, '-')}`;
                     const cardHTML = `
-                        <div class="e1rm-card p-4">
+                        <div class="e1rm-card p-4 cursor-pointer hover:shadow-[0_0_15px_rgba(250,204,21,0.5)] transition-all transform hover:scale-[1.02]" onclick="if(window.openFullscreenE1RM) window.openFullscreenE1RM('${exerciseName}')">
                             <div class="flex justify-between items-center mb-4">
                                 <span class="e1rm-exercise-name">${exerciseName}</span>
                                 <span class="e1rm-weight">${maxE1RM.toFixed(1)} kg</span>
                             </div>
-                            <div style="height: 300px;">
+                            <div style="height: 300px;" class="pointer-events-none">
                                 <canvas id="${canvasId}"></canvas>
                             </div>
                         </div>
@@ -931,7 +944,12 @@
                 if (log.workoutTitle.includes("BILBO — PUSH")) {
                     const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
-                        const series = exercise.series[0];
+                        let series = exercise.series[0];
+                        exercise.series.forEach(s => {
+                            if ((parseInt(s.reps, 10) || 0) > (parseInt(series.reps, 10) || 0)) {
+                                series = s;
+                            }
+                        });
                         if (series.weight && series.reps) {
                             bilboPushData.push({
                                 x: new Date(log.date),
@@ -943,7 +961,12 @@
                 } else if (log.workoutTitle.includes("BILBO — PULL")) {
                     const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
-                        const series = exercise.series[0];
+                        let series = exercise.series[0];
+                        exercise.series.forEach(s => {
+                            if ((parseInt(s.reps, 10) || 0) > (parseInt(series.reps, 10) || 0)) {
+                                series = s;
+                            }
+                        });
                         if (series.weight && series.reps) {
                             bilboPullData.push({
                                 x: new Date(log.date),
@@ -985,10 +1008,63 @@
             hdPullChart = createProgressionChart('hdPullChartCanvas', hdPullChart, 'Progresión HD Pull (Jalón Neutro)', hdPullData);
         }
 
-        function createE1RMChart(canvasId, chartInstance, data, color) {
+        function createE1RMChart(canvasId, chartInstance, data, color, isFullscreen = false) {
             const ctx = document.getElementById(canvasId)?.getContext('2d');
             if (!ctx) return;
             if (chartInstance) chartInstance.destroy();
+
+            const options = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { display: false },
+                    legend: { display: false },
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        adapter: 'date-fns',
+                        time: { unit: 'day', tooltipFormat: 'dd/MM/yy' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#94a3b8', font: { size: isFullscreen ? 14 : 12 } },
+                    },
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#e5e7eb', font: { size: isFullscreen ? 14 : 12 } },
+                        title: { display: true, text: 'e1RM (kg)', color: '#e5e7eb', font: { size: isFullscreen ? 16 : 14 } }
+                    }
+                }
+            };
+
+            if (isFullscreen) {
+                options.plugins.tooltip = {
+                    backgroundColor: 'rgba(24, 24, 27, 0.95)',
+                    titleColor: '#facc15',
+                    bodyColor: '#e5e7eb',
+                    borderColor: color,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    titleFont: { size: 16, family: 'Inter', weight: 'bold' },
+                    bodyFont: { size: 14, family: 'Inter' },
+                    callbacks: {
+                        title: function(context) {
+                            const pt = context[0].raw;
+                            const dateStr = context[0].label;
+                            return `${dateStr}  |  RM: ${pt.y.toFixed(1)} kg`;
+                        },
+                        label: function(context) {
+                            const pt = context.raw;
+                            return [
+                                `Carga cogida: ${pt.rawWeight} kg`,
+                                `Repeticiones: ${pt.rawReps}`
+                            ];
+                        }
+                    }
+                };
+            }
 
             return new Chart(ctx, {
                 type: 'line',
@@ -998,35 +1074,14 @@
                         data: data,
                         borderColor: color,
                         backgroundColor: color,
-                        pointStyle: 'circle',
+                        pointStyle: isFullscreen ? 'rectRounded' : 'circle',
+                        pointRadius: isFullscreen ? 6 : 3,
+                        pointHoverRadius: isFullscreen ? 8 : 5,
                         tension: 0.1,
-                        borderWidth: 3
+                        borderWidth: isFullscreen ? 4 : 3
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: false },
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            adapter: 'date-fns',
-                            time: { unit: 'day', tooltipFormat: 'dd/MM/yy' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: '#94a3b8' },
-                        },
-                        y: {
-                            type: 'linear',
-                            position: 'left',
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: '#e5e7eb' },
-                            title: { display: true, text: 'e1RM (kg)', color: '#e5e7eb' }
-                        }
-                    }
-                }
+                options: options
             });
         }
 
@@ -1047,7 +1102,12 @@
                 if (!log.exercises || log.workoutType === 'rest') return;
 
                 const date = new Date(log.date);
-                let maxE1RM = { pressBanca: 0, jalonNeutro: 0, jalonEstrecho: 0, curlZ: 0 };
+                let maxE1RM = { 
+                    pressBanca: { e1rm: 0, weight: 0, reps: 0 }, 
+                    jalonNeutro: { e1rm: 0, weight: 0, reps: 0 }, 
+                    jalonEstrecho: { e1rm: 0, weight: 0, reps: 0 }, 
+                    curlZ: { e1rm: 0, weight: 0, reps: 0 } 
+                };
 
                 log.exercises.forEach(ex => {
                     let dataKey = null;
@@ -1058,24 +1118,35 @@
                     else if (normalizedName === exercisesToTrack.curlZ) dataKey = 'curlZ';
 
                     if (dataKey && Array.isArray(ex.series)) {
-                        let maxE1RMThisDay = 0;
+                        let maxE1RMThisDay = { e1rm: 0, weight: 0, reps: 0 };
                         ex.series.forEach(s => {
                             const weight = parseFloat(s.weight);
                             const reps = parseInt(s.reps, 10);
                             if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
                                 const e1rm = calculateLombardi(weight, reps);
-                                if (e1rm > maxE1RMThisDay) maxE1RMThisDay = e1rm;
+                                if (e1rm > maxE1RMThisDay.e1rm) {
+                                    maxE1RMThisDay = { e1rm: e1rm, weight: weight, reps: reps };
+                                }
                             }
                         });
-                        if (maxE1RMThisDay > maxE1RM[dataKey]) maxE1RM[dataKey] = maxE1RMThisDay;
+                        if (maxE1RMThisDay.e1rm > maxE1RM[dataKey].e1rm) {
+                            maxE1RM[dataKey] = maxE1RMThisDay;
+                        }
                     }
                 });
 
-                if (maxE1RM.pressBanca > 0) data.pressBanca.push({ x: date, y: maxE1RM.pressBanca });
-                if (maxE1RM.jalonNeutro > 0) data.jalonNeutro.push({ x: date, y: maxE1RM.jalonNeutro });
-                if (maxE1RM.jalonEstrecho > 0) data.jalonEstrecho.push({ x: date, y: maxE1RM.jalonEstrecho });
-                if (maxE1RM.curlZ > 0) data.curlZ.push({ x: date, y: maxE1RM.curlZ });
+                if (maxE1RM.pressBanca.e1rm > 0) data.pressBanca.push({ x: date, y: maxE1RM.pressBanca.e1rm, rawWeight: maxE1RM.pressBanca.weight, rawReps: maxE1RM.pressBanca.reps });
+                if (maxE1RM.jalonNeutro.e1rm > 0) data.jalonNeutro.push({ x: date, y: maxE1RM.jalonNeutro.e1rm, rawWeight: maxE1RM.jalonNeutro.weight, rawReps: maxE1RM.jalonNeutro.reps });
+                if (maxE1RM.jalonEstrecho.e1rm > 0) data.jalonEstrecho.push({ x: date, y: maxE1RM.jalonEstrecho.e1rm, rawWeight: maxE1RM.jalonEstrecho.weight, rawReps: maxE1RM.jalonEstrecho.reps });
+                if (maxE1RM.curlZ.e1rm > 0) data.curlZ.push({ x: date, y: maxE1RM.curlZ.e1rm, rawWeight: maxE1RM.curlZ.weight, rawReps: maxE1RM.curlZ.reps });
             });
+
+            window.e1rmDataStore = {
+                [exercisesToTrack.pressBanca]: { data: data.pressBanca, color: '#3b82f6' },
+                [exercisesToTrack.jalonNeutro]: { data: data.jalonNeutro, color: '#06b6d4' },
+                [exercisesToTrack.jalonEstrecho]: { data: data.jalonEstrecho, color: '#67e8f9' },
+                [exercisesToTrack.curlZ]: { data: data.curlZ, color: '#e5e7eb' }
+            };
 
             e1rmChartPressBanca = createE1RMChart(`e1rmChart-${exercisesToTrack.pressBanca.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartPressBanca, data.pressBanca, '#3b82f6');
             e1rmChartJalonNeutro = createE1RMChart(`e1rmChart-${exercisesToTrack.jalonNeutro.replace(/[^a-zA-Z0-9]/g, '-')}`, e1rmChartJalonNeutro, data.jalonNeutro, '#06b6d4');
@@ -1240,10 +1311,31 @@
             }
         }
 
+        let fullscreenE1RMChart = null;
+
+        window.openFullscreenE1RM = function(exerciseName) {
+            if (!window.e1rmDataStore) return;
+            const exerciseData = window.e1rmDataStore[exerciseName];
+            if (!exerciseData) return;
+
+            document.getElementById('e1rm-fullscreen-title').textContent = exerciseName;
+            document.getElementById('e1rm-fullscreen-modal').classList.remove('hidden');
+
+            fullscreenE1RMChart = createE1RMChart('e1rmFullscreenCanvas', fullscreenE1RMChart, exerciseData.data, exerciseData.color, true);
+        };
+
         function setupEventListeners() {
             if (DOM.prevMonthBtn) DOM.prevMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() - 1); renderCalendar(); });
             if (DOM.nextMonthBtn) DOM.nextMonthBtn.addEventListener('click', () => { state.currentDate.setMonth(state.currentDate.getMonth() + 1); renderCalendar(); });
             if (DOM.closeHistoryModalBtn) DOM.closeHistoryModalBtn.addEventListener('click', () => DOM.historyModal.classList.add('hidden'));
+            
+            const closeE1RmFullscreenBtn = document.getElementById('close-e1rm-fullscreen');
+            if (closeE1RmFullscreenBtn) {
+                closeE1RmFullscreenBtn.addEventListener('click', () => {
+                    document.getElementById('e1rm-fullscreen-modal').classList.add('hidden');
+                });
+            }
+
             if (DOM.calendarGrid) {
                 DOM.calendarGrid.addEventListener('click', (e) => {
                     const dayCell = e.target.closest('.calendar-day');
