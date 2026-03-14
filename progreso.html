@@ -590,13 +590,24 @@
             return parseFloat(weight) * Math.pow(parseFloat(reps), 0.10);
         }
 
+        function normalizeExerciseName(name) {
+            const map = {
+                "Press de banca plano (barra)": "Press de Banca Plano con Barra",
+                "Curl en barra Z": "Curl con Barra Z",
+                "Jalón en polea agarre neutro": "Jalón en Polea al Pecho (Agarre Neutro)",
+                "Jalón al pecho agarre estrecho": "Jalón al Pecho (Agarre Estrecho)",
+                "Press inclinado con barra": "Press Inclinado con Barra"
+            };
+            return map[name] || name;
+        }
+
         function calculateAllEstimated1RMs() {
             const history = getAppData('workoutHistory');
             const exercisesToTrack = [
-                "Press de banca plano (barra)",
-                "Curl en barra Z",
-                "Jalón en polea agarre neutro",
-                "Jalón al pecho agarre estrecho"
+                "Press de Banca Plano con Barra",
+                "Curl con Barra Z",
+                "Jalón en Polea al Pecho (Agarre Neutro)",
+                "Jalón al Pecho (Agarre Estrecho)"
             ];
             const e1rmMap = new Map();
 
@@ -604,15 +615,16 @@
                 const log = history[date];
                 if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
                     log.exercises.forEach(ex => {
-                        if (exercisesToTrack.includes(ex.name) && Array.isArray(ex.series)) {
+                        const normalizedName = normalizeExerciseName(ex.name);
+                        if (exercisesToTrack.includes(normalizedName) && Array.isArray(ex.series)) {
                             ex.series.forEach(s => {
                                 const weight = parseFloat(s.weight);
                                 const reps = parseInt(s.reps, 10);
                                 if (!isNaN(weight) && !isNaN(reps) && reps > 0 && weight > 0) {
                                     const e1rm = calculateLombardi(weight, reps);
-                                    const currentMax = e1rmMap.get(ex.name) || 0;
+                                    const currentMax = e1rmMap.get(normalizedName) || 0;
                                     if (e1rm > currentMax) {
-                                        e1rmMap.set(ex.name, e1rm);
+                                        e1rmMap.set(normalizedName, e1rm);
                                     }
                                 }
                             });
@@ -630,7 +642,7 @@
             days.forEach((day) => {
                 const workout = workouts[day];
                 if (workout.type !== 'rest') {
-                    workout.exercises.forEach(ex => allExerciseNames.add(ex.name));
+                    workout.exercises.forEach(ex => allExerciseNames.add(normalizeExerciseName(ex.name)));
                 }
             });
 
@@ -638,13 +650,14 @@
                 const log = history[date];
                 if (log && Array.isArray(log.exercises) && log.workoutType !== 'rest') {
                     log.exercises.forEach(ex => {
+                        const normalizedName = normalizeExerciseName(ex.name);
                         if (Array.isArray(ex.series)) {
                             ex.series.forEach(s => {
                                 const weight = parseFloat(s.weight);
                                 if (!isNaN(weight)) {
-                                    const currentMax = maxRepMap.get(ex.name) || 0;
+                                    const currentMax = maxRepMap.get(normalizedName) || 0;
                                     if (weight > currentMax) {
-                                        maxRepMap.set(ex.name, weight);
+                                        maxRepMap.set(normalizedName, weight);
                                     }
                                 }
                             });
@@ -798,10 +811,10 @@
             if (!DOM.e1rmList) return;
             DOM.e1rmList.innerHTML = '';
             const exercisesToTrack = [
-                "Press de banca plano (barra)",
-                "Jalón en polea agarre neutro",
-                "Jalón al pecho agarre estrecho",
-                "Curl en barra Z"
+                "Press de Banca Plano con Barra",
+                "Jalón en Polea al Pecho (Agarre Neutro)",
+                "Jalón al Pecho (Agarre Estrecho)",
+                "Curl con Barra Z"
             ];
 
             exercisesToTrack.forEach(exerciseName => {
@@ -907,16 +920,16 @@
             const hdPushData = [];
             const hdPullData = [];
 
-            const bilboPushExercise = "Press de banca plano (barra)";
-            const bilboPullExercise = "Jalón al pecho agarre estrecho";
-            const hdPushExercise = "Press inclinado con barra";
-            const hdPullExercise = "Jalón en polea agarre neutro";
+            const bilboPushExercise = "Press de Banca Plano con Barra";
+            const bilboPullExercise = "Jalón al Pecho (Agarre Estrecho)";
+            const hdPushExercise = "Press Inclinado con Barra";
+            const hdPullExercise = "Jalón en Polea al Pecho (Agarre Neutro)";
 
             sortedEntries.forEach(log => {
                 if (!log.exercises) return;
 
                 if (log.workoutTitle.includes("BILBO — PUSH")) {
-                    const exercise = log.exercises.find(ex => ex.name === bilboPushExercise);
+                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
@@ -928,7 +941,7 @@
                         }
                     }
                 } else if (log.workoutTitle.includes("BILBO — PULL")) {
-                    const exercise = log.exercises.find(ex => ex.name === bilboPullExercise);
+                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const series = exercise.series[0];
                         if (series.weight && series.reps) {
@@ -940,7 +953,7 @@
                         }
                     }
                 } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
-                    const exercise = log.exercises.find(ex => ex.name === hdPushExercise);
+                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === hdPushExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
@@ -952,7 +965,7 @@
                         }
                     }
                 } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
-                    const exercise = log.exercises.find(ex => ex.name === hdPullExercise);
+                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === hdPullExercise);
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
@@ -1022,10 +1035,10 @@
             const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const exercisesToTrack = {
-                pressBanca: "Press de banca plano (barra)",
-                jalonNeutro: "Jalón en polea agarre neutro",
-                jalonEstrecho: "Jalón al pecho agarre estrecho",
-                curlZ: "Curl en barra Z"
+                pressBanca: "Press de Banca Plano con Barra",
+                jalonNeutro: "Jalón en Polea al Pecho (Agarre Neutro)",
+                jalonEstrecho: "Jalón al Pecho (Agarre Estrecho)",
+                curlZ: "Curl con Barra Z"
             };
 
             const data = { pressBanca: [], jalonNeutro: [], jalonEstrecho: [], curlZ: [] };
@@ -1038,10 +1051,11 @@
 
                 log.exercises.forEach(ex => {
                     let dataKey = null;
-                    if (ex.name === exercisesToTrack.pressBanca) dataKey = 'pressBanca';
-                    else if (ex.name === exercisesToTrack.jalonNeutro) dataKey = 'jalonNeutro';
-                    else if (ex.name === exercisesToTrack.jalonEstrecho) dataKey = 'jalonEstrecho';
-                    else if (ex.name === exercisesToTrack.curlZ) dataKey = 'curlZ';
+                    const normalizedName = normalizeExerciseName(ex.name);
+                    if (normalizedName === exercisesToTrack.pressBanca) dataKey = 'pressBanca';
+                    else if (normalizedName === exercisesToTrack.jalonNeutro) dataKey = 'jalonNeutro';
+                    else if (normalizedName === exercisesToTrack.jalonEstrecho) dataKey = 'jalonEstrecho';
+                    else if (normalizedName === exercisesToTrack.curlZ) dataKey = 'curlZ';
 
                     if (dataKey && Array.isArray(ex.series)) {
                         let maxE1RMThisDay = 0;
