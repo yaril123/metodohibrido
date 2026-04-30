@@ -336,7 +336,7 @@
              */
             function getWorkoutDataSummary() {
                 try {
-                    const historyString = localStorage.getItem('workoutHistory') || '{}';
+                    const historyString = localStorage.getItem('fem_workoutHistory') || '{}';
                     const history = JSON.parse(historyString);
                     
                     const e1rms = calculateAllEstimated1RMs(history);

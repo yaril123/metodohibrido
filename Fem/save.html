@@ -62,7 +62,7 @@
 
     <script>
         // La clave de localStorage que vamos a manipular
-        const STORAGE_KEY = 'workoutHistory';
+        const STORAGE_KEY = 'fem_workoutHistory';
 
         // Obtener referencias a los elementos del DOM
         const dataTextarea = document.getElementById('workoutData');
@@ -130,7 +130,7 @@
             const dataToSave = dataTextarea.value;
             if (dataToSave.trim() === '') {
                 // Si el usuario deja el área vacía, preguntamos si quiere borrar
-                if (window.confirm("El área de texto está vacía. ¿Quieres eliminar la clave 'workoutHistory' de localStorage?")) {
+                if (window.confirm("El área de texto está vacía. ¿Quieres eliminar la clave 'fem_workoutHistory' de localStorage?")) {
                     localStorage.removeItem(STORAGE_KEY);
                     dataTextarea.placeholder = 'La clave ' + STORAGE_KEY + ' ha sido eliminada.';
                     updateMessage(`Clave "${STORAGE_KEY}" eliminada exitosamente.`, 'success');
@@ -148,7 +148,7 @@
         }
         
         /**
-         * Elimina la clave 'workoutHistory' de localStorage.
+         * Elimina la clave 'fem_workoutHistory' de localStorage.
          */
         function clearHistory() {
             // Utilizamos confirm() como método simple para requerir la confirmación del usuario

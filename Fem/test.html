@@ -311,7 +311,7 @@
 
             // --- Cargar Historial de Tests ---
             function loadTestHistory() {
-                const history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
+                const history = JSON.parse(localStorage.getItem('fem_workoutHistory')) || {};
                 const historyContent = document.getElementById('test-history-content');
                 if (!historyContent) return;
 
@@ -414,7 +414,7 @@
                         const today = new Date();
                         // Creamos una clave única para el test
                         const testKey = `${today.toISOString()}_TEST`;
-                        let history = JSON.parse(localStorage.getItem('workoutHistory')) || {};
+                        let history = JSON.parse(localStorage.getItem('fem_workoutHistory')) || {};
 
                         const logEntry = {
                             date: today.toISOString().split('T')[0],
@@ -425,7 +425,7 @@
                         };
 
                         history[testKey] = logEntry;
-                        localStorage.setItem('workoutHistory', JSON.stringify(history));
+                        localStorage.setItem('fem_workoutHistory', JSON.stringify(history));
 
                         // Actualizar el historial visible en la página
                         loadTestHistory();

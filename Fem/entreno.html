@@ -831,7 +831,7 @@
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
-        const appId = 'metodo-hibrido-data';
+        const appId = 'metodo-hibrido-fem-data';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
@@ -936,27 +936,27 @@
         // Carga todos los datos relevantes de localStorage
         function loadAllLocalData() {
             return {
-                workoutHistory: loadLocalData('workoutHistory') || {},
-                progressionFlags: loadLocalData('progressionFlags') || {},
-                bilboCycleCount: localStorage.getItem('bilboCycleCount') || '1',
-                bilboPushCycleEnded: localStorage.getItem('bilboPushCycleEnded') || 'false',
-                bilboPullCycleEnded: localStorage.getItem('bilboPullCycleEnded') || 'false',
-                bilboResetFlags: loadLocalData('bilboResetFlags') || {},
-                workoutProgress: loadLocalData('workoutProgress') || null,
-                compactMode: localStorage.getItem('compactMode') === 'true'
+                workoutHistory: loadLocalData('fem_workoutHistory') || {},
+                progressionFlags: loadLocalData('fem_progressionFlags') || {},
+                bilboCycleCount: localStorage.getItem('fem_bilboCycleCount') || '1',
+                bilboPushCycleEnded: localStorage.getItem('fem_bilboPushCycleEnded') || 'false',
+                bilboPullCycleEnded: localStorage.getItem('fem_bilboPullCycleEnded') || 'false',
+                bilboResetFlags: loadLocalData('fem_bilboResetFlags') || {},
+                workoutProgress: loadLocalData('fem_workoutProgress') || null,
+                compactMode: localStorage.getItem('fem_compactMode') === 'true'
             };
         }
 
         // Guarda todos los datos relevantes a localStorage (para modo invitado)
         function saveAllLocalData(updatedAppData) {
-            saveLocalData('workoutHistory', updatedAppData.workoutHistory);
-            saveLocalData('progressionFlags', updatedAppData.progressionFlags);
-            localStorage.setItem('bilboCycleCount', updatedAppData.bilboCycleCount);
-            localStorage.setItem('bilboPushCycleEnded', updatedAppData.bilboPushCycleEnded);
-            localStorage.setItem('bilboPullCycleEnded', updatedAppData.bilboPullCycleEnded);
-            saveLocalData('bilboResetFlags', updatedAppData.bilboResetFlags);
-            saveLocalData('workoutProgress', updatedAppData.workoutProgress);
-            localStorage.setItem('compactMode', updatedAppData.compactMode);
+            saveLocalData('fem_workoutHistory', updatedAppData.workoutHistory);
+            saveLocalData('fem_progressionFlags', updatedAppData.progressionFlags);
+            localStorage.setItem('fem_bilboCycleCount', updatedAppData.bilboCycleCount);
+            localStorage.setItem('fem_bilboPushCycleEnded', updatedAppData.bilboPushCycleEnded);
+            localStorage.setItem('fem_bilboPullCycleEnded', updatedAppData.bilboPullCycleEnded);
+            saveLocalData('fem_bilboResetFlags', updatedAppData.bilboResetFlags);
+            saveLocalData('fem_workoutProgress', updatedAppData.workoutProgress);
+            localStorage.setItem('fem_compactMode', updatedAppData.compactMode);
         }
 
         // Escribe todos los datos al documento de Firebase (documento 'data' en colección 'entreno')
@@ -976,7 +976,7 @@
         // Función para obtener datos: Abstracta el origen (Firebase o local)
         function getAppData(key) {
             // Caso especial para el progreso diario (es dependiente de la fecha)
-            if (key === 'workoutProgress') {
+            if (key === 'fem_workoutProgress') {
                 const todayStr = getTodayDateString();
                 const progress = appData.workoutProgress || null;
                 // Devolvemos el progreso solo si la fecha coincide con hoy
@@ -1088,7 +1088,7 @@
             generateWorkoutHTML();
 
             // 3. Cargar el estado del modo compacto
-            const isCompact = getAppData('compactMode');
+            const isCompact = getAppData('fem_compactMode');
             document.body.classList.toggle('compact-mode', isCompact);
             if (DOM.compactModeToggle) {
                 DOM.compactModeToggle.checked = isCompact;
@@ -1096,7 +1096,7 @@
 
             // 4. Determinar el día a cargar
             let dayToLoad = days[0];
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const sortedDates = Object.keys(history).sort().reverse();
 
             if (sortedDates.length > 0) {
@@ -1364,7 +1364,7 @@
             document.getElementById(dayToShow)?.classList.remove('hidden');
 
             const workoutInfo = workouts[dayToShow];
-            const bilboCycleCount = getAppData('bilboCycleCount'); // Usa getAppData
+            const bilboCycleCount = getAppData('fem_bilboCycleCount'); // Usa getAppData
             let subtitleHTML = '';
 
             if (dayToShow.includes('hd')) {
@@ -1518,11 +1518,11 @@
                     progress.workouts[day][exIndex] = { completed: isCompleted, weights: weights, reps: reps, dropsets: dropsets };
                 });
             });
-            setAppData('workoutProgress', progress); // Usa setAppData
+            setAppData('fem_workoutProgress', progress); // Usa setAppData
         }
 
         function loadProgress() {
-            const progress = getAppData('workoutProgress'); // Usa getAppData
+            const progress = getAppData('fem_workoutProgress'); // Usa getAppData
             if (!progress || progress.date !== getTodayDateString()) {
                 return;
             }
@@ -1574,25 +1574,25 @@
         }
 
         function approveWeightIncrease() {
-            let flags = getAppData('progressionFlags'); // Usa getAppData
+            let flags = getAppData('fem_progressionFlags'); // Usa getAppData
             flags[currentExerciseNameForModal] = true;
-            setAppData('progressionFlags', flags); // Usa setAppData
+            setAppData('fem_progressionFlags', flags); // Usa setAppData
             DOM.progressionModal.classList.add('hidden');
             currentExerciseNameForModal = null;
         }
 
         function denyWeightIncrease() {
-            let flags = getAppData('progressionFlags'); // Usa getAppData
+            let flags = getAppData('fem_progressionFlags'); // Usa getAppData
             flags[currentExerciseNameForModal] = false;
-            setAppData('progressionFlags', flags); // Usa setAppData
+            setAppData('fem_progressionFlags', flags); // Usa setAppData
             DOM.progressionModal.classList.add('hidden');
             currentExerciseNameForModal = null;
         }
 
         function closeBilboCycleModal() {
-            let flags = getAppData('bilboResetFlags'); // Usa getAppData
+            let flags = getAppData('fem_bilboResetFlags'); // Usa getAppData
             flags[currentExerciseNameForModal] = true; // Set reset flag
-            setAppData('bilboResetFlags', flags); // Usa setAppData
+            setAppData('fem_bilboResetFlags', flags); // Usa setAppData
             DOM.bilboCycleModal.classList.add('hidden');
             currentExerciseNameForModal = null;
         }
@@ -1707,9 +1707,9 @@
             if (dayTrained) {
                 const workoutType = workouts[dayTrained].type;
                 const workoutTitle = workouts[dayTrained].title;
-                let history = getAppData('workoutHistory');
-                let progressionFlags = getAppData('progressionFlags');
-                let bilboResetFlags = getAppData('bilboResetFlags');
+                let history = getAppData('fem_workoutHistory');
+                let progressionFlags = getAppData('fem_progressionFlags');
+                let bilboResetFlags = getAppData('fem_bilboResetFlags');
 
                 let logEntry = {
                     date: todayStr,
@@ -1720,35 +1720,35 @@
                 };
 
                 history[todayStr] = logEntry;
-                setAppData('workoutHistory', history);
+                setAppData('fem_workoutHistory', history);
 
                 if (isBilboDay) {
-                    let currentBilboCycle = parseInt(getAppData('bilboCycleCount'));
-                    let bilboPushCompleted = getAppData('bilboPushCycleEnded') === 'true';
-                    let bilboPullCompleted = getAppData('bilboPullCycleEnded') === 'true';
+                    let currentBilboCycle = parseInt(getAppData('fem_bilboCycleCount'));
+                    let bilboPushCompleted = getAppData('fem_bilboPushCycleEnded') === 'true';
+                    let bilboPullCompleted = getAppData('fem_bilboPullCycleEnded') === 'true';
 
                     logEntry.bilboCycle = currentBilboCycle; // Añadir ciclo al log
 
                     if (dayTrained === 'bilbo_push' && bilboResets.length > 0) {
-                        setAppData('bilboPushCycleEnded', 'true');
+                        setAppData('fem_bilboPushCycleEnded', 'true');
                         bilboPushCompleted = true;
                     } else if (dayTrained === 'bilbo_pull' && bilboResets.length > 0) {
-                        setAppData('bilboPullCycleEnded', 'true');
+                        setAppData('fem_bilboPullCycleEnded', 'true');
                         bilboPullCompleted = true;
                     }
 
                     if (bilboPushCompleted && bilboPullCompleted) {
                         currentBilboCycle++;
-                        setAppData('bilboCycleCount', currentBilboCycle.toString());
-                        setAppData('bilboPushCycleEnded', 'false');
-                        setAppData('bilboPullCycleEnded', 'false');
+                        setAppData('fem_bilboCycleCount', currentBilboCycle.toString());
+                        setAppData('fem_bilboPushCycleEnded', 'false');
+                        setAppData('fem_bilboPullCycleEnded', 'false');
                         console.log("Bilbo Cycle Completed! Moving to cycle:", currentBilboCycle);
                     }
                 }
 
                 // Guardar flags actualizados (necesarios para el modal y la próxima carga)
-                setAppData('progressionFlags', progressionFlags);
-                setAppData('bilboResetFlags', bilboResetFlags);
+                setAppData('fem_progressionFlags', progressionFlags);
+                setAppData('fem_bilboResetFlags', bilboResetFlags);
 
                 showNotification("Entrenamiento guardado con exito!!!");
             } else {
@@ -1791,9 +1791,9 @@
                                 nextWeight = 20; // Fallback
                             }
 
-                            let flags = getAppData('bilboResetFlags');
+                            let flags = getAppData('fem_bilboResetFlags');
                             flags[name] = true;
-                            setAppData('bilboResetFlags', flags);
+                            setAppData('fem_bilboResetFlags', flags);
 
                             detailsHTML += `<div class="flex justify-between"><span>${name}:</span> <span class="text-yellow-400 font-bold">~${nextWeight.toFixed(1)} kg</span></div>`;
                         });
@@ -1804,7 +1804,7 @@
                     } else {
                         // Standard reset logic
                         const exerciseName = bilboResets[0].name;
-                        const newCycle = parseInt(getAppData('bilboCycleCount'));
+                        const newCycle = parseInt(getAppData('fem_bilboCycleCount'));
                         const newWeight = (e1rmMap.get(exerciseName) || 40) * 0.5;
                         showBilboCycleModal(exerciseName, newCycle, newWeight);
                     }
@@ -1814,7 +1814,7 @@
 
 
         function loadLastPerformance(e1rmMap) {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             // Robust date sorting
             const sortedDates = Object.keys(history).sort((a, b) => {
                 const dateA = new Date(history[a].date || a);
@@ -1822,8 +1822,8 @@
                 return dateB - dateA;
             });
 
-            let progressionFlags = getAppData('progressionFlags');
-            let bilboResetFlags = getAppData('bilboResetFlags');
+            let progressionFlags = getAppData('fem_progressionFlags');
+            let bilboResetFlags = getAppData('fem_bilboResetFlags');
 
             // Custom Rounding Function
             const roundWeight = (val) => {
@@ -2061,7 +2061,7 @@
                                 const e1rm = e1rmMap.get(exerciseName) || 0;
                                 if (e1rm > 0) newBilboWeight = e1rm * 0.5;
                                 bilboResetFlags[exerciseName] = false;
-                                setAppData('bilboResetFlags', bilboResetFlags);
+                                setAppData('fem_bilboResetFlags', bilboResetFlags);
                             }
 
                             inputs.forEach((input, i) => {
@@ -2122,7 +2122,7 @@
         }
 
         function calculateAllEstimated1RMs() {
-            const history = getAppData('workoutHistory'); // Usa getAppData
+            const history = getAppData('fem_workoutHistory'); // Usa getAppData
             // Aliases: Map Legacy Name -> New Name (to ensure new logic finds the RM under the new key)
             const aliases = {
                 "Press de banca plano (barra)": "Press de Banca Plano con Barra",
@@ -2177,7 +2177,7 @@
         let currentEditDate = null;
 
         function renderHistoryList() {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const container = document.getElementById('history-list-view');
             container.innerHTML = '';
 
@@ -2206,7 +2206,7 @@
 
         function loadWorkoutForEdit(date) {
             currentEditDate = date;
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const log = history[date];
             const container = document.getElementById('edit-workout-container');
 
@@ -2253,7 +2253,7 @@
 
         function saveHistoryChanges() {
             if (!currentEditDate) return;
-            let history = getAppData('workoutHistory');
+            let history = getAppData('fem_workoutHistory');
             const log = history[currentEditDate];
             const container = document.getElementById('edit-workout-container');
 
@@ -2280,7 +2280,7 @@
 
             // Persist
             history[currentEditDate] = log;
-            setAppData('workoutHistory', history);
+            setAppData('fem_workoutHistory', history);
             showNotification('Cambios guardados');
 
             // Recalculate RMs just in case
@@ -2293,9 +2293,9 @@
         function deleteHistoryEntry() {
             if (!currentEditDate) return;
             if (confirm("¿Estás seguro de que quieres eliminar este entreno del registro?")) {
-                let history = getAppData('workoutHistory');
+                let history = getAppData('fem_workoutHistory');
                 delete history[currentEditDate];
-                setAppData('workoutHistory', history);
+                setAppData('fem_workoutHistory', history);
                 showNotification('Entreno eliminado');
 
                 // Recalculate
@@ -2433,10 +2433,10 @@
 
             if (DOM.resetCycleBtn) {
                 DOM.resetCycleBtn.addEventListener('click', () => {
-                    setAppData('bilboCycleCount', '1');
-                    setAppData('bilboPushCycleEnded', 'false');
-                    setAppData('bilboPullCycleEnded', 'false');
-                    setAppData('bilboResetFlags', {});
+                    setAppData('fem_bilboCycleCount', '1');
+                    setAppData('fem_bilboPushCycleEnded', 'false');
+                    setAppData('fem_bilboPullCycleEnded', 'false');
+                    setAppData('fem_bilboResetFlags', {});
                     showNotification('Ciclo Bilbo reiniciado a 1');
                     DOM.settingsModal.classList.add('hidden');
                     const activeDay = document.querySelector('.day-nav-button.active')?.dataset.day;
@@ -2473,13 +2473,13 @@
                     const btn = e.target;
                     if (btn.dataset.confirm === 'true') {
                         // Resetear todos los datos de la aplicación
-                        setAppData('workoutHistory', {});
-                        setAppData('progressionFlags', {});
-                        setAppData('workoutProgress', null);
-                        setAppData('bilboCycleCount', '1');
-                        setAppData('bilboPushCycleEnded', 'false');
-                        setAppData('bilboPullCycleEnded', 'false');
-                        setAppData('bilboResetFlags', {});
+                        setAppData('fem_workoutHistory', {});
+                        setAppData('fem_progressionFlags', {});
+                        setAppData('fem_workoutProgress', null);
+                        setAppData('fem_bilboCycleCount', '1');
+                        setAppData('fem_bilboPushCycleEnded', 'false');
+                        setAppData('fem_bilboPullCycleEnded', 'false');
+                        setAppData('fem_bilboResetFlags', {});
 
                         showNotification('Historial borrado');
                         DOM.settingsModal.classList.add('hidden');
@@ -2504,7 +2504,7 @@
                 DOM.compactModeToggle.addEventListener('change', (e) => {
                     const isChecked = e.target.checked;
                     document.body.classList.toggle('compact-mode', isChecked);
-                    setAppData('compactMode', isChecked);
+                    setAppData('fem_compactMode', isChecked);
                 });
             }
         }
@@ -2559,7 +2559,7 @@
         }
 
         if (firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
+            const app = initializeApp(firebaseConfig, 'FemApp');
             db = getFirestore(app);
             auth = getAuth(app);
 

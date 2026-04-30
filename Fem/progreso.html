@@ -471,7 +471,7 @@
         import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- CONFIGURACIÓN FIREBASE (MANDATORIO) ---
-        const appId = 'metodo-hibrido-data';
+        const appId = 'metodo-hibrido-fem-data';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBghFB_ziORhQHvrkQT08iwoh-N8CJKYpg",
@@ -568,7 +568,7 @@
 
         function loadAllLocalData() {
             return {
-                workoutHistory: loadLocalData('workoutHistory') || {},
+                workoutHistory: loadLocalData('fem_workoutHistory') || {},
             };
         }
 
@@ -588,7 +588,7 @@
             } catch (e) {
                 console.error("Error guardando en Firestore:", e);
                 // Fallback local si falla la red
-                localStorage.setItem('workoutHistory', JSON.stringify(data.workoutHistory));
+                localStorage.setItem('fem_workoutHistory', JSON.stringify(data.workoutHistory));
             }
         }
 
@@ -616,7 +616,7 @@
         }
 
         function calculateAllEstimated1RMs() {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const exercisesToTrack = [
                 "Press de Banca Plano con Barra",
                 "Curl con Barra Z",
@@ -650,7 +650,7 @@
         }
 
         function calculateAllMaxReps() {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const maxRepMap = new Map();
 
             days.forEach((day) => {
@@ -688,7 +688,7 @@
             DOM.calendarGrid.innerHTML = '';
             const year = state.currentDate.getFullYear();
             const month = state.currentDate.getMonth();
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const todayStr = getTodayDateString();
 
             DOM.monthYearEl.textContent = `${state.currentDate.toLocaleString('es-ES', { month: 'long' })} ${year}`;
@@ -926,7 +926,7 @@
         }
 
         function renderProgressionCharts() {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const bilboPushData = [];
@@ -1087,7 +1087,7 @@
         }
 
         function renderE1RMCharts() {
-            const history = getAppData('workoutHistory');
+            const history = getAppData('fem_workoutHistory');
             const sortedEntries = Object.values(history).sort((a, b) => new Date(a.date) - new Date(b.date));
 
             const exercisesToTrack = {
@@ -1341,7 +1341,7 @@
                 DOM.calendarGrid.addEventListener('click', (e) => {
                     const dayCell = e.target.closest('.calendar-day');
                     if (dayCell && dayCell.dataset.date) {
-                        const history = getAppData('workoutHistory');
+                        const history = getAppData('fem_workoutHistory');
                         const workout = history[dayCell.dataset.date];
                         if (workout) showWorkoutDetails(workout);
                     }
@@ -1432,7 +1432,7 @@
         }
 
         if (firebaseConfig.apiKey) {
-            const app = initializeApp(firebaseConfig);
+            const app = initializeApp(firebaseConfig, 'FemApp');
             db = getFirestore(app);
             auth = getAuth(app);
 

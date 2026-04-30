@@ -459,11 +459,11 @@
     };
 
 
-    const app = initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig, 'FemApp');
     const auth = getAuth(app);
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
-    const APP_STORAGE_ID = 'metodo-hibrido-data';
+    const APP_STORAGE_ID = 'metodo-hibrido-fem-data';
 
     // Elementos UI
     const profileTrigger = document.getElementById('profileTrigger');
@@ -564,7 +564,7 @@
         await setDoc(userDocRef, allData);
 
         // IMPORTANTE: Guardar también en localStorage que estamos actualizados
-        localStorage.setItem('lastUpdated', allData.lastUpdated);
+        localStorage.setItem('fem_lastUpdated', allData.lastUpdated);
 
         lastSyncedData = getLocalStorageString(); // Actualizamos referencia
         setStatus('synced');
@@ -587,7 +587,7 @@
 
         if (docSnap.exists()) {
           const cloudData = docSnap.data();
-          const localTimestampStr = localStorage.getItem('lastUpdated');
+          const localTimestampStr = localStorage.getItem('fem_lastUpdated');
 
           let cloudTime = 0;
           let localTime = 0;
@@ -616,7 +616,7 @@
             const keysToRemove = [];
             for (let i = 0; i < localStorage.length; i++) {
               const key = localStorage.key(i);
-              if (!key.startsWith('firebase:') && !cloudData.hasOwnProperty(key) && key !== 'lastUpdated') {
+              if (!key.startsWith('firebase:') && !cloudData.hasOwnProperty(key) && key !== 'fem_lastUpdated') {
                 keysToRemove.push(key);
               }
             }

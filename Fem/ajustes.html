@@ -276,33 +276,33 @@
             }
 
             // --- Cargar Estado Inicial de Preferencias ---
-            const isCompact = localStorage.getItem('compactMode') === 'true';
+            const isCompact = localStorage.getItem('fem_compactMode') === 'true';
             compactModeToggle.checked = isCompact;
 
-            const areTimerSoundsOn = localStorage.getItem('timerSounds') !== 'false'; // <-- NUEVO (default a 'true')
+            const areTimerSoundsOn = localStorage.getItem('fem_timerSounds') !== 'false'; // <-- NUEVO (default a 'true')
             timerSoundsToggle.checked = areTimerSoundsOn; // <-- NUEVO
 
             // --- Listeners ---
 
             // Modo Compacto
             compactModeToggle.addEventListener('change', (e) => {
-                localStorage.setItem('compactMode', e.target.checked);
+                localStorage.setItem('fem_compactMode', e.target.checked);
                 showNotification(`Modo Compacto ${e.target.checked ? 'activado' : 'desactivado'}`);
             });
 
             // NUEVO: Sonidos del Temporizador
             timerSoundsToggle.addEventListener('change', (e) => {
-                localStorage.setItem('timerSounds', e.target.checked);
+                localStorage.setItem('fem_timerSounds', e.target.checked);
                 showNotification(`Sonidos del temporizador ${e.target.checked ? 'activados' : 'desactivados'}`);
             });
 
             // Reiniciar Ciclo Bilbo
             resetCycleBtn.addEventListener('click', () => {
                 if (confirm('¿Estás seguro de que quieres reiniciar el conteo de ciclos de Bilbo a 1?')) {
-                    localStorage.setItem('bilboCycleCount', '1');
-                    localStorage.setItem('bilboPushCycleEnded', 'false');
-                    localStorage.setItem('bilboPullCycleEnded', 'false');
-                    localStorage.setItem('bilboResetFlags', JSON.stringify({})); // Limpiar flags de reseteo
+                    localStorage.setItem('fem_bilboCycleCount', '1');
+                    localStorage.setItem('fem_bilboPushCycleEnded', 'false');
+                    localStorage.setItem('fem_bilboPullCycleEnded', 'false');
+                    localStorage.setItem('fem_bilboResetFlags', JSON.stringify({})); // Limpiar flags de reseteo
                     showNotification('Ciclo Bilbo reiniciado a 1');
                 }
             });
@@ -322,15 +322,15 @@
                 if (confirmation === 'BORRAR') {
                     try {
                         // Borrar todo lo relacionado con el historial y la progresión
-                        localStorage.removeItem('workoutHistory');
-                        localStorage.removeItem('progressionFlags');
-                        localStorage.removeItem('workoutProgress');
-                        localStorage.removeItem('bilboResetFlags');
+                        localStorage.removeItem('fem_workoutHistory');
+                        localStorage.removeItem('fem_progressionFlags');
+                        localStorage.removeItem('fem_workoutProgress');
+                        localStorage.removeItem('fem_bilboResetFlags');
 
                         // Resetear el ciclo Bilbo también
-                        localStorage.setItem('bilboCycleCount', '1');
-                        localStorage.setItem('bilboPushCycleEnded', 'false');
-                        localStorage.setItem('bilboPullCycleEnded', 'false');
+                        localStorage.setItem('fem_bilboCycleCount', '1');
+                        localStorage.setItem('fem_bilboPushCycleEnded', 'false');
+                        localStorage.setItem('fem_bilboPullCycleEnded', 'false');
 
                         showNotification('¡Historial borrado con éxito!');
                     } catch (error) {
