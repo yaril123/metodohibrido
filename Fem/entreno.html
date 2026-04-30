@@ -860,51 +860,46 @@
 
         // --- Configuration ---
         const workouts = {
-            hd_push: {
-                title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
-                    // Añadimos restPause: true para activar la columna RP
-                    { name: "Press Inclinado con Barra", rmPercentage: "50 / 70", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-9' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>AL FALLO ABSOLUTO.</strong> Cadencia: 4s↓ / 2s↑. Calentamiento lento. En la efectiva: <strong>REST PAUSE</strong> (al fallo, descansa 15s, saca 1 rep más).", rest: 120 },
-                    { name: "Landmine", rmPercentage: "50 / 75 / 75", seriesCount: 3, sets: [{ reps: 8 }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO TÉCNICO.</strong> Cadencia: 4s↓ / 2s↑. Mantén abdomen apretado, no arquees espalda baja. Empuja con el deltoides.", rest: 180 },
-                    { name: "Elevaciones Laterales en Polea", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. <strong>REST PAUSE:</strong> Al fallar, descansa 10s y saca un par más.", rest: 180 },
-                    // ISO support
-                    { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, isometric: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s↓ / 2s↑.</strong> Al fallar, mantén <strong>ISOMÉTRICO</strong> 10-15s hasta que arda.", rest: 180 },
-                    { name: "Patada de glúteo en polea", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejecución: Torso ligeramente inclinado. Rodilla ligeramente flexionada. Empuja el talón hacia atrás sin arquear la zona lumbar. Aprieta el glúteo 1-2 s arriba. Objetivo: descargar cadena posterior.", rest: 120 },
-                    { name: "Gemelos", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-20' }, { reps: '12-20' }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
+            bilbo_pierna: {
+                title: "PIERNA BILBO", type: 'bilbo', exercises: [
+                    { name: "Sentadilla Guiada (Bilbo)", rmPercentage: "- / 30 / Bilbo / Bilbo", seriesCount: 4, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-yellow-400'>Serie Bilbo:</strong> Explosiva. Serie extra: 10-12 reps con peso Bilbo.", rest: 180 },
+                    { name: "Hip Thrust", rmPercentage: "- / 70 / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Calentamiento sin peso. Efectivas con el 70% RM.", rest: 180 },
+                    { name: "Zancada Estática", rmPercentage: "- / 65 / 65", seriesCount: 3, sets: [{ reps: 12 }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "1 calentamiento, luego 2 series efectivas por pierna al 65% RM.", rest: 120 },
+                    { name: "Extensión Cuádriceps", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Sin calentamiento necesario. Series al 65% RM aprox.", rest: 120 }
                 ]
             },
-            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
-            hd_pull: {
-                title: "HEAVY DUTY — PULL", type: 'hd', exercises: [
-                    { name: "Jalón en Polea al Pecho (Agarre Neutro)", rmPercentage: "50 / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '6-10' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. Pausa 1s abajo. No uses inercia.", rest: 120 },
-                    { name: "Remo en Barra T", rmPercentage: "60 / 70", seriesCount: 2, sets: [{ reps: 6 }, { reps: '6-10' }], dropSet: false, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia: 4s↓ / 2s↑. Crucial para grosor. Cuidado con la espalda baja.", rest: 180 },
-                    { name: "Pájaros (reverse fly)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, allSetsEffective: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia lenta. 3s↓ / 1s↑ / 1s pausa.", rest: 180 },
-                    { name: "Curl de Bíceps Mentzer", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '6-10' }, { reps: '6-10' }, { reps: '6-10' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s bajada.</strong> Barra recta pref. Cuerpo estricto. <strong>REST PAUSE</strong> al fallo.", rest: 180 },
-                    { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 12 }, { reps: 12 }], dropSet: false, tip: "<strong class='text-yellow-400'>Ejercicio correctivo.</strong> Mucho cuidado con la técnica, pulgares siempre señalando hacia atrás y llegando con las manos por detrás de la cabeza.", rest: 180 },
+            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones.", rest: 0 }] },
+            bilbo_upper: {
+                title: "UPPER BILBO + CORE", type: 'bilbo', exercises: [
+                    { name: "Jalón en Polea (Bilbo)", rmPercentage: "- / 30 / Bilbo", seriesCount: 3, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-yellow-400'>Serie Bilbo.</strong>", rest: 180 },
+                    { name: "Remo en Polea", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 de calentamiento + 1 serie al 75% RM.", rest: 180 },
+                    { name: "Elevaciones Laterales", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 10 }, { reps: 10 }], dropSet: false, tip: "2 series de 10 repeticiones al 60% RM.", rest: 120 },
+                    { name: "Espaldera (Elevación de Piernas)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 1. Controla el balanceo.", rest: 90 },
+                    { name: "Vacío Abdominal", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '20-30s' }, { reps: '20-30s' }], dropSet: false, tip: "CORE bloque 1. Exhala todo el aire y mete el ombligo.", rest: 90 }
                 ]
             },
-            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
-            bilbo_push: {
-                title: "BILBO — PUSH", type: 'bilbo', exercises: [
-                    { name: "Press de Banca Plano con Barra", rmPercentage: "Barr / 40 / Bilbo / 70", seriesCount: 4, sets: [{ reps: 15 }, { reps: 6 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calent: Barra 15reps + 40% 6reps. <strong class='text-yellow-400'>Serie Bilbo:</strong> Explosiva, NO fallo (RIR 1-3). Serie extra: 70%.", rest: 180 },
-                    { name: "Landmine", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Busca congestión y control, no velocidad. Descansos cortos (90s).", rest: 90 },
-                    { name: "Fondos", rmPercentage: "Lastr", seriesCount: 3, sets: [{ reps: '>15' }, { reps: '>15' }, { reps: '>15' }], dropSet: false, tip: "Al fallo o RIR 0-1. Si haces >15, lastre 5kg.", rest: 180 },
-                    { name: "Cruces en Polea Alta (Pecho)", rmPercentage: "60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejercicio de detalle. Cruza las manos abajo para apretar el pecho. Mantén la contracción 1 segundo.", rest: 120 },
-                    { name: "Sentadilla adelantada en barra guiada", rmPercentage: "70", seriesCount: 3, sets: [{ reps: 10 }, { reps: 10 }, { reps: 10 }], dropSet: false, tip: "Pies 15-25 cm adelantados respecto a la barra. Tibias casi verticales. Baja 3 segundos sin sobrepasar donde la pelvis se mete. Empuja el suelo con todo el pie.", rest: 180 },
-                    { name: "Gemelos en barra guiada", rmPercentage: "70", seriesCount: 2, sets: [{ reps: 15 }, { reps: 15 }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
+            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            hd_pierna: {
+                title: "PIERNA HEAVY DUTY", type: 'hd', exercises: [
+                    { name: "Hip Thrust HD", rmPercentage: "- / 80", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1-2 series suaves de calentamiento. 1 serie efectiva al <strong class='text-yellow-400'>80% RM AL FALLO</strong>.", rest: 180 },
+                    { name: "Peso Muerto Rumano (Mancuerna)", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 calentamiento + 1 serie efectiva al fallo.", rest: 180 },
+                    { name: "Patada Glúteo Polea", rmPercentage: "- / 75 / 75", seriesCount: 3, sets: [{ reps: 15 }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "1 calentamiento sin peso + 2 series al 75%.", rest: 120 },
+                    { name: "Abducción", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 }
                 ]
             },
-            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
-            bilbo_pull: {
-                title: "BILBO — PULL", type: 'bilbo', exercises: [
-                    { name: "Jalón al Pecho (Agarre Estrecho)", rmPercentage: "30 / Bilbo / 70", seriesCount: 3, sets: [{ reps: 12 }, { reps: 'Bilbo' }, { reps: '8-12' }], dropSet: false, tip: "Calent: 30% 12reps. <strong class='text-yellow-400'>Serie Bilbo:</strong> 15-30 reps, carga moderada. No estires brazos del todo (tensión constante). Vel máx. RIR 2.", rest: 180 },
-                    { name: "Remo Bajo en Polea (Agarre Neutro)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Codos hacia la cadera.", rest: 180 },
-                    { name: "Remo Inclinado con Mancuernas (Apoyo banco)", rmPercentage: "65", seriesCount: 3, sets: [{ reps: '10-12' }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "Apoya pecho en banco a 30º.", rest: 180 },
-                    { name: "Curl con Barra Z", rmPercentage: "60", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "Bombeo puro. Descansos cortos (45s). Que fluya la sangre.", rest: 45 },
+            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            hd_upper: {
+                title: "UPPER HEAVY DUTY + CORE", type: 'hd', exercises: [
+                    { name: "Jalón Polea Agarre Cerrado HD", rmPercentage: "25 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 ligera 25% RM 10 reps. 1 efectiva <strong class='text-yellow-400'>85% RM AL FALLO</strong>.", rest: 180 },
+                    { name: "Remo Polea HD", rmPercentage: "75", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "1 serie efectiva al 75% RM al fallo.", rest: 180 },
+                    { name: "Elevaciones Laterales HD", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 },
+                    { name: "Curl Bíceps", rmPercentage: "60", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 60% de la RM.", rest: 120 },
+                    { name: "Tríceps Polea", rmPercentage: "65", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 65% de la RM.", rest: 120 }
                 ]
             }
         };
-        const days = ['hd_push', 'rest1', 'hd_pull', 'rest2', 'bilbo_push', 'rest3', 'bilbo_pull'];
-        const dayNames = { hd_push: 'HD PUSH', rest1: 'CARDIO', hd_pull: 'HD PULL', rest2: 'CARDIO', bilbo_push: 'BILBO PUSH', rest3: 'CARDIO', bilbo_pull: 'BILBO PULL' };
+        const days = ['bilbo_pierna', 'rest1', 'bilbo_upper', 'rest2', 'hd_pierna', 'rest3', 'hd_upper'];
+        const dayNames = { bilbo_pierna: 'BILBO PIERNA', rest1: 'CARDIO', bilbo_upper: 'BILBO UPPER', rest2: 'CARDIO', hd_pierna: 'HD PIERNA', rest3: 'CARDIO', hd_upper: 'HD UPPER' };
 
         let allExerciseNames = new Set();
         let currentExerciseNameForModal = null;
@@ -1909,9 +1904,8 @@
                     }
                 }
 
-                // --- DISPLAY LAST DATA (Gray Columns) ---
-                // Special handling for Press Banca Bilbo to fix row mismatch
-                if (exerciseName === "Press de Banca Plano con Barra" && lastSessionData) {
+                // Special handling for Bilbo to fix row mismatch
+                if (exerciseName === "Sentadilla Guiada (Bilbo)" && lastSessionData) {
                     const weightCells = card.querySelectorAll('.last-weight-cell');
                     const repsCells = card.querySelectorAll('.last-reps-cell');
 
@@ -1939,7 +1933,7 @@
                         if (repsCells[2]) repsCells[2].textContent = bestSet.reps;
                     }
 
-                } else if (exerciseName === "Jalón al Pecho (Agarre Estrecho)" && lastSessionData) {
+                } else if (exerciseName === "Jalón en Polea (Bilbo)" && lastSessionData) {
                     const weightCells = card.querySelectorAll('.last-weight-cell');
                     const repsCells = card.querySelectorAll('.last-reps-cell');
 
@@ -1959,10 +1953,10 @@
                     weightCells.forEach(c => c.textContent = '-');
                     repsCells.forEach(c => c.textContent = '-');
 
-                    // Assign Max Volume Set to Row 1 (Index 1 - Serie Bilbo for Jalón)
-                    if (bestSet && weightCells[1]) {
-                        weightCells[1].textContent = `${bestSet.weight} kg`;
-                        if (repsCells[1]) repsCells[1].textContent = bestSet.reps;
+                    // Assign Max Volume Set to Row 2 (Index 2 - Serie Bilbo for Jalón)
+                    if (bestSet && weightCells[2]) {
+                        weightCells[2].textContent = `${bestSet.weight} kg`;
+                        if (repsCells[2]) repsCells[2].textContent = bestSet.reps;
                     }
 
                 } else if (lastSessionData) {
@@ -2008,7 +2002,7 @@
 
                     if (day.includes('hd')) {
                         // REGLAS HEAVY DUTY
-                        const rule2KgGroup = ["Press Inclinado con Barra", "Jalón en Polea al Pecho (Agarre Neutro)", "Curl de Bíceps Mentzer"];
+                        const rule2KgGroup = ["Hip Thrust HD", "Jalón Polea Agarre Cerrado HD"];
                         let suggestedEffectiveWeight = lastWeight;
 
                         if (rule2KgGroup.includes(exerciseName)) {
@@ -2043,7 +2037,7 @@
                         // Check manual reset
                         const shouldReset = bilboResetFlags[exerciseName] === true;
                         
-                        if (exerciseName === "Press de Banca Plano con Barra" || exerciseName === "Jalón al Pecho (Agarre Estrecho)") {
+                        if (exerciseName === "Sentadilla Guiada (Bilbo)" || exerciseName === "Jalón en Polea (Bilbo)") {
                             // Buscar Serie Bilbo (máximo volumen = weight * reps)
                             let lastBilboWeight = 0;
                             let lastBilboReps = 0;
@@ -2065,23 +2059,15 @@
                             }
 
                             inputs.forEach((input, i) => {
-                                if (exerciseName === "Press de Banca Plano con Barra") {
+                                if (exerciseName === "Sentadilla Guiada (Bilbo)") {
                                     if (i === 0) input.value = 0;
-                                    else if (i === 1) input.value = roundWeight(newBilboWeight * 0.40);
+                                    else if (i === 1) input.value = roundWeight(newBilboWeight * 0.30);
                                     else if (i === 2) input.value = roundWeight(newBilboWeight); // Bilbo row
-                                    else if (i === 3) {
-                                        const globalE1rm = e1rmMap.get(exerciseName) || 0;
-                                        if (globalE1rm > 0) input.value = roundWeight(globalE1rm * 0.70);
-                                        else input.value = roundWeight(newBilboWeight * 0.70);
-                                    }
-                                } else { // Jalón
-                                    if (i === 0) input.value = roundWeight(newBilboWeight * 0.30);
-                                    else if (i === 1) input.value = roundWeight(newBilboWeight); // Bilbo row
-                                    else if (i === 2) {
-                                        const globalE1rm = e1rmMap.get(exerciseName) || 0;
-                                        if (globalE1rm > 0) input.value = roundWeight((globalE1rm * 0.70) + 4);
-                                        else input.value = roundWeight((newBilboWeight * 0.70) + 4);
-                                    }
+                                    else if (i === 3) input.value = roundWeight(newBilboWeight); // Serie extra 10-12 con peso bilbo
+                                } else { // Jalón en Polea (Bilbo)
+                                    if (i === 0) input.value = 0;
+                                    else if (i === 1) input.value = roundWeight(newBilboWeight * 0.30);
+                                    else if (i === 2) input.value = roundWeight(newBilboWeight); // Bilbo row
                                 }
                             });
                             repsInputs.forEach((input, i) => {
@@ -2130,13 +2116,10 @@
                 "Jalón al pecho agarre estrecho": "Jalón al Pecho (Agarre Estrecho)"
             };
             const exercisesToTrack = [
-                "Press de banca plano (barra)",
-                "Press de Banca Plano con Barra",
-                "Curl en barra Z",
-                "Jalón en polea agarre neutro",
-                "Jalón en Polea al Pecho (Agarre Neutro)",
-                "Jalón al pecho agarre estrecho",
-                "Jalón al Pecho (Agarre Estrecho)"
+                "Sentadilla Guiada (Bilbo)",
+                "Jalón en Polea (Bilbo)",
+                "Hip Thrust HD",
+                "Jalón Polea Agarre Cerrado HD"
             ];
             const e1rmMap = new Map();
 
