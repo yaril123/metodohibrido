@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrición - Método Híbrido</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos base para coincidir con tus otros archivos */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0D0D0D;
+            /* Fondo principal oscuro */
+            color: #E0E0E0;
+            /* Texto principal claro */
+        }
+
+        /* Estilos para los 'cards' */
+        .card {
+            background-color: #18181b;
+            /* zinc-900 */
+            border: 1px solid #3f3f46;
+            /* zinc-700 */
+            border-radius: 0.75rem;
+            /* bordes redondeados */
+            padding: 1.5rem;
+            /* p-6 */
+        }
+
+        /* Estilos para los campos del formulario */
+        .form-input,
+        .form-select {
+            background-color: #0D0D0D;
+            /* Fondo de input oscuro */
+            border: 1px solid #3f3f46;
+            /* Borde zinc-700 */
+            color: #E0E0E0;
+            border-radius: 0.375rem;
+            /* rounded-md */
+            padding: 0.75rem 1rem;
+            /* py-3 px-4 */
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #facc15;
+            /* Borde dorado al enfocar */
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3);
+        }
+
+        /* Estilo del botón de cálculo (inspirado en Bilbo) */
+        .calculate-button {
+            background: linear-gradient(90deg, #facc15, #ca8a04);
+            /* yellow-400 to yellow-600 */
+            color: #18181b;
+            /* Texto oscuro para contraste */
+            font-weight: 700;
+            border: 1px solid #a16207;
+            /* yellow-700 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .calculate-button:hover {
+            opacity: 0.85;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(250, 204, 21, 0.1);
+        }
+
+        /* Estilo para el botón de navegación */
+        .nav-button {
+            display: inline-block;
+            width: 100%;
+            max-width: 28rem;
+            /* max-w-md */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 1rem;
+            /* p-4 */
+            border-radius: 0.5rem;
+            /* rounded-lg */
+            background-color: #3f3f46;
+            /* bg-zinc-700 */
+            color: white;
+            font-size: 1.125rem;
+            /* text-lg */
+            font-weight: 700;
+            /* font-bold */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            /* tracking-wider */
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-button:hover {
+            background-color: #52525b;
+            /* hover:bg-zinc-600 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            /* hover:shadow-lg */
+        }
+
+        /* Animación para mostrar resultados */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-3xl mx-auto">
+
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Nutrición</h1>
+            <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Calculadora de Macros</p>
+            <p class="text-lg font-medium text-gray-300">Para fuerza e hipertrofia</p>
+        </header>
+
+        <!-- Formulario de Calculadora -->
+        <div class="card">
+            <form id="calculator-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Columna 1 -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="edad" class="block text-sm font-medium text-gray-300 mb-1">Edad</label>
+                            <input type="number" id="edad" class="form-input" placeholder="Ej: 30" required>
+                        </div>
+                        <div>
+                            <label for="peso" class="block text-sm font-medium text-gray-300 mb-1">Peso (kg)</label>
+                            <input type="number" step="0.1" id="peso" class="form-input" placeholder="Ej: 80.5"
+                                required>
+                        </div>
+                        <div>
+                            <label for="estatura" class="block text-sm font-medium text-gray-300 mb-1">Estatura
+                                (cm)</label>
+                            <input type="number" id="estatura" class="form-input" placeholder="Ej: 175" required>
+                        </div>
+                    </div>
+                    <!-- Columna 2 -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="morfologia"
+                                class="block text-sm font-medium text-gray-300 mb-1">Morfología</label>
+                            <select id="morfologia" class="form-select" required>
+                                <option value="" disabled selected>Selecciona tu tipo</option>
+                                <option value="delgado">Delgado (Ectomorfo)</option>
+                                <option value="medio">Medio (Mesomorfo)</option>
+                                <option value="grueso">Grueso (Endomorfo)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="nivelEntreno" class="block text-sm font-medium text-gray-300 mb-1">Nivel de
+                                Entreno</label>
+                            <select id="nivelEntreno" class="form-select" required>
+                                <option value="" disabled selected>Selecciona tu actividad</option>
+                                <option value="1.2">Sedentario (oficina, sin entreno)</option>
+                                <option value="1.375">Ligero (1-3 días/semana)</option>
+                                <option value="1.55">Moderado (3-5 días/semana)</option>
+                                <option value="1.725">Intenso (6-7 días/semana)</option>
+                                <option value="1.9">Muy Intenso (dobles sesiones, trabajo físico)</option>
+                            </select>
+                        </div>
+
+                        <div class="pt-2"> <!-- Espacio extra para alinear con los inputs -->
+                            <button type="submit" id="calculate-btn" class="calculate-button mt-5">Calcular</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="error-message" class="text-red-400 text-center text-sm mt-4 hidden">Por favor, rellena todos
+                    los campos con valores válidos.</div>
+            </form>
+        </div>
+
+        <!-- Sección de Resultados (Oculta por defecto) -->
+        <div id="results-section" class="hidden mt-6">
+            <div class="card border-2 border-yellow-400">
+                <!-- Calorías Totales -->
+                <div class="text-center mb-6">
+                    <h2 class="text-lg font-semibold text-gray-300 uppercase tracking-wider">Calorías Diarias (TDEE)
+                    </h2>
+                    <p id="tdee-result" class="text-5xl font-black text-yellow-400 my-2">0</p>
+                    <p class="text-sm text-gray-400">Calorías estimadas para tu objetivo</p>
+                </div>
+
+                <!-- Macros -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Proteína -->
+                    <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
+                        <h3 class="text-lg font-bold text-yellow-400">Proteína</h3>
+                        <p id="protein-grams" class="text-3xl font-bold text-white my-1">0g</p>
+                        <p id="protein-cals" class="text-sm text-gray-400">0 kcal</p>
+                    </div>
+                    <!-- Hidratos -->
+                    <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
+                        <h3 class="text-lg font-bold text-yellow-400">Hidratos</h3>
+                        <p id="carbs-grams" class="text-3xl font-bold text-white my-1">0g</p>
+                        <p id="carbs-cals" class="text-sm text-gray-400">0 kcal</p>
+                    </div>
+                    <!-- Grasas -->
+                    <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
+                        <h3 class="text-lg font-bold text-yellow-400">Grasas</h3>
+                        <p id="fats-grams" class="text-3xl font-bold text-white my-1">0g</p>
+                        <p id="fats-cals" class="text-sm text-gray-400">0 kcal</p>
+                    </div>
+                </div>
+
+                <!-- Agua -->
+                <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
+                    <h3 class="text-lg font-bold text-yellow-400">Hidratación Diaria</h3>
+                    <p id="water-liters" class="text-3xl font-bold text-white my-1">0 L</p>
+                    <p class="text-sm text-gray-400">Mínimo recomendado</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección de Explicación (Oculta por defecto) -->
+        <div id="explanation-section" class="hidden mt-6">
+            <div class="card space-y-6">
+                <!-- Porqué de Macros -->
+                <div>
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">El Porqué de tus Macros</h3>
+                    <div class="space-y-4 text-gray-300">
+                        <p><strong>Proteína:</strong> Es el pilar fundamental. Son los "ladrillos" que tu cuerpo usa
+                            para reparar las fibras musculares rotas durante el entreno y construir nuevo músculo. Sin
+                            suficiente proteína, tu esfuerzo en el gimnasio no se traducirá en hipertrofia.</p>
+                        <p><strong>Hidratos de Carbono:</strong> Son tu combustible principal. Llenan tus depósitos de
+                            glucógeno en los músculos, dándote la energía necesaria para entrenar duro y con intensidad.
+                            Un entreno intenso es la señal que le dice a tu cuerpo "necesito crecer".</p>
+                        <p><strong>Grasas:</strong> Son esenciales para la salud general y, crucialmente, para la
+                            producción hormonal. Un entorno hormonal saludable (buenos niveles de testosterona, etc.) es
+                            vital para la ganancia de masa muscular y la recuperación.</p>
+                    </div>
+                </div>
+
+                <!-- El Poder del Agua -->
+                <div>
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">El Poder del Agua</h3>
+                    <p class="text-gray-300">Tus músculos son aproximadamente un 75% agua. Piensa en el agua como el
+                        "sistema de transporte" de tu cuerpo. Lleva los nutrientes (como la proteína) a tus músculos y
+                        ayuda a eliminar los desechos. Una deshidratación, incluso leve, reduce drásticamente tu
+                        rendimiento y la capacidad de tu cuerpo para la síntesis de proteínas. <strong
+                            class="text-white">Sin agua, no vas a construir músculo igual que sin proteína.</strong> Es
+                        así de simple.</p>
+                </div>
+
+                <!-- Comida Real y Flexibilidad -->
+                <div>
+                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">Comida Real y Flexibilidad</h3>
+                    <p class="text-gray-300">Basa el 80-90% de tu dieta en comida real: carnes, pescados, huevos,
+                        frutas, verduras, tubérculos, arroz, etc. Pero no te obsesiones. La adherencia es la clave del
+                        éxito a largo plazo.</p>
+                    <p class="mt-2 text-gray-300"><strong class="text-white">No pasa nada por comer fuera un par de
+                            días</strong> o disfrutar de "comida basura" de vez en cuando. Si esos días te aseguras de
+                        alcanzar tu <strong class="text-yellow-400">objetivo de proteínas</strong> y mantienes un buen
+                        <strong class="text-yellow-400">nivel de hidratación</strong>, el impacto en tu progreso será
+                        mínimo o nulo. Disfruta del proceso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón de Navegación a Inicio -->
+        <div class="mt-12 text-center">
+            <a class="nav-button" href="index.html">
+                Volver a Inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('calculator-form');
+            const errorMessage = document.getElementById('error-message');
+            const resultsSection = document.getElementById('results-section');
+            const explanationSection = document.getElementById('explanation-section');
+
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Obtener valores del formulario
+                const edad = parseInt(document.getElementById('edad').value);
+                const peso = parseFloat(document.getElementById('peso').value);
+                const estatura = parseInt(document.getElementById('estatura').value);
+                const morfologia = document.getElementById('morfologia').value;
+                const nivelEntreno = parseFloat(document.getElementById('nivelEntreno').value);
+
+                // Validación
+                if (isNaN(edad) || isNaN(peso) || isNaN(estatura) || !morfologia || isNaN(nivelEntreno) || edad <= 0 || peso <= 0 || estatura <= 0) {
+                    errorMessage.classList.remove('hidden');
+                    resultsSection.classList.add('hidden');
+                    explanationSection.classList.add('hidden');
+                    return;
+                }
+                errorMessage.classList.add('hidden');
+
+                // --- Inicia Lógica de Cálculo ---
+
+                // 1. Calcular TMB (Tasa Metabólica Basal) - Fórmula de Mifflin-St Jeor (asumiendo hombre, estándar para apps de fitness)
+                // (10 * peso en kg) + (6.25 * altura en cm) - (5 * edad en años) + 5
+                const tmb = (10 * peso) + (6.25 * estatura) - (5 * edad) + 5;
+
+                // 2. Calcular TDEE (Gasto Energético Diario Total)
+                let tdee = tmb * nivelEntreno;
+
+                // 3. Ajustar TDEE según Morfología (petición del usuario)
+                // Esto es una heurística para ajustar el superávit/déficit inicial
+                // Asumimos un objetivo de ganancia de músculo (ligero superávit)
+                let tdeeAjustado = tdee;
+                switch (morfologia) {
+                    case 'delgado': // Ectomorfo - necesita más calorías
+                        tdeeAjustado = tdee + 350; // Superávit más agresivo
+                        break;
+                    case 'medio': // Mesomorfo - estándar
+                        tdeeAjustado = tdee + 250; // Superávit estándar
+                        break;
+                    case 'grueso': // Endomorfo - necesita menos calorías
+                        tdeeAjustado = tdee + 150; // Superávit ligero para minimizar grasa
+                        break;
+                }
+
+                // 4. Calcular Macros
+                // Proteína: 2g por kg de peso corporal
+                const proteinaGramos = peso * 2;
+                const proteinaCalorias = proteinaGramos * 4;
+
+                // Grasas: Basado en morfología (Endo más, Ecto menos)
+                let fatMultiplier = 0.25; // Base para Meso
+                if (morfologia === 'delgado') fatMultiplier = 0.20;
+                if (morfologia === 'grueso') fatMultiplier = 0.30;
+
+                const grasasCalorias = tdeeAjustado * fatMultiplier;
+                const grasasGramos = grasasCalorias / 9;
+
+                // Hidratos: Las calorías restantes
+                const hidratosCalorias = tdeeAjustado - proteinaCalorias - grasasCalorias;
+                const hidratosGramos = hidratosCalorias / 4;
+
+                // 5. Calcular Agua
+                // 35ml por kg de peso
+                const aguaLitros = (peso * 0.035);
+
+                // --- Fin Lógica de Cálculo ---
+
+                // Mostrar Resultados
+                document.getElementById('tdee-result').textContent = tdeeAjustado.toFixed(0);
+
+                document.getElementById('protein-grams').textContent = `${proteinaGramos.toFixed(0)}g`;
+                document.getElementById('protein-cals').textContent = `${proteinaCalorias.toFixed(0)} kcal`;
+
+                document.getElementById('carbs-grams').textContent = `${hidratosGramos.toFixed(0)}g`;
+                document.getElementById('carbs-cals').textContent = `${hidratosCalorias.toFixed(0)} kcal`;
+
+                document.getElementById('fats-grams').textContent = `${grasasGramos.toFixed(0)}g`;
+                document.getElementById('fats-cals').textContent = `${grasasCalorias.toFixed(0)} kcal`;
+
+                document.getElementById('water-liters').textContent = `${aguaLitros.toFixed(1)} L`;
+
+                // Mostrar secciones con animación
+                resultsSection.classList.remove('hidden');
+                explanationSection.classList.remove('hidden');
+                resultsSection.classList.add('fade-in');
+                explanationSection.classList.add('fade-in');
+
+                // Scroll para ver los resultados en móvil
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
