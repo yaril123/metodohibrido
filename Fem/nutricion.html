@@ -55,20 +55,20 @@
         .form-input:focus,
         .form-select:focus {
             outline: none;
-            border-color: #facc15;
+            border-color: #f472b6;
             /* Borde dorado al enfocar */
             box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3);
         }
 
         /* Estilo del botón de cálculo (inspirado en Bilbo) */
         .calculate-button {
-            background: linear-gradient(90deg, #facc15, #ca8a04);
-            /* yellow-400 to yellow-600 */
+            background: linear-gradient(90deg, #f472b6, #db2777);
+            /* pink-400 to pink-600 */
             color: #18181b;
             /* Texto oscuro para contraste */
             font-weight: 700;
             border: 1px solid #a16207;
-            /* yellow-700 */
+            /* pink-700 */
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
             /* rounded-lg */
@@ -144,7 +144,7 @@
 
         <header class="mb-6 text-center">
             <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Nutrición</h1>
-            <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Calculadora de Macros</p>
+            <p class="text-xl sm:text-2xl font-bold text-pink-400 mt-1">Calculadora de Macros</p>
             <p class="text-lg font-medium text-gray-300">Para fuerza e hipertrofia</p>
         </header>
 
@@ -206,12 +206,12 @@
 
         <!-- Sección de Resultados (Oculta por defecto) -->
         <div id="results-section" class="hidden mt-6">
-            <div class="card border-2 border-yellow-400">
+            <div class="card border-2 border-pink-400">
                 <!-- Calorías Totales -->
                 <div class="text-center mb-6">
                     <h2 class="text-lg font-semibold text-gray-300 uppercase tracking-wider">Calorías Diarias (TDEE)
                     </h2>
-                    <p id="tdee-result" class="text-5xl font-black text-yellow-400 my-2">0</p>
+                    <p id="tdee-result" class="text-5xl font-black text-pink-400 my-2">0</p>
                     <p class="text-sm text-gray-400">Calorías estimadas para tu objetivo</p>
                 </div>
 
@@ -219,19 +219,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <!-- Proteína -->
                     <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
-                        <h3 class="text-lg font-bold text-yellow-400">Proteína</h3>
+                        <h3 class="text-lg font-bold text-pink-400">Proteína</h3>
                         <p id="protein-grams" class="text-3xl font-bold text-white my-1">0g</p>
                         <p id="protein-cals" class="text-sm text-gray-400">0 kcal</p>
                     </div>
                     <!-- Hidratos -->
                     <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
-                        <h3 class="text-lg font-bold text-yellow-400">Hidratos</h3>
+                        <h3 class="text-lg font-bold text-pink-400">Hidratos</h3>
                         <p id="carbs-grams" class="text-3xl font-bold text-white my-1">0g</p>
                         <p id="carbs-cals" class="text-sm text-gray-400">0 kcal</p>
                     </div>
                     <!-- Grasas -->
                     <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
-                        <h3 class="text-lg font-bold text-yellow-400">Grasas</h3>
+                        <h3 class="text-lg font-bold text-pink-400">Grasas</h3>
                         <p id="fats-grams" class="text-3xl font-bold text-white my-1">0g</p>
                         <p id="fats-cals" class="text-sm text-gray-400">0 kcal</p>
                     </div>
@@ -239,7 +239,7 @@
 
                 <!-- Agua -->
                 <div class="bg-zinc-800 p-4 rounded-lg text-center border border-zinc-700">
-                    <h3 class="text-lg font-bold text-yellow-400">Hidratación Diaria</h3>
+                    <h3 class="text-lg font-bold text-pink-400">Hidratación Diaria</h3>
                     <p id="water-liters" class="text-3xl font-bold text-white my-1">0 L</p>
                     <p class="text-sm text-gray-400">Mínimo recomendado</p>
                 </div>
@@ -251,7 +251,7 @@
             <div class="card space-y-6">
                 <!-- Porqué de Macros -->
                 <div>
-                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">El Porqué de tus Macros</h3>
+                    <h3 class="text-2xl font-bold text-pink-400 mb-3">El Porqué de tus Macros</h3>
                     <div class="space-y-4 text-gray-300">
                         <p><strong>Proteína:</strong> Es el pilar fundamental. Son los "ladrillos" que tu cuerpo usa
                             para reparar las fibras musculares rotas durante el entreno y construir nuevo músculo. Sin
@@ -267,7 +267,7 @@
 
                 <!-- El Poder del Agua -->
                 <div>
-                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">El Poder del Agua</h3>
+                    <h3 class="text-2xl font-bold text-pink-400 mb-3">El Poder del Agua</h3>
                     <p class="text-gray-300">Tus músculos son aproximadamente un 75% agua. Piensa en el agua como el
                         "sistema de transporte" de tu cuerpo. Lleva los nutrientes (como la proteína) a tus músculos y
                         ayuda a eliminar los desechos. Una deshidratación, incluso leve, reduce drásticamente tu
@@ -278,14 +278,14 @@
 
                 <!-- Comida Real y Flexibilidad -->
                 <div>
-                    <h3 class="text-2xl font-bold text-yellow-400 mb-3">Comida Real y Flexibilidad</h3>
+                    <h3 class="text-2xl font-bold text-pink-400 mb-3">Comida Real y Flexibilidad</h3>
                     <p class="text-gray-300">Basa el 80-90% de tu dieta en comida real: carnes, pescados, huevos,
                         frutas, verduras, tubérculos, arroz, etc. Pero no te obsesiones. La adherencia es la clave del
                         éxito a largo plazo.</p>
                     <p class="mt-2 text-gray-300"><strong class="text-white">No pasa nada por comer fuera un par de
                             días</strong> o disfrutar de "comida basura" de vez en cuando. Si esos días te aseguras de
-                        alcanzar tu <strong class="text-yellow-400">objetivo de proteínas</strong> y mantienes un buen
-                        <strong class="text-yellow-400">nivel de hidratación</strong>, el impacto en tu progreso será
+                        alcanzar tu <strong class="text-pink-400">objetivo de proteínas</strong> y mantienes un buen
+                        <strong class="text-pink-400">nivel de hidratación</strong>, el impacto en tu progreso será
                         mínimo o nulo. Disfruta del proceso.</p>
                 </div>
             </div>

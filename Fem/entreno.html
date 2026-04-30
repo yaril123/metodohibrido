@@ -41,7 +41,7 @@
             width: 40px;
             height: 40px;
             border: 4px solid #333;
-            border-top: 4px solid #facc15;
+            border-top: 4px solid #f472b6;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 1rem;
@@ -106,7 +106,7 @@
         .day-nav-button.active {
             /* No background or color change, just animation */
             animation: active-pulse 1.3s infinite ease-in-out;
-            border-color: #facc15;
+            border-color: #f472b6;
             /* Gold border for active */
         }
 
@@ -119,11 +119,15 @@
         }
 
         .day-nav-button-bilbo {
-            background: linear-gradient(90deg, #facc15, #ca8a04);
-            /* yellow-400 to yellow-600 */
+            background: linear-gradient(90deg, #fbcfe8, #f472b6); /* Rosa pálido */
             color: black;
-            border-color: #a16207;
-            /* yellow-700 */
+            border-color: #db2777;
+        }
+
+        .day-nav-button-pierna {
+            background: linear-gradient(90deg, #67e8f9, #06b6d4); /* Azul turquesa */
+            color: black;
+            border-color: #0891b2;
         }
 
         .day-nav-button-rest {
@@ -192,7 +196,7 @@
         }
 
         .exercise-title {
-            color: #facc15;
+            color: #f472b6;
             /* Gold */
         }
 
@@ -210,18 +214,18 @@
             flex-shrink: 0;
         }
 
-        .timer-yellow {
+        .timer-pink {
             background-color: rgba(250, 204, 21, 0.1);
-            border: 2px solid #facc15;
-            color: #facc15;
+            border: 2px solid #f472b6;
+            color: #f472b6;
         }
 
-        .timer-yellow:hover {
+        .timer-pink:hover {
             background-color: rgba(250, 204, 21, 0.2);
         }
 
         .timer-running {
-            background-color: #facc15;
+            background-color: #f472b6;
             color: #1A1A1A;
         }
 
@@ -327,13 +331,13 @@
         .weight-input:focus,
         .reps-input:focus {
             outline: none;
-            border-color: #facc15;
+            border-color: #f472b6;
             /* Gold */
         }
 
         .effective-set .weight-input,
         .effective-set .reps-input {
-            border-color: #facc15;
+            border-color: #f472b6;
             /* Gold */
         }
 
@@ -440,8 +444,8 @@
             transform: scale(1.1);
             background-color: #52525b;
             /* zinc-600 */
-            border-color: #facc15;
-            color: #facc15;
+            border-color: #f472b6;
+            color: #f472b6;
         }
 
         /* Settings Modal */
@@ -516,7 +520,7 @@
         }
 
         input:checked+.toggle-slider {
-            background-color: #facc15;
+            background-color: #f472b6;
             /* Gold */
         }
 
@@ -561,7 +565,7 @@
         .info-subtitle {
             font-size: 1.125rem;
             font-weight: 700;
-            color: #facc15;
+            color: #f472b6;
             /* Gold */
             margin-top: 1.5rem;
             margin-bottom: 0.5rem;
@@ -584,11 +588,11 @@
 
         .history-list-item:hover {
             background-color: #3f3f46;
-            border-color: #facc15;
+            border-color: #f472b6;
         }
 
         .history-date {
-            color: #facc15;
+            color: #f472b6;
             font-weight: bold;
             font-size: 0.9rem;
         }
@@ -634,18 +638,18 @@
 
     <div class="max-w-7xl mx-auto">
         <header class="mb-8 header-background">
-            <img src="https://logise1.netlify.app/src/gym/automatizado.png" alt="Fondo" class="header-image">
+            <img src="metodohibridobigcolorfemenino.png" alt="Fondo" class="header-image">
 
             <div class="header-content">
                 <div>
                     <h1 id="main-title" class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">
                         HEAVY DUTY</h1>
-                    <p id="workout-title" class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1"></p>
+                    <p id="workout-title" class="text-xl sm:text-2xl font-bold text-pink-400 mt-1"></p>
                 </div>
                 <div id="stopwatch-container" class="text-right flex-shrink-0">
                     <div id="stopwatch-display" class="text-2xl sm:text-3xl font-bold text-white">00:00:00</div>
                     <button id="stopwatch-control"
-                        class="mt-2 w-full px-4 py-2 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg">Start</button>
+                        class="mt-2 w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-600 transition-colors text-black font-semibold rounded-lg">Start</button>
                 </div>
             </div>
         </header>
@@ -656,7 +660,7 @@
         <!-- Botón Start/Pause Inferior -->
         <div class="mt-8 mb-2">
             <button id="stopwatch-control-bottom"
-                class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 transition-colors text-white font-semibold rounded-lg uppercase tracking-wider">Start</button>
+                class="w-full px-4 py-2 bg-yellow-500 hover:bg-yellow-600 transition-colors text-black font-semibold rounded-lg uppercase tracking-wider">Terminar</button>
         </div>
 
         <!-- Botón de Navegación a Inicio -->
@@ -674,6 +678,14 @@
     <button id="settings-btn">⚙️</button>
 
     <!-- Modals & Notifications -->
+    <div id="exercise-guide-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4 z-[9999]" style="background-color: rgba(0,0,0,0.85);">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <h2 id="guide-modal-title" class="text-xl sm:text-2xl font-bold mb-4 text-pink-400"></h2>
+            <div id="guide-modal-content" class="text-gray-300 leading-relaxed mb-6 space-y-2"></div>
+            <button id="guide-modal-close" class="w-full py-3 bg-pink-500 text-black font-bold rounded-lg hover:bg-pink-600 uppercase tracking-wider">Cerrar</button>
+        </div>
+    </div>
+
     <div id="notification"
         class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-green-600 text-white py-2 px-5 rounded-lg shadow-lg opacity-0 transform translate-y-10 z-50">
         Entrenamiento guardado con exito!!!
@@ -719,7 +731,7 @@
     <!-- Nuevo Modal de Ciclo Bilbo -->
     <div id="bilbo-cycle-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
         <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-sm w-full">
-            <h2 id="bilbo-cycle-title" class="text-xl font-bold mb-4 text-yellow-400">¡Ciclo Bilbo Completado!</h2>
+            <h2 id="bilbo-cycle-title" class="text-xl font-bold mb-4 text-pink-400">¡Ciclo Bilbo Completado!</h2>
             <p id="bilbo-cycle-text" class="text-gray-300 mb-6"></p>
             <button id="bilbo-cycle-ok-btn"
                 class="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold py-3 px-6 rounded-lg">Entendido</button>
@@ -728,8 +740,8 @@
 
     <!-- Modal de Advertencia Bilbo < 15 Reps -->
     <div id="bilbo-warning-modal" class="modal fixed inset-0 flex items-center justify-center hidden p-4">
-        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-lg w-full border border-yellow-500">
-            <h2 class="text-2xl font-bold mb-4 text-yellow-400 uppercase">¡Atención!</h2>
+        <div class="modal-content p-8 rounded-lg text-center shadow-lg max-w-lg w-full border border-pink-500">
+            <h2 class="text-2xl font-bold mb-4 text-pink-400 uppercase">¡Atención!</h2>
             <p class="text-gray-300 mb-4 text-lg">
                 Felicidades por haber completado un ciclo completo de Bilbo. Es el momento de volver a bajar peso y
                 aumentar repeticiones.
@@ -743,7 +755,7 @@
                 <!-- Details injected here -->
             </div>
             <button id="bilbo-warning-ok-btn"
-                class="w-full bg-yellow-500 hover:bg-yellow-600 transition-colors text-black font-bold py-3 px-6 rounded-lg">Entendido</button>
+                class="w-full bg-pink-500 hover:bg-pink-600 transition-colors text-black font-bold py-3 px-6 rounded-lg">Entendido</button>
         </div>
     </div>
     <!-- MODAL DE AJUSTES -->
@@ -752,7 +764,7 @@
             class="modal-content max-w-md w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 rounded-lg shadow-lg relative">
             <button id="close-settings-modal"
                 class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-            <h2 class="text-2xl font-bold text-yellow-400 mb-6">Ajustes y Personalización</h2>
+            <h2 class="text-2xl font-bold text-pink-400 mb-6">Ajustes y Personalización</h2>
             <div class="space-y-4">
                 <a href="metodo.html" class="settings-button">Ver Información del Plan</a>
 
@@ -776,7 +788,7 @@
         <div
             class="modal-content max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col rounded-lg shadow-lg relative bg-zinc-900 border border-zinc-700">
             <div class="p-4 border-b border-zinc-700 flex justify-between items-center bg-zinc-800">
-                <h2 id="history-modal-title" class="text-xl font-bold text-yellow-400">Historial</h2>
+                <h2 id="history-modal-title" class="text-xl font-bold text-pink-400">Historial</h2>
                 <button id="close-history-modal"
                     class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
             </div>
@@ -816,11 +828,11 @@
         <div class="absolute top-10 text-gray-400 font-bold uppercase tracking-widest text-sm">Descanso en curso</div>
         <!-- Texto reducido a la mitad aprox: text-6xl (movil) y text-8xl (escritorio) -->
         <div id="rest-overlay-timer"
-            class="text-7xl sm:text-9xl font-bold text-yellow-400 tabular-nums leading-none drop-shadow-lg">00:00</div>
+            class="text-7xl sm:text-9xl font-bold text-pink-400 tabular-nums leading-none drop-shadow-lg">00:00</div>
 
         <!-- Botón un poco más discreto también -->
         <button id="skip-rest-btn"
-            class="mt-8 px-8 py-3 bg-zinc-800/80 text-white rounded-full text-lg font-bold border border-zinc-600 hover:bg-zinc-700 transition-colors shadow-lg hover:shadow-yellow-500/10 backdrop-blur-md">
+            class="mt-8 px-8 py-3 bg-zinc-800/80 text-white rounded-full text-lg font-bold border border-zinc-600 hover:bg-zinc-700 transition-colors shadow-lg hover:shadow-pink-500/10 backdrop-blur-md">
             Saltar Descanso
         </button>
     </div>
@@ -862,7 +874,7 @@
         const workouts = {
             bilbo_pierna: {
                 title: "PIERNA BILBO", type: 'bilbo', exercises: [
-                    { name: "Sentadilla Guiada (Bilbo)", rmPercentage: "- / 30 / Bilbo / Bilbo", seriesCount: 4, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-yellow-400'>Serie Bilbo:</strong> Explosiva. Serie extra: 10-12 reps con peso Bilbo.", rest: 180 },
+                    { name: "Sentadilla Guiada (Bilbo)", rmPercentage: "- / 30 / Bilbo / Bilbo", seriesCount: 4, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo:</strong> Explosiva. Serie extra: 10-12 reps con peso Bilbo.", rest: 180 },
                     { name: "Hip Thrust", rmPercentage: "- / 70 / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Calentamiento sin peso. Efectivas con el 70% RM.", rest: 180 },
                     { name: "Zancada Estática", rmPercentage: "- / 65 / 65", seriesCount: 3, sets: [{ reps: 12 }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "1 calentamiento, luego 2 series efectivas por pierna al 65% RM.", rest: 120 },
                     { name: "Extensión Cuádriceps", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Sin calentamiento necesario. Series al 65% RM aprox.", rest: 120 }
@@ -871,7 +883,7 @@
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones.", rest: 0 }] },
             bilbo_upper: {
                 title: "UPPER BILBO + CORE", type: 'bilbo', exercises: [
-                    { name: "Jalón en Polea (Bilbo)", rmPercentage: "- / 30 / Bilbo", seriesCount: 3, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-yellow-400'>Serie Bilbo.</strong>", rest: 180 },
+                    { name: "Jalón en Polea (Bilbo)", rmPercentage: "- / 30 / Bilbo", seriesCount: 3, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo.</strong>", rest: 180 },
                     { name: "Remo en Polea", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 de calentamiento + 1 serie al 75% RM.", rest: 180 },
                     { name: "Elevaciones Laterales", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 10 }, { reps: 10 }], dropSet: false, tip: "2 series de 10 repeticiones al 60% RM.", rest: 120 },
                     { name: "Espaldera (Elevación de Piernas)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 1. Controla el balanceo.", rest: 90 },
@@ -881,7 +893,7 @@
             rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
             hd_pierna: {
                 title: "PIERNA HEAVY DUTY", type: 'hd', exercises: [
-                    { name: "Hip Thrust HD", rmPercentage: "- / 80", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1-2 series suaves de calentamiento. 1 serie efectiva al <strong class='text-yellow-400'>80% RM AL FALLO</strong>.", rest: 180 },
+                    { name: "Hip Thrust HD", rmPercentage: "- / 80", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1-2 series suaves de calentamiento. 1 serie efectiva al <strong class='text-pink-400'>80% RM AL FALLO</strong>.", rest: 180 },
                     { name: "Peso Muerto Rumano (Mancuerna)", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 calentamiento + 1 serie efectiva al fallo.", rest: 180 },
                     { name: "Patada Glúteo Polea", rmPercentage: "- / 75 / 75", seriesCount: 3, sets: [{ reps: 15 }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "1 calentamiento sin peso + 2 series al 75%.", rest: 120 },
                     { name: "Abducción", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 }
@@ -890,7 +902,7 @@
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
             hd_upper: {
                 title: "UPPER HEAVY DUTY + CORE", type: 'hd', exercises: [
-                    { name: "Jalón Polea Agarre Cerrado HD", rmPercentage: "25 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 ligera 25% RM 10 reps. 1 efectiva <strong class='text-yellow-400'>85% RM AL FALLO</strong>.", rest: 180 },
+                    { name: "Jalón Polea Agarre Cerrado HD", rmPercentage: "25 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 ligera 25% RM 10 reps. 1 efectiva <strong class='text-pink-400'>85% RM AL FALLO</strong>.", rest: 180 },
                     { name: "Remo Polea HD", rmPercentage: "75", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "1 serie efectiva al 75% RM al fallo.", rest: 180 },
                     { name: "Elevaciones Laterales HD", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 },
                     { name: "Curl Bíceps", rmPercentage: "60", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 60% de la RM.", rest: 120 },
@@ -900,6 +912,73 @@
         };
         const days = ['bilbo_pierna', 'rest1', 'bilbo_upper', 'rest2', 'hd_pierna', 'rest3', 'hd_upper'];
         const dayNames = { bilbo_pierna: 'BILBO PIERNA', rest1: 'CARDIO', bilbo_upper: 'BILBO UPPER', rest2: 'CARDIO', hd_pierna: 'HD PIERNA', rest3: 'CARDIO', hd_upper: 'HD UPPER' };
+
+        const exerciseGuides = {
+            "Sentadilla Guiada (Bilbo)": {
+                short: "Bajar lento cadera atrás. Empujar con talones (sin levantarlos).",
+                full: "<b>Objetivo:</b> cuádriceps + glúteo<br><br><b>Ejecución:</b><br>• Pies un poco más abiertos que hombros.<br>• Puntas ligeramente hacia fuera.<br>• Espalda neutra (no arquear).<br>• Bajar lento llevando cadera atrás.<br>• Rodillas siguen la línea del pie.<br>• Bajar hasta donde controle (mínimo paralelo si puede).<br>• Subir empujando con talones.<br><br><b>Clave:</b> no levantar talones.<br><b>Error:</b> bajar rápido y rebotar."
+            },
+            "Hip Thrust": {
+                short: "Subir cadera apretando glúteo. Mantener 1-2s arriba sin arquear lumbar.",
+                full: "<b>Objetivo:</b> glúteo alto<br><br><b>Ejecución:</b><br>• Espalda apoyada en banco.<br>• Pies a anchura de hombros.<br>• Mirada al frente o barbilla ligeramente hacia dentro.<br>• Subir cadera apretando glúteo.<br>• Mantener 1-2 segundos arriba.<br>• Bajar controlado sin soltar tensión.<br><br><b>Clave:</b> pelvis neutra (no arquear lumbar).<br><b>Error:</b> empujar con la espalda en vez de glúteo."
+            },
+            "Hip Thrust HD": {
+                short: "Subir cadera apretando glúteo. Mantener 1-2s arriba sin arquear lumbar.",
+                full: "<b>Objetivo:</b> glúteo alto<br><br><b>Ejecución:</b><br>• Espalda apoyada en banco.<br>• Pies a anchura de hombros.<br>• Mirada al frente o barbilla ligeramente hacia dentro.<br>• Subir cadera apretando glúteo.<br>• Mantener 1-2 segundos arriba.<br>• Bajar controlado sin soltar tensión.<br><br><b>Clave:</b> pelvis neutra (no arquear lumbar).<br><b>Error:</b> empujar con la espalda en vez de glúteo."
+            },
+            "Zancada Estática": {
+                short: "Paso largo adelante. Bajar en vertical. Peso en talón delantero.",
+                full: "<b>Objetivo:</b> glúteo + cuádriceps<br><br><b>Ejecución:</b><br>• Paso largo hacia delante.<br>• Tronco ligeramente inclinado.<br>• Bajar en vertical.<br>• Rodilla trasera hacia el suelo.<br>• Empujar con la pierna delantera.<br><br><b>Clave:</b> peso en talón delantero.<br><b>Error:</b> paso corto → todo al cuádriceps."
+            },
+            "Extensión Cuádriceps": {
+                short: "Subir piernas hasta extender con pausa de 1s. Bajar lento.",
+                full: "<b>Objetivo:</b> aislamiento cuádriceps<br><br><b>Ejecución:</b><br>• Ajustar bien la máquina.<br>• Subir piernas hasta extender.<br>• Pausa 1 segundo arriba.<br>• Bajar lento.<br><br><b>Clave:</b> control total.<br><b>Error:</b> balancearse."
+            },
+            "Jalón en Polea (Bilbo)": {
+                short: "Tirar hacia el pecho con codos hacia abajo. Tirar con la espalda.",
+                full: "<b>Objetivo:</b> espalda (dorsal)<br><br><b>Ejecución:</b><br>• Agarre algo más ancho que hombros.<br>• Pecho ligeramente fuera.<br>• Tirar hacia el pecho (no detrás).<br>• Codos hacia abajo.<br>• Subir controlado.<br><br><b>Clave:</b> tirar con espalda, no con brazos.<br><b>Error:</b> inclinarse hacia atrás."
+            },
+            "Jalón Polea Agarre Cerrado HD": {
+                short: "Tirar hacia el pecho con codos hacia abajo. Tirar con la espalda.",
+                full: "<b>Objetivo:</b> espalda (dorsal)<br><br><b>Ejecución:</b><br>• Pecho ligeramente fuera.<br>• Tirar hacia el pecho (no detrás).<br>• Codos hacia abajo.<br>• Subir controlado.<br><br><b>Clave:</b> tirar con espalda, no con brazos.<br><b>Error:</b> inclinarse hacia atrás."
+            },
+            "Remo en Polea": {
+                short: "Tirar llevando codos atrás. Juntar escápulas y volver lento.",
+                full: "<b>Objetivo:</b> espalda media<br><br><b>Ejecución:</b><br>• Espalda recta.<br>• Tirar llevando codos atrás.<br>• Juntar escápulas.<br>• Volver lento.<br><br><b>Clave:</b> pecho abierto.<br><b>Error:</b> encorvarse."
+            },
+            "Remo Polea HD": {
+                short: "Tirar llevando codos atrás. Juntar escápulas y volver lento.",
+                full: "<b>Objetivo:</b> espalda media<br><br><b>Ejecución:</b><br>• Espalda recta.<br>• Tirar llevando codos atrás.<br>• Juntar escápulas.<br>• Volver lento.<br><br><b>Clave:</b> pecho abierto.<br><b>Error:</b> encorvarse."
+            },
+            "Elevaciones Laterales": {
+                short: "Subir brazos hasta línea de hombros con codos algo flexionados.",
+                full: "<b>Objetivo:</b> hombro lateral (clave estética)<br><br><b>Ejecución:</b><br>• Mancuernas ligeras.<br>• Subir brazos hasta línea de hombros.<br>• Codos ligeramente flexionados.<br>• Bajar lento.<br><br><b>Clave:</b> subir con el hombro, no con impulso.<br><b>Error:</b> encoger trapecio."
+            },
+            "Elevaciones Laterales HD": {
+                short: "Subir brazos hasta línea de hombros con codos algo flexionados.",
+                full: "<b>Objetivo:</b> hombro lateral (clave estética)<br><br><b>Ejecución:</b><br>• Mancuernas ligeras.<br>• Subir brazos hasta línea de hombros.<br>• Codos ligeramente flexionados.<br>• Bajar lento.<br><br><b>Clave:</b> subir con el hombro, no con impulso.<br><b>Error:</b> encoger trapecio."
+            },
+            "Peso Muerto Rumano (Mancuerna)": {
+                short: "Bajar cadera atrás notando femoral. Subir apretando glúteo.",
+                full: "<b>Objetivo:</b> glúteo + femoral<br><br><b>Ejecución:</b><br>• Rodillas ligeramente flexionadas.<br>• Bajar cadera hacia atrás.<br>• Mancuernas pegadas al cuerpo.<br>• Notar estiramiento en femoral.<br>• Subir apretando glúteo.<br><br><b>Clave:</b> espalda neutra.<br><b>Error:</b> redondear espalda."
+            },
+            "Patada Glúteo Polea": {
+                short: "Empujar pierna hacia atrás sin arquear la espalda. Pausa arriba.",
+                full: "<b>Objetivo:</b> glúteo<br><br><b>Ejecución:</b><br>• Tronco ligeramente inclinado.<br>• Empujar pierna hacia atrás.<br>• Pausa arriba.<br>• Volver lento.<br><br><b>Clave:</b> no arquear la espalda.<br><b>Error:</b> usar impulso."
+            },
+            "Abducción": {
+                short: "Abrir piernas controlado, pausa de 1s y cerrar lento.",
+                full: "<b>Objetivo:</b> glúteo medio (forma lateral)<br><br><b>Ejecución:</b><br>• Espalda recta.<br>• Abrir piernas controlado.<br>• Pausa 1 segundo.<br>• Cerrar lento.<br><br><b>Clave:</b> tensión constante.<br><b>Error:</b> abrir rápido y soltar."
+            },
+            "Espaldera (Elevación de Piernas)": {
+                short: "Subir rodillas sin balanceo. Control total al bajar.",
+                full: "<b>Objetivo:</b> abdomen inferior<br><br><b>Ejecución:</b><br>• Apoyo firme en brazos.<br>• Subir rodillas sin balanceo.<br>• Bajar lento.<br><br><b>Clave:</b> control total.<br><b>Error:</b> impulso."
+            },
+            "Vacío Abdominal": {
+                short: "Soltar aire y meter ombligo hacia dentro. Mantener activación suave.",
+                full: "<b>Objetivo:</b> transverso (abdomen plano)<br><br><b>Ejecución:</b><br>• Soltar aire.<br>• Meter ombligo hacia dentro.<br>• Mantener.<br><br><b>Clave:</b> activación suave.<br><b>Error:</b> hacer fuerza hacia fuera."
+            }
+        };
 
         let allExerciseNames = new Set();
         let currentExerciseNameForModal = null;
@@ -1070,8 +1149,9 @@
                 button.dataset.day = day;
                 let classes = 'day-nav-button ';
                 const buttonText = dayNames[day];
-                if (buttonText.includes('HD')) classes += 'day-nav-button-hd';
+                if (buttonText.includes('PIERNA')) classes += 'day-nav-button-pierna';
                 else if (buttonText.includes('BILBO')) classes += 'day-nav-button-bilbo';
+                else if (buttonText.includes('HD')) classes += 'day-nav-button-hd';
                 else classes += 'day-nav-button-rest';
                 button.className = classes;
                 button.innerHTML = `<span>${dayNames[day]}</span>`;
@@ -1163,7 +1243,7 @@
                                 specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-blue-400">ISO</th>`;
                             } else {
                                 // Default a DS (Dropset)
-                                specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-yellow-400">DS</th>`;
+                                specialTechHeader = `<th class="w-[10%] text-center px-0 text-[10px] sm:text-xs uppercase text-pink-400">DS</th>`;
                             }
                         }
 
@@ -1215,14 +1295,14 @@
                             // Special Bilbo Row Styling
                             let finalRowClass = rowClass;
                             if (set.reps === 'Bilbo') {
-                                finalRowClass = 'bg-yellow-500/10 border-yellow-500/30'; // Highlight row
-                                seriesTdClass = 'text-yellow-400 font-bold text-xl'; // Highlight text
+                                finalRowClass = 'bg-pink-500/10 border-pink-500/30'; // Highlight row
+                                seriesTdClass = 'text-pink-400 font-bold text-xl'; // Highlight text
                             }
 
                             let seriesName;
                             if (isBilboDay) {
                                 if (set.reps === 'Bilbo') {
-                                    seriesName = '<span class="text-yellow-400 uppercase tracking-wider">Serie Bilbo</span>';
+                                    seriesName = '<span class="text-pink-400 uppercase tracking-wider">Serie Bilbo</span>';
                                 } else {
                                     // Check location relative to Bilbo set
                                     const bilboIndex = exercise.sets.findIndex(s => s.reps === 'Bilbo');
@@ -1256,7 +1336,7 @@
                             let specialTechCell = '';
                             if (isHdDay) {
                                 if (isEffectiveSet && (exercise.dropSet || exercise.restPause || exercise.isometric)) {
-                                    let inputType = 'accent-yellow-400';
+                                    let inputType = 'accent-pink-400';
                                     if (exercise.restPause) inputType = 'accent-red-500';
                                     if (exercise.isometric) inputType = 'accent-blue-400';
 
@@ -1302,12 +1382,23 @@
                     const restTimeFormatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                     const dropSetHTML = (exercise.dropSet === true && isStrengthDay) ? `<span><strong class="text-gray-400 font-medium">Drop Set:</strong> ✅ Sí</span>` : '';
 
+                    let guideHTML = '';
+                    if (exerciseGuides[exercise.name]) {
+                        guideHTML = `<p class="text-xs sm:text-sm text-gray-400 mt-1 leading-tight">
+                            ${exerciseGuides[exercise.name].short} 
+                            <span class="text-pink-400 cursor-pointer font-semibold ml-1 hover:underline leer-mas-btn" data-ex-name="${exercise.name}">Leer más</span>
+                        </p>`;
+                    }
+
                     card.innerHTML = `
                         <!-- Fila Superior: Título y Reloj -->
-                        <div class="flex justify-between items-center mb-3">
-                            <h3 class="exercise-title text-xl font-bold flex-grow pr-2">${exercise.name}</h3>
-                            <div class="flex-shrink-0">
-                                ${isStrengthDay ? `<div class="timer-clock timer-yellow" data-duration="${exercise.rest}" data-day="${day}" data-ex-index="${exIndex}">${restTimeFormatted}</div>` : ''}
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-grow pr-2">
+                                <h3 class="exercise-title text-xl font-bold">${exercise.name}</h3>
+                                ${guideHTML}
+                            </div>
+                            <div class="flex-shrink-0 mt-1">
+                                ${isStrengthDay ? `<div class="timer-clock timer-pink" data-duration="${exercise.rest}" data-day="${day}" data-ex-index="${exIndex}">${restTimeFormatted}</div>` : ''}
                             </div>
                         </div>
 
@@ -1321,9 +1412,9 @@
                                     ${(exercise.restPause && isStrengthDay) ? `<span><strong class="text-red-400 font-medium">Rest Pause:</strong> ✅</span>` : ''}
                                     ${(exercise.isometric && isStrengthDay) ? `<span><strong class="text-blue-400 font-medium">Isométrico:</strong> ✅</span>` : ''}
                                 </div>
-                                <p><strong class="text-yellow-500 font-medium">Tip:</strong> ${exercise.tip}</p>
+                                <p><strong class="text-pink-500 font-medium">Tip:</strong> ${exercise.tip}</p>
                             ` : `
-                                    <p><strong class="text-yellow-500 font-medium">Tip:</strong> ${exercise.tip}</p>
+                                    <p><strong class="text-pink-500 font-medium">Tip:</strong> ${exercise.tip}</p>
                                 ${exercise.antiMigraineTip ? `<p class="mt-1 text-xs text-gray-400">${exercise.antiMigraineTip}</p>` : ''}
                             `}
                         </div>
@@ -1480,7 +1571,6 @@
             if (state.isStopwatchRunning) return;
             state.isStopwatchRunning = true;
             DOM.stopwatchControlBtn.textContent = 'Pausar';
-            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.textContent = 'Pausar';
             state.stopwatchInterval = setInterval(() => {
                 state.totalSeconds++;
                 updateStopwatchDisplay();
@@ -1754,7 +1844,6 @@
             state.isStopwatchRunning = false;
             updateStopwatchDisplay();
             DOM.stopwatchControlBtn.textContent = 'Start';
-            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.textContent = 'Start';
             DOM.pauseModal.classList.add('hidden');
 
             e1rmMap = calculateAllEstimated1RMs();
@@ -1790,7 +1879,7 @@
                             flags[name] = true;
                             setAppData('fem_bilboResetFlags', flags);
 
-                            detailsHTML += `<div class="flex justify-between"><span>${name}:</span> <span class="text-yellow-400 font-bold">~${nextWeight.toFixed(1)} kg</span></div>`;
+                            detailsHTML += `<div class="flex justify-between"><span>${name}:</span> <span class="text-pink-400 font-bold">~${nextWeight.toFixed(1)} kg</span></div>`;
                         });
 
                         document.getElementById('bilbo-warning-details').innerHTML = detailsHTML;
@@ -1857,6 +1946,7 @@
 
                 // --- FIND LAST LOG (w/ Legacy Support) ---
                 let lastSessionData = null;
+                let lastSessionWasTest = false;
                 const legacyMapping = {
                     "Press Inclinado con Barra": ["Press inclinado con barra", "Press Inclinado", "Press inclinado", "Press Inclinado (barra)"],
                     "Landmine": ["Landmine Diagonal de Pie (Hombro–Techo)", "Landmine Rodilla al Suelo (Cintura–Cabeza)"], // Array support check?
@@ -1899,6 +1989,7 @@
 
                         if (exLog && exLog.series && exLog.series.length > 0) {
                             lastSessionData = exLog;
+                            lastSessionWasTest = (log.workoutType === 'test' || log.workoutTitle === 'Test RM');
                             break;
                         }
                     }
@@ -1985,7 +2076,46 @@
                 const inputs = card.querySelectorAll('.weight-input');
                 const repsInputs = card.querySelectorAll('.reps-input');
 
-                if (lastSessionData && workoutType !== 'rest') {
+                const e1rm = e1rmMap.get(exerciseName) || 0;
+
+                // Si la última vez fue un test, o no tenemos lastSessionData, usamos el RM
+                if ((!lastSessionData || lastSessionWasTest) && e1rm > 0) {
+                    const rmPercs = exerciseDataDef.rmPercentage ? exerciseDataDef.rmPercentage.split('/').map(s => parseInt(s.trim())) : [];
+                    const effectivePerc = rmPercs[rmPercs.length - 1] || 0;
+
+                    if (day.includes('bilbo')) {
+                        let newBilboWeight = e1rm * 0.5; // Bilbo se empieza con el 50%
+                        inputs.forEach((input, i) => {
+                            if (exerciseName === "Sentadilla Guiada (Bilbo)") {
+                                if (i === 0) input.value = 0;
+                                else if (i === 1) input.value = roundWeight(newBilboWeight * 0.30);
+                                else if (i === 2) input.value = roundWeight(newBilboWeight);
+                                else if (i === 3) input.value = roundWeight(newBilboWeight);
+                            } else if (exerciseName === "Jalón en Polea (Bilbo)") {
+                                if (i === 0) input.value = 0;
+                                else if (i === 1) input.value = roundWeight(newBilboWeight * 0.30);
+                                else if (i === 2) input.value = roundWeight(newBilboWeight);
+                            } else {
+                                const perc = rmPercs[i] || effectivePerc;
+                                if (perc > 0) input.value = roundWeight(e1rm * (perc / 100));
+                            }
+                        });
+                    } else { // Heavy Duty / Accesorios
+                        inputs.forEach((input, i) => {
+                            const perc = rmPercs[i] || effectivePerc;
+                            if (perc > 0) input.value = roundWeight(e1rm * (perc / 100));
+                        });
+                    }
+
+                    // Sugerir reps objetivo
+                    repsInputs.forEach((input, i) => {
+                        if (exerciseDataDef.sets && exerciseDataDef.sets[i]) {
+                            const repsStr = exerciseDataDef.sets[i].reps.toString();
+                            const nums = repsStr.match(/\d+/g);
+                            if (nums) input.value = Math.max(...nums.map(Number));
+                        }
+                    });
+                } else if (lastSessionData && workoutType !== 'rest') {
                     // Utility info
                     const lastSetIdx = lastSessionData.series.length - 1;
                     const lastSet = lastSessionData.series[lastSetIdx];
@@ -2002,19 +2132,11 @@
 
                     if (day.includes('hd')) {
                         // REGLAS HEAVY DUTY
-                        const rule2KgGroup = ["Hip Thrust HD", "Jalón Polea Agarre Cerrado HD"];
                         let suggestedEffectiveWeight = lastWeight;
 
-                        if (rule2KgGroup.includes(exerciseName)) {
-                            // "si paso de 10 repeticiones en la serie mas pesada, aumentas 2 kilos"
-                            if (lastReps > 10 && lastWeight > 0) {
-                                suggestedEffectiveWeight = lastWeight + 2;
-                            }
-                        } else {
-                            // "resto de ejercicios: si se ha acanzado numero maximo de repeticiones objetivo, subes 1 kilo"
-                            if (lastReps >= maxTargetReps && lastWeight > 0) {
-                                suggestedEffectiveWeight = lastWeight + 1;
-                            }
+                        // "si se ha acanzado numero maximo de repeticiones objetivo, subes 1 kilo"
+                        if (lastReps >= maxTargetReps && lastWeight > 0) {
+                            suggestedEffectiveWeight = lastWeight + 1;
                         }
 
                         // Calcular según porcentaje de la efectiva
@@ -2048,7 +2170,7 @@
                                 if (w * r > maxVol) { maxVol = w * r; lastBilboWeight = w; lastBilboReps = r; }
                             });
                             
-                            let newBilboWeight = lastBilboWeight > 0 ? (lastBilboWeight + 4) : 0;
+                            let newBilboWeight = lastBilboWeight > 0 ? (lastBilboWeight + 1) : 0;
                             
                             // Si se pidió un reseteo en el modal
                             if (shouldReset) {
@@ -2075,20 +2197,12 @@
                                 if (prevSeries && prevSeries.reps) input.value = prevSeries.reps;
                             });
 
-                        } else if (exerciseName === "Remo Bajo en Polea (Agarre Neutro)") {
+                        } else {
+                            // Demás ejercicios de Bilbo (Aumento 1kg si se alcanzan reps)
                             let suggestedWeight = lastWeight;
                             if (lastReps >= maxTargetReps && lastWeight > 0) {
-                                suggestedWeight = lastWeight + 2;
+                                suggestedWeight = lastWeight + 1;
                             }
-                            inputs.forEach(input => { if (suggestedWeight > 0) input.value = suggestedWeight; });
-                            repsInputs.forEach((input, i) => {
-                                const prevSeries = lastSessionData.series[i] || lastSet;
-                                if (prevSeries.reps) input.value = prevSeries.reps;
-                            });
-
-                        } else {
-                            // Demás ejercicios de Bilbo (Aumento 1kg incondicional pedido)
-                            let suggestedWeight = lastWeight > 0 ? (lastWeight + 1) : 0;
                             inputs.forEach(input => { if (suggestedWeight > 0) input.value = suggestedWeight; });
                             repsInputs.forEach((input, i) => {
                                 const prevSeries = lastSessionData.series[i] || lastSet;
@@ -2117,9 +2231,13 @@
             };
             const exercisesToTrack = [
                 "Sentadilla Guiada (Bilbo)",
-                "Jalón en Polea (Bilbo)",
                 "Hip Thrust HD",
-                "Jalón Polea Agarre Cerrado HD"
+                "Extensión Cuádriceps",
+                "Jalón en Polea (Bilbo)",
+                "Remo en Polea",
+                "Peso Muerto Rumano (Mancuerna)",
+                "Curl Bíceps",
+                "Tríceps Polea"
             ];
             const e1rmMap = new Map();
 
@@ -2205,7 +2323,7 @@
                 log.exercises.forEach((ex, exIndex) => {
                     const exDiv = document.createElement('div');
                     exDiv.className = 'bg-zinc-800 p-3 rounded border border-zinc-700';
-                    exDiv.innerHTML = `<h4 class="text-yellow-500 font-bold mb-2 text-sm">${ex.name}</h4>`;
+                    exDiv.innerHTML = `<h4 class="text-pink-500 font-bold mb-2 text-sm">${ex.name}</h4>`;
 
                     if (ex.series) {
                         // Header
@@ -2381,7 +2499,7 @@
                 }
             };
             if (DOM.stopwatchControlBtn) DOM.stopwatchControlBtn.addEventListener('click', toggleStopwatch);
-            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.addEventListener('click', toggleStopwatch);
+            if (DOM.stopwatchControlBtnBottom) DOM.stopwatchControlBtnBottom.addEventListener('click', showFinishConfirmation);
             if (DOM.resumeBtn) {
                 DOM.resumeBtn.addEventListener('click', () => { DOM.pauseModal.classList.add('hidden'); startStopwatch(); });
             }
@@ -2411,6 +2529,26 @@
             if (bilboWarningOkBtn) {
                 bilboWarningOkBtn.addEventListener('click', () => {
                     document.getElementById('bilbo-warning-modal').classList.add('hidden');
+                });
+            }
+
+            // Exercise Guide Modal listeners
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('leer-mas-btn')) {
+                    const exName = e.target.dataset.exName;
+                    const guide = exerciseGuides[exName];
+                    if (guide) {
+                        document.getElementById('guide-modal-title').textContent = exName;
+                        document.getElementById('guide-modal-content').innerHTML = guide.full;
+                        document.getElementById('exercise-guide-modal').classList.remove('hidden');
+                    }
+                }
+            });
+            
+            const guideModalCloseBtn = document.getElementById('guide-modal-close');
+            if (guideModalCloseBtn) {
+                guideModalCloseBtn.addEventListener('click', () => {
+                    document.getElementById('exercise-guide-modal').classList.add('hidden');
                 });
             }
 

@@ -41,12 +41,12 @@
 
         .form-input:focus {
             outline: none;
-            border-color: #facc15;
+            border-color: #f472b6;
             box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.3);
         }
 
         .save-button {
-            background: linear-gradient(90deg, #facc15, #ca8a04);
+            background: linear-gradient(90deg, #f472b6, #db2777);
             color: #18181b;
             font-weight: 700;
             border: 1px solid #a16207;
@@ -114,7 +114,7 @@
 
         <header class="mb-6 text-center">
             <h1 class="text-3xl sm:text-4xl font-black text-white uppercase tracking-wider">Test</h1>
-            <p class="text-xl sm:text-2xl font-bold text-yellow-400 mt-1">Método Bilbo (Lombardi)</p>
+            <p class="text-xl sm:text-2xl font-bold text-pink-400 mt-1">Método Bilbo (Lombardi)</p>
         </header>
 
         <!-- NUEVO: Instrucciones del Test -->
@@ -122,17 +122,21 @@
             <h3 class="text-xl font-bold text-white">Antes de comenzar...</h3>
             <p>Antes de comenzar a entrenar vamos a hacer un test para saber por donde tenemos que comenzar.</p>
             <p>Estos son los ejercicios que vamos a realizar en el test:</p>
-            <ul style="list-style-type: disc; padding-left: 40px;">
-                <li>Press de banca plano (barra)</li>
-                <li>Jalón en polea agarre neutro</li>
-                <li>Jalón al pecho agarre estrecho</li>
-                <li>Curl en barra Z</li>
+            <ul style="list-style-type: disc; padding-left: 40px;" class="mb-4">
+                <li>Sentadilla Guiada</li>
+                <li>Hip Thrust</li>
+                <li>Extensión de Cuádriceps</li>
+                <li>Jalón en Polea</li>
+                <li>Remo en Polea</li>
+                <li>Peso Muerto Rumano</li>
+                <li>Curl Bíceps</li>
+                <li>Tríceps Polea</li>
             </ul>
 
             <ol class="list-decimal list-inside space-y-2 pl-2">
                 <li>Calienta las articulaciones y músculos durante unos minutos.</li>
-                <li>Busca un peso que puedas cargar <strong class="text-yellow-400">entre 15 y 50 repeticiones</strong>,
-                    preferiblemente <strong class="text-yellow-400">30</strong> para el test. Pero aún, no hagas nada
+                <li>Busca un peso que puedas cargar <strong class="text-pink-400">entre 15 y 50 repeticiones</strong>,
+                    preferiblemente <strong class="text-pink-400">30</strong> para el test. Pero aún, no hagas nada
                     con el.</li>
                 <li>Antes de realizar la serie que contará para nuestro test, haz cada ejercicio con la mitad de peso
                     del que vas a cargar en la serie objetivo y realiza de 8 a 10 repeticiones, lentas y técnicas. La
@@ -146,7 +150,7 @@
             </ol>
             <p class="font-medium">Cuando acabes, descansa. No entrenes más ese día. Tómatelo con calma.</p>
 
-            <p class="mt-4 p-3 bg-zinc-900 border border-yellow-500 rounded-lg text-yellow-400 font-medium">
+            <p class="mt-4 p-3 bg-zinc-900 border border-pink-500 rounded-lg text-pink-400 font-medium">
                 <strong class="font-bold block">¡Importante!</strong>
                 Si dejas de entrenar más de 2 semanas, debes realizar de nuevo el test inicial. Habrás perdido parte de
                 tu forma y la mejor manera de retomar es volver a hacer el test.
@@ -155,7 +159,7 @@
 
         <!-- Explicación del Método -->
         <div class="card mb-6 space-y-4 text-gray-300">
-            <p>Para el test inicial vamos a utilizar el <strong class="text-yellow-400">método Bilbo</strong>, ya que
+            <p>Para el test inicial vamos a utilizar el <strong class="text-pink-400">método Bilbo</strong>, ya que
                 con esta metodología podemos calcular nuestra Repetición Máxima (RM) sin riesgo a lesionarnos ni poner
                 en peligro ligamentos ni tendones.</p>
             <p>Este test tiene como fin calcular nuestra <strong class="text-white">Repetición Máxima Estimada
@@ -170,75 +174,122 @@
             <form id="test-form">
                 <div class="space-y-6">
 
-                    <!-- Ejercicio 1: Press de banca plano (con barra) -->
+                    <!-- Ejercicio 1: Sentadilla Guiada -->
                     <div>
-                        <label class="block text-lg font-bold text-gray-200 mb-2">Press de banca plano (barra)</label>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Sentadilla Guiada</label>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="press-banca-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso
-                                    (kg)</label>
-                                <input type="number" step="0.5" id="press-banca-peso" class="form-input"
-                                    placeholder="Ej: 50">
+                                <label for="sentadilla-guiada-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="sentadilla-guiada-peso" class="form-input" placeholder="Ej: 50">
                             </div>
                             <div>
-                                <label for="press-banca-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps
-                                    (15-50)</label>
-                                <input type="number" id="press-banca-reps" class="form-input" placeholder="Ej: 25">
+                                <label for="sentadilla-guiada-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="sentadilla-guiada-reps" class="form-input" placeholder="Ej: 25">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ejercicio 2: Jalón en polea agarre neutro -->
+                    <!-- Ejercicio 2: Hip Thrust -->
                     <div>
-                        <label class="block text-lg font-bold text-gray-200 mb-2">Jalón en polea agarre neutro</label>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Hip Thrust</label>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="jalon-neutro-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso
-                                    (kg)</label>
-                                <input type="number" step="0.5" id="jalon-neutro-peso" class="form-input"
-                                    placeholder="Ej: 40">
+                                <label for="hip-thrust-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="hip-thrust-peso" class="form-input" placeholder="Ej: 80">
                             </div>
                             <div>
-                                <label for="jalon-neutro-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps
-                                    (15-50)</label>
-                                <input type="number" id="jalon-neutro-reps" class="form-input" placeholder="Ej: 30">
+                                <label for="hip-thrust-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="hip-thrust-reps" class="form-input" placeholder="Ej: 20">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ejercicio 3: Jalón al pecho agarre estrecho -->
+                    <!-- Ejercicio 3: Extensión de Cuádriceps -->
                     <div>
-                        <label class="block text-lg font-bold text-gray-200 mb-2">Jalón al pecho agarre estrecho</label>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Extensión de Cuádriceps</label>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="jalon-pecho-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso
-                                    (kg)</label>
-                                <input type="number" step="0.5" id="jalon-pecho-peso" class="form-input"
-                                    placeholder="Ej: 35">
+                                <label for="ext-cuadriceps-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="ext-cuadriceps-peso" class="form-input" placeholder="Ej: 30">
                             </div>
                             <div>
-                                <label for="jalon-pecho-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps
-                                    (15-50)</label>
-                                <input type="number" id="jalon-pecho-reps" class="form-input" placeholder="Ej: 28">
+                                <label for="ext-cuadriceps-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="ext-cuadriceps-reps" class="form-input" placeholder="Ej: 25">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ejercicio 4: Curl en barra Z -->
-                    <!-- Nota: Uso "Curl en barra Z" para que coincida con progreso.html -->
+                    <!-- Ejercicio 4: Jalón en Polea -->
                     <div>
-                        <label class="block text-lg font-bold text-gray-200 mb-2">Curl en barra Z</label>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Jalón en Polea</label>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="curl-barra-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso
-                                    (kg)</label>
-                                <input type="number" step="0.5" id="curl-barra-peso" class="form-input"
-                                    placeholder="Ej: 20">
+                                <label for="jalon-polea-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="jalon-polea-peso" class="form-input" placeholder="Ej: 40">
                             </div>
                             <div>
-                                <label for="curl-barra-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps
-                                    (15-50)</label>
-                                <input type="number" id="curl-barra-reps" class="form-input" placeholder="Ej: 22">
+                                <label for="jalon-polea-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="jalon-polea-reps" class="form-input" placeholder="Ej: 30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 5: Remo en Polea -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Remo en Polea</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="remo-polea-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="remo-polea-peso" class="form-input" placeholder="Ej: 35">
+                            </div>
+                            <div>
+                                <label for="remo-polea-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="remo-polea-reps" class="form-input" placeholder="Ej: 25">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 6: Peso Muerto Rumano -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Peso Muerto Rumano</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="pm-rumano-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="pm-rumano-peso" class="form-input" placeholder="Ej: 40">
+                            </div>
+                            <div>
+                                <label for="pm-rumano-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="pm-rumano-reps" class="form-input" placeholder="Ej: 20">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 7: Curl Bíceps -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Curl Bíceps</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="curl-biceps-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="curl-biceps-peso" class="form-input" placeholder="Ej: 15">
+                            </div>
+                            <div>
+                                <label for="curl-biceps-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="curl-biceps-reps" class="form-input" placeholder="Ej: 20">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ejercicio 8: Tríceps Polea -->
+                    <div>
+                        <label class="block text-lg font-bold text-gray-200 mb-2">Tríceps Polea</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="triceps-polea-peso" class="block text-sm font-medium text-gray-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.5" id="triceps-polea-peso" class="form-input" placeholder="Ej: 20">
+                            </div>
+                            <div>
+                                <label for="triceps-polea-reps" class="block text-sm font-medium text-gray-400 mb-1">Reps (15-50)</label>
+                                <input type="number" id="triceps-polea-reps" class="form-input" placeholder="Ej: 25">
                             </div>
                         </div>
                     </div>
@@ -255,8 +306,8 @@
         </div>
 
         <!-- Sección de Resultados (Oculta por defecto) -->
-        <div id="results-card" class="card hidden border-2 border-yellow-400">
-            <h2 class="text-2xl font-bold text-yellow-400 mb-4">Resultados (RM Estimada)</h2>
+        <div id="results-card" class="card hidden border-2 border-pink-400">
+            <h2 class="text-2xl font-bold text-pink-400 mb-4">Resultados (RM Estimada)</h2>
             <div id="results-content" class="space-y-3">
                 <!-- Los resultados se inyectarán aquí -->
             </div>
@@ -294,10 +345,14 @@
             // Lista de ejercicios para el test.
             // IMPORTANTE: Los 'name' DEBEN coincidir con los de progreso.html
             const exercises = [
-                { id: 'press-banca', name: 'Press de banca plano (barra)' },
-                { id: 'jalon-neutro', name: 'Jalón en polea agarre neutro' },
-                { id: 'jalon-pecho', name: 'Jalón al pecho agarre estrecho' },
-                { id: 'curl-barra', name: 'Curl en barra Z' }
+                { id: 'sentadilla-guiada', name: 'Sentadilla Guiada (Bilbo)' },
+                { id: 'hip-thrust', name: 'Hip Thrust HD' },
+                { id: 'ext-cuadriceps', name: 'Extensión Cuádriceps' },
+                { id: 'jalon-polea', name: 'Jalón en Polea (Bilbo)' },
+                { id: 'remo-polea', name: 'Remo en Polea' },
+                { id: 'pm-rumano', name: 'Peso Muerto Rumano (Mancuerna)' },
+                { id: 'curl-biceps', name: 'Curl Bíceps' },
+                { id: 'triceps-polea', name: 'Tríceps Polea' }
             ];
 
             // --- Helper Function ---
@@ -333,7 +388,7 @@
                     const formattedDate = date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
                     html += `<div class="card fade-in">
-                                <h3 class="text-lg font-bold text-yellow-400 mb-3">Test del ${formattedDate}</h3>
+                                <h3 class="text-lg font-bold text-pink-400 mb-3">Test del ${formattedDate}</h3>
                                 <div class="space-y-2">`;
 
                     log.exercises.forEach(ex => {
