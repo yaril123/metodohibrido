@@ -874,39 +874,42 @@
         const workouts = {
             bilbo_pierna: {
                 title: "PIERNA BILBO", type: 'bilbo', exercises: [
-                    { name: "Sentadilla Guiada (Bilbo)", rmPercentage: "- / 30 / Bilbo / Bilbo", seriesCount: 4, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo:</strong> Explosiva. Serie extra: 10-12 reps con peso Bilbo.", rest: 180 },
-                    { name: "Hip Thrust", rmPercentage: "- / 70 / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Calentamiento sin peso. Efectivas con el 70% RM.", rest: 180 },
-                    { name: "Zancada Estática", rmPercentage: "- / 65 / 65", seriesCount: 3, sets: [{ reps: 12 }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "1 calentamiento, luego 2 series efectivas por pierna al 65% RM.", rest: 120 },
-                    { name: "Extensión Cuádriceps", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Sin calentamiento necesario. Series al 65% RM aprox.", rest: 120 }
+                    { name: "Sentadilla Guiada (Bilbo)", rmPercentage: "- / 30 / Bilbo / Bilbo", seriesCount: 4, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo:</strong> Explosiva. <br>👉 aquí no bajes mucho o pierde rendimiento. Back-off rest: 1:30 min.", rest: 120 },
+                    { name: "Hip Thrust", rmPercentage: "- / 70 / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Calentamiento sin peso. Efectivas con el 70% RM.", rest: 90 },
+                    { name: "Zancada Estática", rmPercentage: "- / 65 / 65", seriesCount: 3, sets: [{ reps: 12 }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "1 calentamiento, luego 2 series efectivas por pierna al 65% RM.", rest: 75 },
+                    { name: "Extensión Cuádriceps", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Sin calentamiento necesario. Series al 65% RM aprox.", rest: 60 },
+                    { name: "Gemelos", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: '15-20' }, { reps: '15-20' }], dropSet: false, tip: "Elevación de talones.", rest: 60 }
                 ]
             },
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones.", rest: 0 }] },
             bilbo_upper: {
                 title: "UPPER BILBO + CORE", type: 'bilbo', exercises: [
-                    { name: "Jalón en Polea (Bilbo)", rmPercentage: "- / 30 / Bilbo", seriesCount: 3, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo.</strong>", rest: 180 },
-                    { name: "Remo en Polea", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 de calentamiento + 1 serie al 75% RM.", rest: 180 },
-                    { name: "Elevaciones Laterales", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 10 }, { reps: 10 }], dropSet: false, tip: "2 series de 10 repeticiones al 60% RM.", rest: 120 },
-                    { name: "Espaldera (Elevación de Piernas)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 1. Controla el balanceo.", rest: 90 },
-                    { name: "Vacío Abdominal", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '20-30s' }, { reps: '20-30s' }], dropSet: false, tip: "CORE bloque 1. Exhala todo el aire y mete el ombligo.", rest: 90 }
+                    { name: "Jalón en Polea (Bilbo)", rmPercentage: "- / 30 / Bilbo", seriesCount: 3, sets: [{ reps: 10 }, { reps: 5 }, { reps: 'Bilbo' }], dropSet: false, tip: "Calentamiento: 1x10 sin peso, 1x5 con 30% Bilbo. <strong class='text-pink-400'>Serie Bilbo.</strong>", rest: 75 },
+                    { name: "Remo en Polea", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 de calentamiento + 1 serie al 75% RM.", rest: 75 },
+                    { name: "Elevaciones Laterales", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 10 }, { reps: 10 }], dropSet: false, tip: "2 series de 10 repeticiones al 60% RM.", rest: 60 },
+                    { name: "Espaldera (Elevación de Piernas)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 1. Controla el balanceo.", rest: 60 },
+                    { name: "Vacío Abdominal", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '20-30s' }, { reps: '20-30s' }], dropSet: false, tip: "CORE bloque 1. Exhala todo el aire y mete el ombligo.", rest: 40 }
                 ]
             },
             rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
             hd_pierna: {
                 title: "PIERNA HEAVY DUTY", type: 'hd', exercises: [
-                    { name: "Hip Thrust HD", rmPercentage: "- / 80", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1-2 series suaves de calentamiento. 1 serie efectiva al <strong class='text-pink-400'>80% RM AL FALLO</strong>.", rest: 180 },
-                    { name: "Peso Muerto Rumano (Mancuerna)", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 calentamiento + 1 serie efectiva al fallo.", rest: 180 },
-                    { name: "Patada Glúteo Polea", rmPercentage: "- / 75 / 75", seriesCount: 3, sets: [{ reps: 15 }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "1 calentamiento sin peso + 2 series al 75%.", rest: 120 },
-                    { name: "Abducción", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 }
+                    { name: "Hip Thrust HD", rmPercentage: "- / 80", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1-2 series suaves de calentamiento. 1 serie efectiva al <strong class='text-pink-400'>80% RM AL FALLO</strong>.", rest: 90 },
+                    { name: "Peso Muerto Rumano (Mancuerna)", rmPercentage: "- / 75", seriesCount: 2, sets: [{ reps: 12 }, { reps: '8-12' }], dropSet: false, tip: "1 calentamiento + 1 serie efectiva al fallo.", rest: 90 },
+                    { name: "Patada Glúteo Polea", rmPercentage: "- / 75 / 75", seriesCount: 3, sets: [{ reps: 15 }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "1 calentamiento sin peso + 2 series al 75%.", rest: 60 },
+                    { name: "Abducción", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "2 series al 65%.", rest: 60 }
                 ]
             },
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
             hd_upper: {
                 title: "UPPER HEAVY DUTY + CORE", type: 'hd', exercises: [
-                    { name: "Jalón Polea Agarre Cerrado HD", rmPercentage: "25 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 ligera 25% RM 10 reps. 1 efectiva <strong class='text-pink-400'>85% RM AL FALLO</strong>.", rest: 180 },
-                    { name: "Remo Polea HD", rmPercentage: "75", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "1 serie efectiva al 75% RM al fallo.", rest: 180 },
-                    { name: "Elevaciones Laterales HD", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2 series al 65%.", rest: 120 },
-                    { name: "Curl Bíceps", rmPercentage: "60", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 60% de la RM.", rest: 120 },
-                    { name: "Tríceps Polea", rmPercentage: "65", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 65% de la RM.", rest: 120 }
+                    { name: "Jalón Polea Agarre Cerrado HD", rmPercentage: "25 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 ligera 25% RM 10 reps. 1 efectiva <strong class='text-pink-400'>85% RM AL FALLO</strong>.", rest: 90 },
+                    { name: "Remo Polea HD", rmPercentage: "75", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "1 serie efectiva al 75% RM al fallo.", rest: 75 },
+                    { name: "Elevaciones Laterales HD", rmPercentage: "65 / 65", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2 series al 65%.", rest: 60 },
+                    { name: "Curl Bíceps", rmPercentage: "60", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 60% de la RM.", rest: 60 },
+                    { name: "Tríceps Polea", rmPercentage: "65", seriesCount: 1, sets: [{ reps: '10-15' }], dropSet: false, tip: "1 serie al 65% de la RM.", rest: 60 },
+                    { name: "Espaldera (Elevación de Piernas)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 2. Controla el balanceo.", rest: 60 },
+                    { name: "Ejercicios de Kegel", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "CORE bloque 2. Fluido, sin descanso real.", rest: 0 }
                 ]
             }
         };
@@ -977,6 +980,14 @@
             "Vacío Abdominal": {
                 short: "Soltar aire y meter ombligo hacia dentro. Mantener activación suave.",
                 full: "<b>Objetivo:</b> transverso (abdomen plano)<br><br><b>Ejecución:</b><br>• Soltar aire.<br>• Meter ombligo hacia dentro.<br>• Mantener.<br><br><b>Clave:</b> activación suave.<br><b>Error:</b> hacer fuerza hacia fuera."
+            },
+            "Gemelos": {
+                short: "Elevación de talones. Controlar la bajada y pausa arriba.",
+                full: "<b>Objetivo:</b> Gemelos (pantorrilla)<br><br><b>Ejecución:</b><br>• De pie o sentado según la máquina.<br>• Elevar los talones al máximo.<br>• Pausa de 1 segundo arriba apretando.<br>• Bajar controlado hasta estirar por completo.<br><br><b>Clave:</b> no rebotar, aprovechar el estiramiento.<br><b>Error:</b> movimiento rápido e incompleto."
+            },
+            "Ejercicios de Kegel": {
+                short: "Contracción de suelo pélvico. Fluido sin descanso.",
+                full: "<b>Objetivo:</b> Suelo pélvico y transverso profundo<br><br><b>Ejecución:</b><br>• Contraer como si cortaras el flujo de orina.<br>• Mantener 3-5 segundos.<br>• Relajar por completo.<br><br><b>Clave:</b> no contraer glúteo o piernas."
             }
         };
 
