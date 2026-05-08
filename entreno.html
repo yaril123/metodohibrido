@@ -621,6 +621,10 @@
             color: #a1a1aa;
             margin-bottom: 0.25rem;
         }
+        .active-phase {
+            background-color: #facc15;
+            color: #000;
+        }
     </style>
 </head>
 
@@ -649,6 +653,14 @@
                 </div>
             </div>
         </header>
+
+        <!-- Phase Selector -->
+        <div class="flex justify-center mb-6">
+            <div class="bg-zinc-800 p-1 rounded-full flex gap-1 shadow-inner border border-zinc-700">
+                <button id="phase-hipertrofia" class="px-6 py-2 rounded-full text-sm font-bold transition-all PhaseBtn active-phase text-black">HIPERTROFIA</button>
+                <button id="phase-afinamiento" class="px-6 py-2 rounded-full text-sm font-bold transition-all text-gray-400 hover:text-white PhaseBtn">AFINAMIENTO</button>
+            </div>
+        </div>
 
         <div id="tabs" class="grid grid-cols-7 gap-2 mb-8"></div>
         <main id="workout-content"></main>
@@ -859,7 +871,7 @@
         const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
 
         // --- Configuration ---
-        const workouts = {
+        const hipertrofiaWorkouts = {
             hd_push: {
                 title: "HEAVY DUTY — PUSH", type: 'hd', exercises: [
                     // Añadimos restPause: true para activar la columna RP
@@ -870,6 +882,7 @@
                     { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, isometric: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s↓ / 2s↑.</strong> Al fallar, mantén <strong>ISOMÉTRICO</strong> 10-15s hasta que arda.", rest: 180 },
                     { name: "Patada de glúteo en polea", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejecución: Torso ligeramente inclinado. Rodilla ligeramente flexionada. Empuja el talón hacia atrás sin arquear la zona lumbar. Aprieta el glúteo 1-2 s arriba. Objetivo: descargar cadena posterior.", rest: 120 },
                     { name: "Gemelos", rmPercentage: "70", seriesCount: 2, sets: [{ reps: '12-20' }, { reps: '12-20' }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
+
                 ]
             },
             rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2. Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -880,6 +893,7 @@
                     { name: "Pájaros (reverse fly)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, allSetsEffective: true, tip: "<strong class='text-yellow-400'>AL FALLO.</strong> Cadencia lenta. 3s↓ / 1s↑ / 1s pausa.", rest: 180 },
                     { name: "Curl de Bíceps Mentzer", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '6-10' }, { reps: '6-10' }, { reps: '6-10' }], dropSet: false, restPause: true, tip: "<strong class='text-yellow-400'>Cadencia: 4s bajada.</strong> Barra recta pref. Cuerpo estricto. <strong>REST PAUSE</strong> al fallo.", rest: 180 },
                     { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 12 }, { reps: 12 }], dropSet: false, tip: "<strong class='text-yellow-400'>Ejercicio correctivo.</strong> Mucho cuidado con la técnica, pulgares siempre señalando hacia atrás y llegando con las manos por detrás de la cabeza.", rest: 180 },
+
                 ]
             },
             rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -891,6 +905,7 @@
                     { name: "Cruces en Polea Alta (Pecho)", rmPercentage: "60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "Ejercicio de detalle. Cruza las manos abajo para apretar el pecho. Mantén la contracción 1 segundo.", rest: 120 },
                     { name: "Sentadilla adelantada en barra guiada", rmPercentage: "70", seriesCount: 3, sets: [{ reps: 10 }, { reps: 10 }, { reps: 10 }], dropSet: false, tip: "Pies 15-25 cm adelantados respecto a la barra. Tibias casi verticales. Baja 3 segundos sin sobrepasar donde la pelvis se mete. Empuja el suelo con todo el pie.", rest: 180 },
                     { name: "Gemelos en barra guiada", rmPercentage: "70", seriesCount: 2, sets: [{ reps: 15 }, { reps: 15 }], dropSet: false, tip: "Sube muy arriba. Pausa 2 segundos arriba. Baja lento (3 segundos).", rest: 120 },
+
                 ]
             },
             rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", antiMigraineTip: "Sin sobrepasar las 130 pulsaciones para estar en la zona 'quemagrasa'.", rest: 0 }] },
@@ -900,9 +915,67 @@
                     { name: "Remo Bajo en Polea (Agarre Neutro)", rmPercentage: "70", seriesCount: 3, sets: [{ reps: '8-12' }, { reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "Codos hacia la cadera.", rest: 180 },
                     { name: "Remo Inclinado con Mancuernas (Apoyo banco)", rmPercentage: "65", seriesCount: 3, sets: [{ reps: '10-12' }, { reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "Apoya pecho en banco a 30º.", rest: 180 },
                     { name: "Curl con Barra Z", rmPercentage: "60", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "Bombeo puro. Descansos cortos (45s). Que fluya la sangre.", rest: 45 },
+
                 ]
             }
         };
+
+        const afinamientoWorkouts = {
+            hd_push: {
+                title: "AFINAMIENTO — HD PUSH", type: 'hd', exercises: [
+                    { name: "Press de Banca Plano con Barra", rmPercentage: "50 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-9' }], dropSet: false, tip: "1 warm up + 1 <strong class='text-yellow-400'>ALL OUT</strong>.", rest: 180 },
+                    { name: "Fondos", rmPercentage: "Lastr", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-9' }], dropSet: false, tip: "1 warm up + 1 <strong class='text-yellow-400'>ALL OUT</strong>.", rest: 180 },
+                    { name: "Landmine", rmPercentage: "75", seriesCount: 1, sets: [{ reps: '8-12' }], dropSet: false, tip: "1 serie fuerte al fallo.", rest: 180 },
+                    { name: "Elevaciones Laterales en Polea", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "1-2 series ligeras opcionales.", rest: 90 },
+                    { name: "Dead Bug", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '8/lado' }, { reps: '8/lado' }], dropSet: false, tip: "Lumbar pegada al suelo. Extiende lento.", rest: 60 },
+                    { name: "Plancha Lateral", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '20-30s/l' }, { reps: '20-30s/l' }], dropSet: false, tip: "Cuerpo recto, pelvis alineada, cuello neutro.", rest: 60 },
+                ]
+            },
+            rest1: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            hd_pull: {
+                title: "AFINAMIENTO — HD PULL", type: 'hd', exercises: [
+                    { name: "Jalón en Polea al Pecho (Agarre Neutro)", rmPercentage: "50 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 warm up + 1 <strong class='text-yellow-400'>ALL OUT</strong>.", rest: 180 },
+                    { name: "Remo en Barra T", rmPercentage: "50 / 85", seriesCount: 2, sets: [{ reps: 10 }, { reps: '6-10' }], dropSet: false, tip: "1 warm up + 1 <strong class='text-yellow-400'>ALL OUT</strong>.", rest: 180 },
+                    { name: "Curl de Bíceps Mentzer", rmPercentage: "85", seriesCount: 1, sets: [{ reps: '6-10' }], dropSet: false, tip: "1 serie <strong class='text-yellow-400'>ALL OUT</strong>.", rest: 180 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: 15 }, { reps: 15 }], dropSet: false, tip: "1-2 series ligeras opcionales.", rest: 90 },
+                    { name: "Pallof Press", rmPercentage: "-", seriesCount: 2, sets: [{ reps: 12 }, { reps: 12 }], dropSet: false, tip: "Polea al pecho, empujas al frente. Resistes rotación. Abdomen firme.", rest: 60 },
+                    { name: "Hollow Hold Suave", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '20-30s' }, { reps: '20-30s' }], dropSet: false, tip: "Lumbar totalmente pegada. Objetivo: CONTROL. No temblar como loco.", rest: 60 },
+                    { name: "Respiración 360º", rmPercentage: "-", seriesCount: 1, sets: [{ reps: '3 min' }], dropSet: false, tip: "Tumbado, manos en costillas. Inhalar expandiendo abdomen y costillas, exhalar lento vaciando abdomen.", rest: 0 },
+                ]
+            },
+            rest2: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            bilbo_push: {
+                title: "AFINAMIENTO — BILBO PUSH", type: 'bilbo', exercises: [
+                    { name: "Press Inclinado con Barra", rmPercentage: "30 / Bilbo / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "1 serie Bilbo + 1 back off moderado.", rest: 180 },
+                    { name: "Landmine", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "2 series buenas.", rest: 120 },
+                    { name: "Elevaciones Laterales en Polea", rmPercentage: "60 / 60 / 60", seriesCount: 3, sets: [{ reps: '10-15' }, { reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2-3 series lentas y controladas.", rest: 90 },
+                    { name: "Fondos", rmPercentage: "Lastr / Lastr", seriesCount: 2, sets: [{ reps: '>10' }, { reps: '>10' }], dropSet: false, tip: "2 series fuertes sin fallo absoluto siempre.", rest: 180 },
+                    { name: "Extensión de Tríceps en Polea con Cuerda", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '10-15' }, { reps: '10-15' }], dropSet: false, tip: "2 series efectivas.", rest: 120 },
+                    { name: "Dead Bug", rmPercentage: "-", seriesCount: 3, sets: [{ reps: '8/lado' }, { reps: '8/lado' }, { reps: '8/lado' }], dropSet: false, tip: "Lumbar pegada al suelo. Extiende lento.", rest: 60 },
+                    { name: "Hollow Hold Suave", rmPercentage: "-", seriesCount: 3, sets: [{ reps: '20-30s' }, { reps: '20-30s' }, { reps: '20-30s' }], dropSet: false, tip: "Lumbar totalmente pegada. Objetivo: CONTROL.", rest: 60 },
+                    { name: "Plancha Corta de Calidad", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '30-40s' }, { reps: '30-40s' }], dropSet: false, tip: "Glúteos apretados, abdomen dentro. NO sacar culo ni hundir lumbar.", rest: 60 },
+                ]
+            },
+            rest3: { title: "CARDIO", type: 'rest', exercises: [{ name: "Cardio Z2", tip: "Caminata larga o cardio en Z2.", rest: 0 }] },
+            bilbo_pull: {
+                title: "AFINAMIENTO — BILBO PULL", type: 'bilbo', exercises: [
+                    { name: "Jalón en Polea al Pecho (Agarre Neutro)", rmPercentage: "30 / Bilbo / 70", seriesCount: 3, sets: [{ reps: 15 }, { reps: 'Bilbo' }, { reps: '10-12' }], dropSet: false, tip: "1 serie Bilbo + 1 back off moderado.", rest: 180 },
+                    { name: "Remo en Barra T", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "2 series buenas controladas.", rest: 180 },
+                    { name: "Pájaros (reverse fly)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: '12-15' }, { reps: '12-15' }], dropSet: false, tip: "2 series tensión continua.", rest: 120 },
+                    { name: "Curl de Bíceps Mentzer", rmPercentage: "70 / 70", seriesCount: 2, sets: [{ reps: '8-12' }, { reps: '8-12' }], dropSet: false, tip: "2 series estrictas.", rest: 120 },
+                    { name: "Face Pull (polea a cara)", rmPercentage: "60 / 60", seriesCount: 2, sets: [{ reps: '15-20' }, { reps: '15-20' }], dropSet: false, tip: "2 series ligeras posturales.", rest: 90 },
+                    { name: "Pallof Press", rmPercentage: "-", seriesCount: 3, sets: [{ reps: '12/lado' }, { reps: '12/lado' }, { reps: '12/lado' }], dropSet: false, tip: "Polea al pecho, empujas al frente. Resistes rotación. Abdomen firme.", rest: 60 },
+                    { name: "Bird Dog", rmPercentage: "-", seriesCount: 3, sets: [{ reps: '8/lado' }, { reps: '8/lado' }, { reps: '8/lado' }], dropSet: false, tip: "Cuadrupedia, extiende brazo y pierna contraria lento. Pelvis quieta. NO levantar demasiado la pierna.", rest: 60 },
+                    { name: "Elevación de Rodillas (espaldera)", rmPercentage: "-", seriesCount: 2, sets: [{ reps: '10-12' }, { reps: '10-12' }], dropSet: false, tip: "Pelvis hacia dentro. Bajar MUY lento. ❌ NO balanceo.", rest: 60 },
+                ]
+            }
+        };
+        const allWorkouts = {
+            hipertrofia: hipertrofiaWorkouts,
+            afinamiento: afinamientoWorkouts
+        };
+
+        let workouts = allWorkouts['hipertrofia']; // Se actualizará al cargar
         const days = ['hd_push', 'rest1', 'hd_pull', 'rest2', 'bilbo_push', 'rest3', 'bilbo_pull'];
         const dayNames = { hd_push: 'HD PUSH', rest1: 'CARDIO', hd_pull: 'HD PULL', rest2: 'CARDIO', bilbo_push: 'BILBO PUSH', rest3: 'CARDIO', bilbo_pull: 'BILBO PULL' };
 
@@ -1065,6 +1138,28 @@
 
         // Función de inicialización principal que se llama cuando los datos están listos
         function coreAppInit() {
+            // Determinar fase actual
+            let phase = localStorage.getItem('trainingPhase') || 'hipertrofia';
+            if (!allWorkouts[phase]) phase = 'hipertrofia';
+            workouts = allWorkouts[phase];
+
+            // Actualizar botones UI
+            const btnHipertrofia = document.getElementById('phase-hipertrofia');
+            const btnAfinamiento = document.getElementById('phase-afinamiento');
+            if(btnHipertrofia && btnAfinamiento) {
+                if (phase === 'hipertrofia') {
+                    btnHipertrofia.classList.add('active-phase', 'text-black');
+                    btnHipertrofia.classList.remove('text-gray-400', 'hover:text-white');
+                    btnAfinamiento.classList.remove('active-phase', 'text-black');
+                    btnAfinamiento.classList.add('text-gray-400', 'hover:text-white');
+                } else {
+                    btnAfinamiento.classList.add('active-phase', 'text-black');
+                    btnAfinamiento.classList.remove('text-gray-400', 'hover:text-white');
+                    btnHipertrofia.classList.remove('active-phase', 'text-black');
+                    btnHipertrofia.classList.add('text-gray-400', 'hover:text-white');
+                }
+            }
+
             // Limpieza previa (por si se llama dos veces)
             DOM.tabsContainer.innerHTML = '';
             DOM.contentContainer.innerHTML = '';
@@ -2355,6 +2450,22 @@
             DOM.deleteHistoryBtn = document.getElementById('delete-history-btn');
 
             DOM.compactModeToggle = document.getElementById('compact-mode-toggle');
+
+            DOM.phaseHipertrofiaBtn = document.getElementById('phase-hipertrofia');
+            DOM.phaseAfinamientoBtn = document.getElementById('phase-afinamiento');
+
+            if (DOM.phaseHipertrofiaBtn) {
+                DOM.phaseHipertrofiaBtn.addEventListener('click', () => {
+                    localStorage.setItem('trainingPhase', 'hipertrofia');
+                    coreAppInit();
+                });
+            }
+            if (DOM.phaseAfinamientoBtn) {
+                DOM.phaseAfinamientoBtn.addEventListener('click', () => {
+                    localStorage.setItem('trainingPhase', 'afinamiento');
+                    coreAppInit();
+                });
+            }
 
             // Rest Overlay
             DOM.restOverlay = document.getElementById('rest-overlay');
