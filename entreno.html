@@ -1779,8 +1779,12 @@
                         if (isBilboDay && exerciseData.sets.length > 0) {
                             const mainExercises = [
                                 "Press de banca plano (barra)",
+                                "Press de Banca Plano con Barra",
+                                "Press Inclinado con Barra",
                                 "Jalón en polea agarre neutro",
-                                "Jalón al pecho agarre estrecho"
+                                "Jalón en Polea al Pecho (Agarre Neutro)",
+                                "Jalón al pecho agarre estrecho",
+                                "Jalón al Pecho (Agarre Estrecho)"
                             ];
 
                             const exerciseName = exerciseData.name;
@@ -1962,23 +1966,23 @@
                 // --- FIND LAST LOG (w/ Legacy Support) ---
                 let lastSessionData = null;
                 const legacyMapping = {
-                    "Press Inclinado con Barra": ["Press inclinado con barra", "Press Inclinado", "Press inclinado", "Press Inclinado (barra)"],
+                    "Press Inclinado con Barra": ["Press inclinado con barra", "Press Inclinado", "Press inclinado", "Press Inclinado (barra)", "Press de Banca Plano con Barra", "Press de banca plano (barra)"],
                     "Landmine": ["Landmine Diagonal de Pie (Hombro–Techo)", "Landmine Rodilla al Suelo (Cintura–Cabeza)"], // Array support check?
                     "Elevaciones Laterales en Polea": ["Elevaciones laterales con gomas", "Elevaciones laterales sentado"],
                     "Extensión de Tríceps en Polea con Cuerda": "Extensión de tríceps en polea con cuerda",
 
-                    "Jalón en Polea al Pecho (Agarre Neutro)": "Jalón en polea agarre neutro",
-                    "Remo en Barra T": "Remo con barra T",
+                    "Jalón en Polea al Pecho (Agarre Neutro)": ["Jalón en polea agarre neutro", "Jalón al Pecho (Agarre Estrecho)", "Jalón al pecho agarre estrecho"],
+                    "Remo en Barra T": ["Remo con barra T", "Remo Bajo en Polea (Agarre Neutro)", "Remo bajo con polea (agarre neutro)"],
                     "Pájaros (reverse fly)": ["Pájaros (reverse fly)", "Face Pull"], // Map back to Face Pull if Pajaros missing? No, user separated. Keep simple.
                     "Face Pull (polea a cara)": ["Face Pull (polea a cara)", "Face Pull"],
                     "Curl de Bíceps Mentzer": ["Curl de bíceps Mentzer (polea baja)", "Curl de Bíceps Mentzer"],
 
-                    "Press de Banca Plano con Barra": "Press de banca plano (barra)",
+                    "Press de Banca Plano con Barra": ["Press de banca plano (barra)", "Press Inclinado con Barra", "Press inclinado con barra", "Press Inclinado", "Press inclinado", "Press Inclinado (barra)"],
                     "Fondos": ["Fondos agarre neutro (cerrado)", "Fondos", "FONDOS"],
                     "Cruces en Polea Alta (Pecho)": ["Cruces con goma pecho", "Cruces con goma (pecho)", "Cruce con goma", "Cruces con gomas pecho", "Cruces en polea alta", "Cruces en Polea Alta", "Cruce"],
 
-                    "Jalón al Pecho (Agarre Estrecho)": "Jalón al pecho agarre estrecho",
-                    "Remo Bajo en Polea (Agarre Neutro)": "Remo bajo con polea (agarre neutro)",
+                    "Jalón al Pecho (Agarre Estrecho)": ["Jalón al pecho agarre estrecho", "Jalón en Polea al Pecho (Agarre Neutro)", "Jalón en polea agarre neutro"],
+                    "Remo Bajo en Polea (Agarre Neutro)": ["Remo bajo con polea (agarre neutro)", "Remo en Barra T", "Remo con barra T"],
                     "Remo Inclinado con Mancuernas (Apoyo banco)": ["Remo Inclinado 30º, Mancuernas, Neutro", "Remo Inclinado con Mancuernas"],
                     "Curl con Barra Z": "Curl en barra Z"
                 };
@@ -2100,7 +2104,7 @@
 
                     if (day.includes('hd')) {
                         // REGLAS HEAVY DUTY
-                        const rule2KgGroup = ["Press Inclinado con Barra", "Jalón en Polea al Pecho (Agarre Neutro)", "Curl de Bíceps Mentzer"];
+                        const rule2KgGroup = ["Press Inclinado con Barra", "Press de Banca Plano con Barra", "Jalón en Polea al Pecho (Agarre Neutro)", "Jalón al Pecho (Agarre Estrecho)", "Curl de Bíceps Mentzer"];
                         let suggestedEffectiveWeight = lastWeight;
 
                         if (rule2KgGroup.includes(exerciseName)) {
