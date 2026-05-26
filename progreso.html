@@ -276,6 +276,31 @@
             color: #ffffff;
             flex-shrink: 0;
         }
+
+        /* Horizontal Scrollbar for Charts */
+        .custom-scrollbar-horizontal {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #27272A #0D0D0D;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .custom-scrollbar-horizontal::-webkit-scrollbar {
+            height: 6px;
+        }
+        
+        .custom-scrollbar-horizontal::-webkit-scrollbar-track {
+            background: #0D0D0D;
+        }
+        
+        .custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+            background: #27272A;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+            background: #3F3F46;
+        }
     </style>
 </head>
 
@@ -315,27 +340,35 @@
                 <!-- Gráficos HD -->
                 <div class="exercise-card">
                     <h3 class="text-xl font-bold text-gray-300 mb-4">Progresión HD Push (Press Inclinado)</h3>
-                    <div style="height: 300px;">
-                        <canvas id="hdPushChartCanvas"></canvas>
+                    <div class="custom-scrollbar-horizontal w-full">
+                        <div style="height: 300px; min-width: 650px;">
+                            <canvas id="hdPushChartCanvas"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="exercise-card">
                     <h3 class="text-xl font-bold text-gray-300 mb-4">Progresión HD Pull (Jalón Neutro)</h3>
-                    <div style="height: 300px;">
-                        <canvas id="hdPullChartCanvas"></canvas>
+                    <div class="custom-scrollbar-horizontal w-full">
+                        <div style="height: 300px; min-width: 650px;">
+                            <canvas id="hdPullChartCanvas"></canvas>
+                        </div>
                     </div>
                 </div>
                 <!-- Gráficos Bilbo -->
                 <div class="exercise-card">
                     <h3 class="text-xl font-bold text-yellow-400 mb-4">Progresión Bilbo Push (Press de Banca)</h3>
-                    <div style="height: 300px;">
-                        <canvas id="bilboPushChartCanvas"></canvas>
+                    <div class="custom-scrollbar-horizontal w-full">
+                        <div style="height: 300px; min-width: 650px;">
+                            <canvas id="bilboPushChartCanvas"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="exercise-card">
                     <h3 class="text-xl font-bold text-yellow-400 mb-4">Progresión Bilbo Pull (Jalón al Pecho)</h3>
-                    <div style="height: 300px;">
-                        <canvas id="bilboPullChartCanvas"></canvas>
+                    <div class="custom-scrollbar-horizontal w-full">
+                        <div style="height: 300px; min-width: 650px;">
+                            <canvas id="bilboPullChartCanvas"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -934,16 +967,22 @@
             const hdPushData = [];
             const hdPullData = [];
 
-            const bilboPushExercise = "Press de Banca Plano con Barra";
-            const bilboPullExercise = "Jalón al Pecho (Agarre Estrecho)";
-            const hdPushExercise = "Press Inclinado con Barra";
-            const hdPullExercise = "Jalón en Polea al Pecho (Agarre Neutro)";
-
             sortedEntries.forEach(log => {
                 if (!log.exercises) return;
 
-                if (log.workoutTitle.includes("BILBO — PUSH")) {
-                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPushExercise);
+                const titleUpper = (log.workoutTitle || "").toUpperCase();
+                const typeUpper = (log.workoutType || "").toUpperCase();
+
+                const isPush = titleUpper.includes("PUSH");
+                const isPull = titleUpper.includes("PULL");
+                const isBilbo = typeUpper === "BILBO" || titleUpper.includes("BILBO");
+                const isHD = typeUpper === "HD" || titleUpper.includes("HD") || titleUpper.includes("HEAVY DUTY");
+
+                if (isBilbo && isPush) {
+                    const exercise = log.exercises.find(ex => {
+                        const norm = normalizeExerciseName(ex.name);
+                        return norm === "Press de Banca Plano con Barra" || norm === "Press Inclinado con Barra";
+                    });
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         let series = exercise.series[0];
                         exercise.series.forEach(s => {
@@ -959,8 +998,11 @@
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("BILBO — PULL")) {
-                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === bilboPullExercise);
+                } else if (isBilbo && isPull) {
+                    const exercise = log.exercises.find(ex => {
+                        const norm = normalizeExerciseName(ex.name);
+                        return norm === "Jalón al Pecho (Agarre Estrecho)" || norm === "Jalón en Polea al Pecho (Agarre Neutro)";
+                    });
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         let series = exercise.series[0];
                         exercise.series.forEach(s => {
@@ -976,8 +1018,11 @@
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("HEAVY DUTY — PUSH")) {
-                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === hdPushExercise);
+                } else if (isHD && isPush) {
+                    const exercise = log.exercises.find(ex => {
+                        const norm = normalizeExerciseName(ex.name);
+                        return norm === "Press Inclinado con Barra" || norm === "Press de Banca Plano con Barra";
+                    });
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
@@ -988,8 +1033,11 @@
                             });
                         }
                     }
-                } else if (log.workoutTitle.includes("HEAVY DUTY — PULL")) {
-                    const exercise = log.exercises.find(ex => normalizeExerciseName(ex.name) === hdPullExercise);
+                } else if (isHD && isPull) {
+                    const exercise = log.exercises.find(ex => {
+                        const norm = normalizeExerciseName(ex.name);
+                        return norm === "Jalón en Polea al Pecho (Agarre Neutro)";
+                    });
                     if (exercise && exercise.series && exercise.series.length > 0) {
                         const lastSeries = exercise.series[exercise.series.length - 1];
                         if (lastSeries.weight && lastSeries.reps) {
@@ -1003,9 +1051,9 @@
                 }
             });
 
-            bilboPushChart = createProgressionChart('bilboPushChartCanvas', bilboPushChart, 'Progresión Bilbo Push (Press de Banca)', bilboPushData);
-            bilboPullChart = createProgressionChart('bilboPullChartCanvas', bilboPullChart, 'Progresión Bilbo Pull (Jalón al Pecho)', bilboPullData);
-            hdPushChart = createProgressionChart('hdPushChartCanvas', hdPushChart, 'Progresión HD Push (Press Inclinado)', hdPushData);
+            bilboPushChart = createProgressionChart('bilboPushChartCanvas', bilboPushChart, 'Progresión Bilbo Push (Press de Banca / Inclinado)', bilboPushData);
+            bilboPullChart = createProgressionChart('bilboPullChartCanvas', bilboPullChart, 'Progresión Bilbo Pull (Jalón Estrecho / Neutro)', bilboPullData);
+            hdPushChart = createProgressionChart('hdPushChartCanvas', hdPushChart, 'Progresión HD Push (Press Inclinado / Banca)', hdPushData);
             hdPullChart = createProgressionChart('hdPullChartCanvas', hdPullChart, 'Progresión HD Pull (Jalón Neutro)', hdPullData);
         }
 
