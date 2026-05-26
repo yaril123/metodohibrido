@@ -158,6 +158,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Active Training Phase style mirroring entreno.html */
+        .active-phase {
+            background: linear-gradient(145deg, #dc2626, #991b1b) !important;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -3px 5px rgba(0,0,0,0.5), 0 0 15px rgba(220, 38, 38, 0.6) !important;
+            color: #ffffff !important;
+            border: 1px solid #f87171 !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            transform: scale(1.02);
+        }
     </style>
 </head>
 
@@ -191,6 +201,24 @@
                 </a>
             </div>
         </header>
+
+        <!-- Phase Switcher Bar -->
+        <div class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4 bg-zinc-900/40 border border-zinc-800 p-4 rounded-2xl backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <span class="p-2.5 bg-yellow-500/10 border border-yellow-500/25 text-yellow-400 rounded-xl">
+                    <i class="fa-solid fa-arrows-spin"></i>
+                </span>
+                <div>
+                    <span class="text-xs font-semibold text-zinc-400 uppercase tracking-widest block">Fase de Entrenamiento Activa</span>
+                    <span id="phase-goal-label" class="text-sm font-bold text-emerald-400">Cargando objetivo...</span>
+                </div>
+            </div>
+            
+            <div class="bg-zinc-900 p-1 rounded-full flex gap-1 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)] border border-zinc-700 items-center w-full sm:w-auto">
+                <button id="toggle-hipertrofia" class="flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn text-gray-400 hover:text-white tracking-wide uppercase">HIPERTROFIA</button>
+                <button id="toggle-afinamiento" class="flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn text-gray-400 hover:text-white tracking-wide uppercase">AFINAMIENTO</button>
+            </div>
+        </div>
 
         <!-- MAIN DASHBOARD LAYOUT -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -507,83 +535,165 @@
         let appData = {}; // Objeto centralizado
         const DATA_DOC_PATH = (uid) => `artifacts/${appId}/users/${uid}/entreno`;
 
-        // Macro Cycling Targets definition
-        const MACRO_TARGETS = {
-            descanso: {
-                name: "Descanso + pasos",
-                kcalMin: 1600,
-                kcalMax: 1750,
-                kcalMid: 1675,
-                proteinMin: 160,
-                proteinMax: 160,
-                proteinMid: 160,
-                carbsMin: 70,
-                carbsMax: 90,
-                carbsMid: 80,
-                fatsMin: 50,
-                fatsMax: 60,
-                fatsMid: 55,
-                borderClass: "border-blue-500/70",
-                activeClass: "active-day-rest"
+        // Macro Cycling Targets definition per phase (Afinamiento / Hipertrofia)
+        const PHASE_TARGETS = {
+            afinamiento: {
+                goalLabel: "Objetivo: Bajar entre 500g y 1000g a la semana",
+                goalClass: "text-emerald-400",
+                descanso: {
+                    name: "Descanso + pasos",
+                    kcalMin: 1600,
+                    kcalMax: 1750,
+                    kcalMid: 1675,
+                    proteinMin: 160,
+                    proteinMax: 160,
+                    proteinMid: 160,
+                    carbsMin: 70,
+                    carbsMax: 90,
+                    carbsMid: 80,
+                    fatsMin: 50,
+                    fatsMax: 60,
+                    fatsMid: 55,
+                    borderClass: "border-blue-500/70",
+                    activeClass: "active-day-rest"
+                },
+                heavy_duty: {
+                    name: "Heavy Duty",
+                    kcalMin: 1800,
+                    kcalMax: 1950,
+                    kcalMid: 1875,
+                    proteinMin: 165,
+                    proteinMax: 165,
+                    proteinMid: 165,
+                    carbsMin: 120,
+                    carbsMax: 140,
+                    carbsMid: 130,
+                    fatsMin: 50,
+                    fatsMax: 60,
+                    fatsMid: 55,
+                    borderClass: "border-zinc-500/70",
+                    activeClass: "active-day-hd"
+                },
+                bilbo: {
+                    name: "Bilbo",
+                    kcalMin: 2000,
+                    kcalMax: 2200,
+                    kcalMid: 2100,
+                    proteinMin: 165,
+                    proteinMax: 165,
+                    proteinMid: 165,
+                    carbsMin: 170,
+                    carbsMax: 210,
+                    carbsMid: 190,
+                    fatsMin: 45,
+                    fatsMax: 55,
+                    fatsMid: 50,
+                    borderClass: "border-yellow-500/70",
+                    activeClass: "active-day-bilbo"
+                },
+                bici: {
+                    name: "Bici Z2",
+                    kcalMin: 2150,
+                    kcalMax: 2400,
+                    kcalMid: 2275,
+                    proteinMin: 160,
+                    proteinMax: 170,
+                    proteinMid: 165,
+                    carbsMin: 220,
+                    carbsMax: 260,
+                    carbsMid: 240,
+                    fatsMin: 45,
+                    fatsMax: 55,
+                    fatsMid: 50,
+                    borderClass: "border-teal-500/70",
+                    activeClass: "active-day-bici"
+                }
             },
-            heavy_duty: {
-                name: "Heavy Duty",
-                kcalMin: 1800,
-                kcalMax: 1950,
-                kcalMid: 1875,
-                proteinMin: 165,
-                proteinMax: 165,
-                proteinMid: 165,
-                carbsMin: 120,
-                carbsMax: 140,
-                carbsMid: 130,
-                fatsMin: 50,
-                fatsMax: 60,
-                fatsMid: 55,
-                borderClass: "border-zinc-500/70",
-                activeClass: "active-day-hd"
-            },
-            bilbo: {
-                name: "Bilbo",
-                kcalMin: 2000,
-                kcalMax: 2200,
-                kcalMid: 2100,
-                proteinMin: 165,
-                proteinMax: 165,
-                proteinMid: 165,
-                carbsMin: 170,
-                carbsMax: 210,
-                carbsMid: 190,
-                fatsMin: 45,
-                fatsMax: 55,
-                fatsMid: 50,
-                borderClass: "border-yellow-500/70",
-                activeClass: "active-day-bilbo"
-            },
-            bici: {
-                name: "Bici Z2",
-                kcalMin: 2150,
-                kcalMax: 2400,
-                kcalMid: 2275,
-                proteinMin: 160,
-                proteinMax: 170,
-                proteinMid: 165,
-                carbsMin: 220,
-                carbsMax: 260,
-                carbsMid: 240,
-                fatsMin: 45,
-                fatsMax: 55,
-                fatsMid: 50,
-                borderClass: "border-teal-500/70",
-                activeClass: "active-day-bici"
+            hipertrofia: {
+                goalLabel: "Objetivo: Subir entre 100g y 250g a la semana",
+                goalClass: "text-yellow-400",
+                descanso: {
+                    name: "Descanso + 10k pasos",
+                    kcalMin: 2000,
+                    kcalMax: 2150,
+                    kcalMid: 2075,
+                    proteinMin: 155,
+                    proteinMax: 165,
+                    proteinMid: 160,
+                    carbsMin: 170,
+                    carbsMax: 210,
+                    carbsMid: 190,
+                    fatsMin: 60,
+                    fatsMax: 70,
+                    fatsMid: 65,
+                    borderClass: "border-blue-500/70",
+                    activeClass: "active-day-rest"
+                },
+                heavy_duty: {
+                    name: "Heavy Duty",
+                    kcalMin: 2200,
+                    kcalMax: 2350,
+                    kcalMid: 2275,
+                    proteinMin: 160,
+                    proteinMax: 170,
+                    proteinMid: 165,
+                    carbsMin: 220,
+                    carbsMax: 270,
+                    carbsMid: 245,
+                    fatsMin: 60,
+                    fatsMax: 70,
+                    fatsMid: 65,
+                    borderClass: "border-zinc-500/70",
+                    activeClass: "active-day-hd"
+                },
+                bilbo: {
+                    name: "Bilbo",
+                    kcalMin: 2300,
+                    kcalMax: 2500,
+                    kcalMid: 2400,
+                    proteinMin: 160,
+                    proteinMax: 170,
+                    proteinMid: 165,
+                    carbsMin: 260,
+                    carbsMax: 320,
+                    carbsMid: 290,
+                    fatsMin: 55,
+                    fatsMax: 70,
+                    fatsMid: 62.5,
+                    borderClass: "border-yellow-500/70",
+                    activeClass: "active-day-bilbo"
+                },
+                bici: {
+                    name: "Bici Z2",
+                    kcalMin: 2400,
+                    kcalMax: 2650,
+                    kcalMid: 2525,
+                    proteinMin: 160,
+                    proteinMax: 170,
+                    proteinMid: 165,
+                    carbsMin: 300,
+                    carbsMax: 370,
+                    carbsMid: 335,
+                    fatsMin: 55,
+                    fatsMax: 70,
+                    fatsMid: 62.5,
+                    borderClass: "border-teal-500/70",
+                    activeClass: "active-day-bici"
+                }
             }
         };
 
-        // UI Date State (Defaults to local today)
+        // UI Date & Phase State
         const state = {
             activeDate: new Date(), // Date object representing selected logging date
-            calendarDate: new Date() // Date object representing the month viewed in calendar
+            calendarDate: new Date(), // Date object representing the month viewed in calendar
+            phase: localStorage.getItem('trainingPhase') || 'afinamiento' // 'afinamiento' or 'hipertrofia'
         };
+
+        // Helper to get active macro targets based on phase
+        function getActiveTargets() {
+            return PHASE_TARGETS[state.phase] || PHASE_TARGETS.afinamiento;
+        }
 
         let nutritionChart = null; // ChartJS Instance
 
@@ -628,6 +738,11 @@
             calendarPrevMonthBtn: null,
             calendarNextMonthBtn: null,
             calendarDaysGrid: null,
+
+            // Phase Toggle
+            toggleAfinamientoBtn: null,
+            toggleHipertrofiaBtn: null,
+            phaseGoalLabel: null,
         };
 
         // Helper to format Date objects as YYYY-MM-DD local strings
@@ -680,9 +795,45 @@
 
         function initAppLogic() {
             setupEventListeners();
+            updatePhaseUI(); // Initialize active phase styles and labels
             loadActiveDayData();
             renderCalendar();
             renderChart();
+        }
+
+        function setPhase(phase) {
+            state.phase = phase;
+            localStorage.setItem('trainingPhase', phase);
+            updatePhaseUI();
+            
+            // Re-trigger calculations and renders
+            loadActiveDayData();
+            renderCalendar();
+            renderChart();
+        }
+
+        function updatePhaseUI() {
+            const targets = PHASE_TARGETS[state.phase];
+            if (DOM.phaseGoalLabel) {
+                DOM.phaseGoalLabel.textContent = targets.goalLabel;
+                DOM.phaseGoalLabel.className = `text-sm font-bold ${targets.goalClass}`;
+            }
+
+            if (state.phase === 'afinamiento') {
+                if (DOM.toggleAfinamientoBtn) {
+                    DOM.toggleAfinamientoBtn.className = "flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn active-phase text-white tracking-wide";
+                }
+                if (DOM.toggleHipertrofiaBtn) {
+                    DOM.toggleHipertrofiaBtn.className = "flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn text-gray-400 hover:text-white tracking-wide";
+                }
+            } else {
+                if (DOM.toggleAfinamientoBtn) {
+                    DOM.toggleAfinamientoBtn.className = "flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn text-gray-400 hover:text-white tracking-wide";
+                }
+                if (DOM.toggleHipertrofiaBtn) {
+                    DOM.toggleHipertrofiaBtn.className = "flex-grow sm:flex-grow-0 px-6 py-2 rounded-full text-sm font-bold transition-all duration-300 PhaseBtn active-phase text-white tracking-wide";
+                }
+            }
         }
 
         function loadActiveDayData() {
@@ -698,7 +849,7 @@
             // Reset Day Type selection UI
             DOM.dayTypeButtons.forEach(btn => {
                 const dayType = btn.dataset.daytype;
-                const config = MACRO_TARGETS[dayType];
+                const config = getActiveTargets()[dayType];
                 btn.className = btn.className
                     .replace(config.activeClass, '')
                     .replace('active-day-selected', '');
@@ -716,7 +867,7 @@
                 // Activate Day Type Button
                 const activeBtn = Array.from(DOM.dayTypeButtons).find(btn => btn.dataset.daytype === entry.dayType);
                 if (activeBtn) {
-                    const config = MACRO_TARGETS[entry.dayType];
+                    const config = getActiveTargets()[entry.dayType];
                     activeBtn.classList.remove('border-zinc-800', 'bg-zinc-950', 'text-zinc-400');
                     activeBtn.classList.add(config.activeClass, 'active-day-selected');
                 }
@@ -729,7 +880,7 @@
         }
 
         function showIdealMacros(dayType) {
-            const config = MACRO_TARGETS[dayType];
+            const config = getActiveTargets()[dayType];
             DOM.idealDayName.textContent = config.name;
             DOM.idealKcal.textContent = `${config.kcalMin}-${config.kcalMax}`;
             DOM.idealProt.textContent = `${config.proteinMin}g`;
@@ -743,7 +894,7 @@
         }
 
         function calculateBalances(dayType) {
-            const config = MACRO_TARGETS[dayType];
+            const config = getActiveTargets()[dayType];
 
             const actKcal = parseFloat(DOM.inputKcal.value);
             const actProt = parseFloat(DOM.inputProt.value);
@@ -946,7 +1097,7 @@
                 let statsHTML = '';
 
                 if (log) {
-                    const config = MACRO_TARGETS[log.dayType];
+                    const config = getActiveTargets()[log.dayType];
                     if (config) {
                         if (log.dayType === 'descanso') {
                             borderTheme = "border-blue-900/80 bg-blue-950/10 hover:border-blue-500";
@@ -1030,7 +1181,7 @@
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const log = history[dateStr];
                 if (log && log.dayType) {
-                    const config = MACRO_TARGETS[log.dayType];
+                    const config = getActiveTargets()[log.dayType];
                     if (config) {
                         const actKcal = log.actualKcal !== null ? log.actualKcal : 0;
                         const diffKcal = actKcal - config.kcalMid; // actual - target midpoint (deficit is negative, surplus is positive)
@@ -1178,6 +1329,18 @@
 
         // --- COMPONENT EVENT LISTENERS ---
         function setupEventListeners() {
+            // Phase Toggle Buttons
+            if (DOM.toggleAfinamientoBtn) {
+                DOM.toggleAfinamientoBtn.addEventListener('click', () => {
+                    setPhase('afinamiento');
+                });
+            }
+            if (DOM.toggleHipertrofiaBtn) {
+                DOM.toggleHipertrofiaBtn.addEventListener('click', () => {
+                    setPhase('hipertrofia');
+                });
+            }
+
             // Day selection arrows
             DOM.prevDayBtn.addEventListener('click', () => {
                 state.activeDate.setDate(state.activeDate.getDate() - 1);
@@ -1206,14 +1369,14 @@
 
                     DOM.dayTypeButtons.forEach(b => {
                         const dt = b.dataset.daytype;
-                        const c = MACRO_TARGETS[dt];
+                        const c = getActiveTargets()[dt];
                         b.className = b.className
                             .replace(c.activeClass, '')
                             .replace('active-day-selected', '');
                         b.classList.add('border-zinc-800', 'bg-zinc-950', 'text-zinc-400');
                     });
 
-                    const config = MACRO_TARGETS[dayType];
+                    const config = getActiveTargets()[dayType];
                     currentActive.classList.remove('border-zinc-800', 'bg-zinc-950', 'text-zinc-400');
                     currentActive.classList.add(config.activeClass, 'active-day-selected');
 
@@ -1392,6 +1555,10 @@
             DOM.calendarPrevMonthBtn = document.getElementById('calendar-prev-month');
             DOM.calendarNextMonthBtn = document.getElementById('calendar-next-month');
             DOM.calendarDaysGrid = document.getElementById('calendar-days-grid');
+
+            DOM.toggleAfinamientoBtn = document.getElementById('toggle-afinamiento');
+            DOM.toggleHipertrofiaBtn = document.getElementById('toggle-hipertrofia');
+            DOM.phaseGoalLabel = document.getElementById('phase-goal-label');
 
             isDomReady = true;
             tryLaunchApp();
